@@ -1,32 +1,71 @@
-# Prerequisites
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# Windows shortcuts
+*.lnk
+
+# build files
+*.o
 *.d
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
+#binaries
 *.so
-*.dylib
-*.dll
 
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
+#libs
 *.a
-*.lib
 
-# Executables
-*.exe
-*.out
-*.app
+#model files
+*.mdl
+
+#files created by build
+*.apk
+*.ap_
+*.class
+drbeef-release-key.keystore
+projects/Android/build/*
+projects/Android/jni/SupportLibs/*
+Projects/Android/.externalNativeBuild/ndkBuild/debug/arm64-v8a/android_gradle_build.json
+*.json
+Projects/Android/.externalNativeBuild/ndkBuild/debug/arm64-v8a/ndkBuild_build_command.txt
+Projects/Android/.externalNativeBuild/ndkBuild/debug/arm64-v8a/ndkBuild_build_output.txt
+Projects/Android/.externalNativeBuild/ndkBuild/release/arm64-v8a/ndkBuild_build_command.txt
+Projects/Android/.externalNativeBuild/ndkBuild/release/armeabi-v7a/ndkBuild_build_output.txt
+*.bin
+Projects/Android/.gradle/4.4/fileHashes/fileHashes.lock
+*.ser
+Projects/Android/.idea/codeStyles/Project.xml
+Projects/Android/.externalNativeBuild/ndkBuild/debug/armeabi-v7a/ndkBuild_build_command.txt
+Projects/Android/.externalNativeBuild/ndkBuild/release/armeabi-v7a/ndkBuild_build_command.txt
+Projects/Android/.externalNativeBuild/ndkBuild/debug/armeabi-v7a/ndkBuild_build_output.txt
+Projects/Android/.externalNativeBuild/ndkBuild/release/arm64-v8a/ndkBuild_build_output.txt
+Projects/Android/.idea/libraries/Gradle__android_android_21.xml
+Projects/Android/.idea/gradle.xml
+Projects/Android/.idea/modules.xml
+Projects/Android/.idea/misc.xml
+Projects/Android/.idea/workspace.xml
+Projects/Android/jni/src/gl4es/spec/xml/glxext.xml
+Projects/Android/jni/src/gl4es/spec/xml/wgl.xml
+Projects/Android/jni/src/gl4es/spec/xml/egl.xml
+Projects/Android/jni/src/gl4es/spec/xml/opengl.xml
+Projects/Android/jni/src/gl4es/spec/xml/gles-2.0.xml
+Projects/Android/.idea/vcs.xml
+Projects/Android/jni/src/gl4es/spec/xml/glx.xml
+Projects/Android/.idea/runConfigurations.xml
+Projects/Android/.gradle/4.6/fileHashes/fileHashes.lock
+Projects/Android/Android.iml
+Projects/Android/.gradle/vcsWorkingDirs/gc.properties
+Projects/Android/.idea/libraries/Gradle__com_android_support_support_annotations_24_2_0_jar.xml
+Projects/Android/.idea/libraries/Gradle__com_android_support_support_compat_24_2_0_aar.xml
+Projects/Android/.idea/encodings.xml
+Projects/Android/.idea/libraries/Gradle__com_android_support_support_core_utils_24_2_0_aar.xml
+Projects/Android/.idea/libraries/Gradle__android_android_24.xml
+Projects/Android/.idea/libraries/Gradle__com_android_support_support_compat_24_2_0.xml
+Projects/Android/.idea/libraries/Gradle__com_android_support_support_core_utils_24_2_0.xml
+Projects/Android/Android.iml
