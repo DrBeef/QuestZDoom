@@ -473,7 +473,7 @@ void GLSceneDrawer::RenderTranslucent()
 //
 //-----------------------------------------------------------------------------
 
-void GLSceneDrawer::DrawScene(int drawmode)
+void GLSceneDrawer::DrawScene(int drawmode, sector_t * viewsector)
 {
 	static int recursion=0;
 	static int ssao_portals_available = 0;
@@ -761,7 +761,7 @@ void GLSceneDrawer::DrawEndScene2D(sector_t * viewsector)
 //
 //-----------------------------------------------------------------------------
 
-void GLSceneDrawer::ProcessScene(bool toscreen)
+void GLSceneDrawer::ProcessScene(bool toscreen, sector_t * viewsector)
 {
 	FDrawInfo::StartDrawInfo(this);
 	iter_dlightf = iter_dlight = draw_dlight = draw_dlightf = 0;
@@ -770,7 +770,7 @@ void GLSceneDrawer::ProcessScene(bool toscreen)
 	int mapsection = R_PointInSubsector(r_viewpoint.Pos)->mapsection;
 	memset(&currentmapsection[0], 0, currentmapsection.Size());
 	currentmapsection[mapsection>>3] |= 1 << (mapsection & 7);
-	DrawScene(toscreen ? DM_MAINVIEW : DM_OFFSCREEN);
+	DrawScene(toscreen ? DM_MAINVIEW : DM_OFFSCREEN, viewsector);
 	FDrawInfo::EndDrawInfo();
 
 }
@@ -897,7 +897,7 @@ sector_t * GLSceneDrawer::RenderViewpoint (AActor * camera, GL_IRECT * bounds, f
 		SetViewMatrix(r_viewpoint.Pos.X, r_viewpoint.Pos.Y, r_viewpoint.Pos.Z, false, false);
 		gl_RenderState.ApplyMatrices();
 
-		ProcessScene(toscreen);
+		ProcessScene(toscreen, lviewsector);
 		if (mainview)
 		{
 			if (FGLRenderBuffers::IsEnabled()) PostProcess.Clock();

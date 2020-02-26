@@ -912,7 +912,7 @@ void RenderFrame( ovrRenderer * renderer, const ovrJava * java,
         //Qcommon_BeginFrame (time * 1000);
 
 		// Render the eye images.
-        for (int eye = 0; eye < renderer->NumBuffers && isHostAlive(); eye++) {
+        for (int eye = 0; eye < renderer->NumBuffers; eye++) {
             ovrFramebuffer *frameBuffer = &(renderer->FrameBuffer[eye]);
             ovrFramebuffer_SetCurrent(frameBuffer);
 
@@ -1566,13 +1566,6 @@ void * AppThreadFunction( void * parm )
 		}
 
         if (runStatus == -1) {
-#ifndef NDEBUG
-            if (appState.FrameIndex > 10800)
-            {
-                //Trigger shutdown after a couple of minutes in debug mode
-                //runStatus = 0;
-            }
-#endif
 
 			// Get the HMD pose, predicted for the middle of the time period during which
 			// the new eye images will be displayed. The number of frames predicted ahead

@@ -3,7 +3,7 @@ LOCAL_PATH := $(call my-dir)/../src
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE    := lzdoom
+LOCAL_MODULE    := qzdoom
 
 LOCAL_CFLAGS   :=  -D__MOBILE__ -DNO_PIX_BUFF  -DOPNMIDI_DISABLE_GX_EMULATOR -DGZDOOM  -DLZDOOM -DUSE_GL_HW_BUFFERS  -DNO_VBO -D__STDINT_LIMITS -DENGINE_NAME=\"lzdoom\"
 
@@ -577,10 +577,21 @@ PCH_SOURCES = \
 	atterm.cpp \
 	GuillotineBinPack.cpp \
 	SkylineBinPack.cpp \
+	
+
+QZDOOM_SRC = \
+   ../../QzDoom/QzDoom_SurfaceView.c \
+   ../../QzDoom/VrCompositor.c \
+   ../../QzDoom/VrInputCommon.c \
+   ../../QzDoom/VrInputDefault.c \
+   ../../QzDoom/mathlib.c \
+   ../../QzDoom/matrixlib.c \
+   ../../QzDoom/argtable3.c
 
 
 LOCAL_SRC_FILES = \
     __autostart.cpp \
+    $(QZDOOM_SRC) \
     $(ANDROID_SRC_FILES) \
     $(PLAT_POSIX_SOURCES) \
     $(PLAT_SDL_SOURCES) \
@@ -607,14 +618,7 @@ LOCAL_SRC_FILES = \
 	math/tan.c \
 	math/tanh.c \
 	math/fastsin.cpp \
-	zzautozend.cpp \
-   ../../QzDoom/QzDoom_SurfaceView.c \
-   ../../QzDoom/VrCompositor.c \
-   ../../QzDoom/VrInputCommon.c \
-   ../../QzDoom/VrInputDefault.c \
-   ../../QzDoom/mathlib.c \
-   ../../QzDoom/matrixlib.c \
-   ../../QzDoom/argtable3.c
+	zzautozend.cpp
 
 
 # Turn down optimisation of this file so clang doesnt produce ldrd instructions which are missaligned

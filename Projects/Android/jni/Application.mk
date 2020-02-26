@@ -19,7 +19,7 @@ APP_ALLOW_MISSING_DEPS=true
 
 APP_SHORT_COMMANDS :=true
 
-APP_MODULES := gl4es lzdoom 
+APP_MODULES := gl4es qzdoom 
 APP_STL := c++_shared
 
 

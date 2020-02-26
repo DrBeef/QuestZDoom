@@ -41,7 +41,7 @@ import static android.system.Os.setenv;
 	// Load the gles3jni library right away to make sure JNI_OnLoad() gets called as the very first thing.
 	static
 	{
-		System.loadLibrary( "lzdoom" );
+		System.loadLibrary( "qzdoom" );
 	}
 
 	private static final String TAG = "QzDoom";

@@ -55,8 +55,8 @@ public:
 	void Set3DViewport(bool mainview);
 	void Reset3DViewport();
 	void SetFixedColormap(player_t *player);
-	void DrawScene(int drawmode);
-	void ProcessScene(bool toscreen = false);
+	void DrawScene(int drawmode, sector_t * viewsector = nullptr);
+	void ProcessScene(bool toscreen = false, sector_t* sector = nullptr);
 	void DrawBlend(sector_t * viewsector);
 	void EndDrawScene(sector_t * viewsector);
 	void DrawEndScene2D(sector_t * viewsector);
