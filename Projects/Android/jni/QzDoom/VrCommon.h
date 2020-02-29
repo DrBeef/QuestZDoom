@@ -1,7 +1,12 @@
 #if !defined(vrcommon_h)
 #define vrcommon_h
 
-#include <VrApi_Ext.h>
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+//#include <VrApi_Ext.h>
 #include <VrApi_Input.h>
 
 #include <android/log.h>
@@ -63,5 +68,14 @@ void rotateAboutOrigin(float v1, float v2, float rotation, vec2_t out);
 void QuatToYawPitchRoll(ovrQuatf q, float pitchAdjust, vec3_t out);
 bool useScreenLayer();
 void handleTrackedControllerButton(ovrInputStateTrackedRemote * trackedRemoteState, ovrInputStateTrackedRemote * prevTrackedRemoteState, uint32_t button, int key);
+
+void setUseScreenLayer(bool use);
+
+void prepareEyeBuffer(int eye );
+void finishEyeBuffer(int eye );
+
+#ifdef __cplusplus
+} // extern "C"
+#endif
 
 #endif //vrcommon_h

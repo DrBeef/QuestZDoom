@@ -403,6 +403,7 @@ PCH_SOURCES = \
 	gl/stereo3d/gl_quadstereo.cpp \
 	gl/stereo3d/gl_sidebyside3d.cpp \
 	gl/stereo3d/gl_interleaved3d.cpp \
+	gl/stereo3d/gl_oculusquest.cpp \
 	gl/system/gl_interface.cpp \
 	gl/system/gl_framebuffer.cpp \
 	gl/system/gl_swframebuffer.cpp \

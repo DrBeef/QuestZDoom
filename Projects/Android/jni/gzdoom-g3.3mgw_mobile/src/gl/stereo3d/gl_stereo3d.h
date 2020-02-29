@@ -90,8 +90,7 @@ public:
 	virtual void UnAdjustPlayerSprites() const {};
 	virtual void AdjustCrossHair() const {}
 	virtual void UnAdjustCrossHair() const {}
-	virtual void DrawControllerModels() const {}
-	
+
 	virtual void Present() const = 0;
 
 	virtual bool GetHandTransform(int hand, VSMatrix* out) const { return false; }
