@@ -56,6 +56,7 @@ int ducked;
 
 bool player_moving;
 
+void shutdownVR();
 
 float radians(float deg);
 float degrees(float rad);
@@ -68,11 +69,20 @@ void rotateAboutOrigin(float v1, float v2, float rotation, vec2_t out);
 void QuatToYawPitchRoll(ovrQuatf q, float pitchAdjust, vec3_t out);
 bool useScreenLayer();
 void handleTrackedControllerButton(ovrInputStateTrackedRemote * trackedRemoteState, ovrInputStateTrackedRemote * prevTrackedRemoteState, uint32_t button, int key);
+void Android_GetScreenRes(uint32_t *width, uint32_t *height);
 
 void setUseScreenLayer(bool use);
 
+void processHaptics();
+void getHMDOrientation(ovrTracking2 *tracking);
+void getTrackedRemotesOrientation();
+
+void incrementFrameIndex();
+
+ovrSubmitFrameDescription2 setupFrameDescriptor(ovrTracking2 *tracking);
 void prepareEyeBuffer(int eye );
 void finishEyeBuffer(int eye );
+void submitFrame(ovrSubmitFrameDescription2 *frameDesc);
 
 #ifdef __cplusplus
 } // extern "C"

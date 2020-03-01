@@ -31,11 +31,12 @@
 #include "gl/stereo3d/gl_quadstereo.h"
 #include "gl/stereo3d/gl_sidebyside3d.h"
 #include "gl/stereo3d/gl_interleaved3d.h"
+#include "gl/stereo3d/gl_oculusquest.h"
 #include "gl/system/gl_cvars.h"
 #include "version.h"
 
 // Set up 3D-specific console variables:
-CVAR(Int, vr_mode, 10, CVAR_GLOBALCONFIG)
+CVAR(Int, vr_mode, 15, CVAR_GLOBALCONFIG)
 
 // switch left and right eye views
 CVAR(Bool, vr_swap_eyes, false, CVAR_GLOBALCONFIG)
@@ -83,7 +84,7 @@ void Stereo3DMode::setCurrentMode(const Stereo3DMode& mode) {
 /* static */
 const Stereo3DMode& Stereo3DMode::getCurrentMode() 
 {
-	if (gl.legacyMode) vr_mode = 0;	// GL 2 does not support this feature.
+	//if (gl.legacyMode) vr_mode = 0;	// GL 2 does not support this feature.
 
 	// NOTE: Ensure that these vr_mode values correspond to the ones in wadsrc/static/menudef.z
 	switch (vr_mode)
@@ -117,7 +118,7 @@ const Stereo3DMode& Stereo3DMode::getCurrentMode()
 	// TODO: 8: Oculus Rift
 	case 9:
 		setCurrentMode(AmberBlue::getInstance(vr_ipd));
-		break;	
+		break;
 	// TODO: 10: HTC Vive/OpenVR
 	case 11:
 		setCurrentMode(TopBottom3D::getInstance(vr_ipd));
@@ -130,6 +131,9 @@ const Stereo3DMode& Stereo3DMode::getCurrentMode()
 		break;
 	case 14:
 		setCurrentMode(CheckerInterleaved3D::getInstance(vr_ipd));
+		break;
+	case 15:
+		setCurrentMode(OculusQuestMode::getInstance());
 		break;
 	case 0:
 	default:

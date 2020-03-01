@@ -31,6 +31,12 @@
 #include "gl_stereo3d.h"
 #include "gl_stereo_leftright.h"
 
+extern "C" {
+#include <VrApi.h>
+#include <VrApi_Types.h>
+#include <VrApi_Helpers.h>
+}
+
 /* stereoscopic 3D API */
 namespace s3d {
 
@@ -100,6 +106,7 @@ protected:
 	mutable int cachedViewwidth, cachedViewheight, cachedViewwindowx, cachedViewwindowy;
 	mutable F2DDrawer * cached2DDrawer;
 	mutable F2DDrawer * crossHairDrawer;
+	mutable ovrSubmitFrameDescription2 frameDesc;
 
 private:
 	typedef Stereo3DMode super;

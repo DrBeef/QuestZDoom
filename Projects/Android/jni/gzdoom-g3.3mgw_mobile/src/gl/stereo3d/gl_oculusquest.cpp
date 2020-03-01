@@ -29,6 +29,7 @@
 
 #include <string>
 #include <map>
+#include <cmath>
 #include "gl/system/gl_system.h"
 #include "doomtype.h" // Printf
 #include "d_player.h"
@@ -51,10 +52,6 @@
 
 #include "QzDoom/VrCommon.h"
 
-extern "C" {
-#include <VrApi.h>
-#include <VrApi_Helpers.h>
-}
 
 EXTERN_CVAR(Int, screenblocks);
 EXTERN_CVAR(Float, movebob);
@@ -153,35 +150,13 @@ namespace s3d
 
     bool OculusQuestEyePose::submitFrame() const
     {
-        // Copy HDR game texture to local vr LDR framebuffer, so gamma correction could work
-/*        if (eyeTexture->handle == nullptr) {
-            glGenFramebuffers(1, &framebuffer);
-            glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+        prepareEyeBuffer( eye );
 
-            GLuint texture;
-            glGenTextures(1, &texture);
-            eyeTexture->handle = (void *)(std::ptrdiff_t)texture;
-            glBindTexture(GL_TEXTURE_2D, texture);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, GLRenderer->mSceneViewport.width,
-                         GLRenderer->mSceneViewport.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
-            GLenum drawBuffers[1] = {GL_COLOR_ATTACHMENT0};
-            glDrawBuffers(1, drawBuffers);
-        }
-        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-            return false;
         GLRenderer->mBuffers->BindEyeTexture(eye, 0);
         GL_IRECT box = {0, 0, GLRenderer->mSceneViewport.width, GLRenderer->mSceneViewport.height};
         GLRenderer->DrawPresentTexture(box, true);
 
-        // Maybe this would help with AMD boards?
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glBindTexture(GL_TEXTURE_2D, 0);
-*/
+        finishEyeBuffer( eye );
 
         return true;
     }
@@ -250,9 +225,9 @@ namespace s3d
         const Stereo3DMode * mode3d = &Stereo3DMode::getCurrentMode();
         if (mode3d->IsMono())
             return;
-        const OculusQuestMode * openVrMode = static_cast<const OculusQuestMode *>(mode3d);
-        if (openVrMode
-            && openVrMode->crossHairDrawer
+        const OculusQuestMode * oculusQuestMode = static_cast<const OculusQuestMode *>(mode3d);
+        if (oculusQuestMode
+            && oculusQuestMode->crossHairDrawer
             // Don't draw the crosshair if there is none
             && CrosshairImage != NULL
             && gamestate != GS_TITLELEVEL
@@ -266,7 +241,7 @@ namespace s3d
                     false,
                     0.0);
             gl_RenderState.ApplyMatrices();
-            openVrMode->crossHairDrawer->Draw();
+            oculusQuestMode->crossHairDrawer->Draw();
         }
 
         // Update HUD matrix to render on a separate quad
@@ -290,6 +265,14 @@ namespace s3d
         gl_RenderState.ApplyMatrices();
     }
 
+
+/* static */
+    const Stereo3DMode& OculusQuestMode::getInstance()
+    {
+        static OculusQuestMode instance;
+        return instance;
+    }
+
     OculusQuestMode::OculusQuestMode()
             : leftEyeView(0)
             , rightEyeView(1)
@@ -299,9 +282,8 @@ namespace s3d
     {
         eye_ptrs.Push(&leftEyeView); // initially default behavior to Mono non-stereo rendering
 
-
         //Get this from my code
-        //vrSystem->GetRecommendedRenderTargetSize(&sceneWidth, &sceneHeight);
+        Android_GetScreenRes(&sceneWidth, &sceneHeight);
 
         leftEyeView.initialize();
         rightEyeView.initialize();
@@ -449,6 +431,13 @@ namespace s3d
         leftEyeView.submitFrame();
         rightEyeView.submitFrame();
 
+        submitFrame(&frameDesc);
+    }
+
+    static int mAngleFromRadians(double radians)
+    {
+        double m = std::round(65535.0 * radians / (2.0 * M_PI));
+        return int(m);
     }
 
     void OculusQuestMode::updateHmdPose(
@@ -470,7 +459,7 @@ namespace s3d
                 havePreviousYaw = true;
             }
             hmdYawDelta = hmdYaw - previousHmdYaw;
-//            G_AddViewAngle(mAngleFromRadians(-hmdYawDelta));
+            G_AddViewAngle(mAngleFromRadians(-hmdYawDelta));
             previousHmdYaw = hmdYaw;
         }
 
@@ -484,7 +473,7 @@ namespace s3d
                     // hmdPitchInDoom
                     -hmdpitch
                     - viewPitchInDoom;
-//            G_AddViewPitch(mAngleFromRadians(-dPitch));
+            G_AddViewPitch(mAngleFromRadians(-dPitch));
         }
 
         // Roll can be local, because it doesn't affect gameplay.
@@ -659,7 +648,15 @@ namespace s3d
             setUseScreenLayer(true);
         }
 
+        processHaptics();
+
+
         //Get controller state here
+        ovrTracking2 tracking;
+        getHMDOrientation(&tracking);
+        getTrackedRemotesOrientation();
+
+        frameDesc = setupFrameDescriptor(&tracking);
 
 /*        player_t* player = r_viewpoint.camera ? r_viewpoint.camera->player : nullptr;
         {

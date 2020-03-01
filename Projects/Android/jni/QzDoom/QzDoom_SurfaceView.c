@@ -151,12 +151,6 @@ bool useScreenLayer()
 	return useVirtualScreen || forceVirtualScreen;
 }
 
-int runStatus = -1;
-void QzDoom_exit(int exitCode)
-{
-	runStatus = exitCode;
-}
-
 static void UnEscapeQuotes( char *arg )
 {
 	char *last = NULL;
@@ -1263,7 +1257,7 @@ int m_height;
 
 //qboolean R_SetMode( void );
 
-void Android_GetScreenRes(int *width, int *height)
+void Android_GetScreenRes(uint32_t *width, uint32_t *height)
 {
     if (useScreenLayer())
     {
@@ -1325,6 +1319,8 @@ extern void SDL_Android_Init(JNIEnv* env, jclass cls);
 static ovrAppThread * gAppThread = NULL;
 static ovrApp gAppState;
 static ovrJava java;
+static bool destroyed = false;
+
 
 void RenderFrame()
 {
@@ -1401,7 +1397,7 @@ void finishEyeBuffer(int eye )
 	ovrFramebuffer_SetNone();
 }
 
-bool processMessageQueue(bool destroyed) {
+bool processMessageQueue() {
 	for ( ; ; )
 	{
 		ovrMessage message;
@@ -1465,10 +1461,10 @@ bool processMessageQueue(bool destroyed) {
 
 		ovrApp_HandleVrModeChanges( &gAppState );
 	}
-	return destroyed;
 }
 
-void vr_main();
+void showLoadingIcon();
+
 
 void * AppThreadFunction(void * parm ) {
 	gAppThread = (ovrAppThread *) parm;
@@ -1503,7 +1499,7 @@ void * AppThreadFunction(void * parm ) {
 	vrapi_SetPropertyInt(&gAppState.Java, VRAPI_EAT_NATIVE_GAMEPAD_EVENTS, 0);
 
 	//Using a symmetrical render target
-	m_height = m_width = (int)(vrapi_GetSystemPropertyInt(&java, VRAPI_SYS_PROP_SUGGESTED_EYE_TEXTURE_WIDTH) *  SS_MULTIPLIER);
+	cylinderSize[0] = cylinderSize[1] = m_height = m_width = (int)(vrapi_GetSystemPropertyInt(&java, VRAPI_SYS_PROP_SUGGESTED_EYE_TEXTURE_WIDTH) *  SS_MULTIPLIER);
 
 	//Use floor based tracking space
 	vrapi_SetTrackingSpace(gAppState.Ovr, VRAPI_TRACKING_SPACE_LOCAL_FLOOR);
@@ -1519,9 +1515,28 @@ void * AppThreadFunction(void * parm ) {
 
 	ovrRenderer_Create(m_width, m_height, &gAppState.Renderer, &java);
 
+	if ( gAppState.Ovr == NULL )
+	{
+		return NULL;
+	}
+
+	// Create the scene if not yet created.
+	ovrScene_Create( cylinderSize[0], cylinderSize[1], &gAppState.Scene, &java );
+
 	chdir("/sdcard/QzDoom");
 
-	vr_main();
+	//Run loading loop until we are ready to start QzDoom
+	while (!destroyed && !qzdoom_initialised) {
+		processMessageQueue();
+		incrementFrameIndex();
+		showLoadingIcon();
+	}
+
+	//Should now be all set up and ready - start the Doom main loop
+	D_DoomMain();
+
+	//We are done, shutdown cleanly
+	shutdownVR();
 
 	return NULL;
 }
@@ -1552,7 +1567,8 @@ void processHaptics() {//Handle haptics
 	}
 }
 
-void showLoadingIcon() {// Show a loading icon.
+void showLoadingIcon()
+{
 	int frameFlags = 0;
 	frameFlags |= VRAPI_FRAME_FLAG_FLUSH;
 
@@ -1585,12 +1601,8 @@ void getHMDOrientation(ovrTracking2 *tracking) {//Get orientation
 	// the new eye images will be displayed. The number of frames predicted ahead
 	// depends on the pipeline depth of the engine and the synthesis rate.
 	// The better the prediction, the less black will be pulled in at the edges.
-	const double predictedDisplayTime = vrapi_GetPredictedDisplayTime(gAppState.Ovr,
-																	  gAppState.FrameIndex);
-	*tracking = vrapi_GetPredictedTracking2(gAppState.Ovr,
-															  predictedDisplayTime);
+	*tracking = vrapi_GetPredictedTracking2(gAppState.Ovr, gAppState.DisplayTime);
 
-	gAppState.DisplayTime = predictedDisplayTime;
 
 	// We extract Yaw, Pitch, Roll instead of directly using the orientation
 	// to allow "additional" yaw manipulation with mouse/controller.
@@ -1605,165 +1617,134 @@ void getHMDOrientation(ovrTracking2 *tracking) {//Get orientation
 	ALOGV("        HMD-Position: %f, %f, %f", positionHmd.x, positionHmd.y, positionHmd.z);
 }
 
-void vr_main()
+void shutdownVR() {
+	ovrRenderer_Destroy( &gAppState.Renderer );
+	ovrEgl_DestroyContext( &gAppState.Egl );
+	(*java.Vm)->DetachCurrentThread( java.Vm );
+	vrapi_Shutdown();
+}
+
+ovrSubmitFrameDescription2 setupFrameDescriptor(ovrTracking2 *tracking) {
+	ovrSubmitFrameDescription2 frameDesc = {0 };
+	if (!useScreenLayer()) {
+
+		ovrLayerProjection2 layer = vrapi_DefaultLayerProjection2();
+		layer.HeadPose = (*tracking).HeadPose;
+		for ( int eye = 0; eye < VRAPI_FRAME_LAYER_EYE_MAX; eye++ )
+		{
+			ovrFramebuffer * frameBuffer = &gAppState.Renderer.FrameBuffer[gAppState.Renderer.NumBuffers == 1 ? 0 : eye];
+			layer.Textures[eye].ColorSwapChain = frameBuffer->ColorTextureSwapChain;
+			layer.Textures[eye].SwapChainIndex = frameBuffer->TextureSwapChainIndex;
+
+			ovrMatrix4f projectionMatrix;
+			projectionMatrix = ovrMatrix4f_CreateProjectionFov(vrFOV, vrFOV,
+															   0.0f, 0.0f, 0.1f, 0.0f);
+
+			layer.Textures[eye].TexCoordsFromTanAngles = ovrMatrix4f_TanAngleMatrixFromProjection(&projectionMatrix);
+
+			layer.Textures[eye].TextureRect.x = 0;
+			layer.Textures[eye].TextureRect.y = 0;
+			layer.Textures[eye].TextureRect.width = 1.0f;
+			layer.Textures[eye].TextureRect.height = 1.0f;
+		}
+		layer.Header.Flags |= VRAPI_FRAME_LAYER_FLAG_CHROMATIC_ABERRATION_CORRECTION;
+
+		// Set up the description for this frame.
+		const ovrLayerHeader2 *layers[] =
+				{
+						&layer.Header
+				};
+
+		ovrSubmitFrameDescription2 frameDesc = {};
+		frameDesc.Flags = 0;
+		frameDesc.SwapInterval = gAppState.SwapInterval;
+		frameDesc.FrameIndex = gAppState.FrameIndex;
+		frameDesc.DisplayTime = gAppState.DisplayTime;
+		frameDesc.LayerCount = 1;
+		frameDesc.Layers = layers;
+
+	} else {
+		// Set-up the compositor layers for this frame.
+		// NOTE: Multiple independent layers are allowed, but they need to be added
+		// in a depth consistent order.
+		memset( gAppState.Layers, 0, sizeof( ovrLayer_Union2 ) * ovrMaxLayerCount );
+		gAppState.LayerCount = 0;
+
+		// Add a simple cylindrical layer
+		gAppState.Layers[gAppState.LayerCount++].Cylinder =
+				BuildCylinderLayer(&gAppState.Scene.CylinderRenderer,
+								   gAppState.Scene.CylinderWidth, gAppState.Scene.CylinderHeight, tracking, radians(playerYaw) );
+
+		// Compose the layers for this frame.
+		const ovrLayerHeader2 * layerHeaders[ovrMaxLayerCount] = { 0 };
+		for ( int i = 0; i < gAppState.LayerCount; i++ )
+		{
+			layerHeaders[i] = &gAppState.Layers[i].Header;
+		}
+
+		// Set up the description for this frame.
+		frameDesc.Flags = 0;
+		frameDesc.SwapInterval = gAppState.SwapInterval;
+		frameDesc.FrameIndex = gAppState.FrameIndex;
+		frameDesc.DisplayTime = gAppState.DisplayTime;
+		frameDesc.LayerCount = gAppState.LayerCount;
+		frameDesc.Layers = layerHeaders;
+	}
+	return frameDesc;
+}
+
+void incrementFrameIndex()
 {
-	for ( bool destroyed = false; destroyed == false; )
-	{
-		destroyed = processMessageQueue(destroyed);
+	// This is the only place the frame index is incremented, right before
+	// calling vrapi_GetPredictedDisplayTime().
+	gAppState.FrameIndex++;
+	gAppState.DisplayTime = vrapi_GetPredictedDisplayTime(gAppState.Ovr,
+														  gAppState.FrameIndex);
+}
 
-		if ( gAppState.Ovr == NULL )
-		{
-			continue;
-		}
+void getTrackedRemotesOrientation() {//Get info for tracked remotes
+    acquireTrackedRemotesData(gAppState.Ovr, gAppState.DisplayTime);
 
-		// Create the scene if not yet created.
-		// The scene is created here to be able to show a loading icon.
-		if ( !ovrScene_IsCreated( &gAppState.Scene ) )
-		{
-			ovrScene_Create( cylinderSize[0], cylinderSize[1], &gAppState.Scene, &java );
-		}
-
-        // This is the only place the frame index is incremented, right before
-        // calling vrapi_GetPredictedDisplayTime().
-        gAppState.FrameIndex++;
-
-        // Create the scene if not yet created.
-		// The scene is created here to be able to show a loading icon.
-		if (!qzdoom_initialised || runStatus != -1)
-		{
-			showLoadingIcon();
-		}
-
-		processHaptics();
-
-		if (runStatus == -1) {
-
-			ovrTracking2 tracking;
-			getHMDOrientation(&tracking);
-
-			//Get info for tracked remotes
-			acquireTrackedRemotesData(gAppState.Ovr, gAppState.DisplayTime);
-
-            //Call additional control schemes here
- //           switch ((int)vr_control_scheme->value)
-			{
+    //Call additional control schemes here
+//           switch ((int)vr_control_scheme->value)
+    {
 //                case RIGHT_HANDED_DEFAULT:
-                    HandleInput_Default(&rightTrackedRemoteState_new, &rightTrackedRemoteState_old, &rightRemoteTracking_new,
-                                        &leftTrackedRemoteState_new, &leftTrackedRemoteState_old, &leftRemoteTracking_new,
-                                        ovrButton_A, ovrButton_B, ovrButton_X, ovrButton_Y);
+            HandleInput_Default(&rightTrackedRemoteState_new, &rightTrackedRemoteState_old, &rightRemoteTracking_new,
+                                &leftTrackedRemoteState_new, &leftTrackedRemoteState_old, &leftRemoteTracking_new,
+                                ovrButton_A, ovrButton_B, ovrButton_X, ovrButton_Y);
 //                    break;
 //                case LEFT_HANDED_DEFAULT:
 //                    HandleInput_Default(&leftTrackedRemoteState_new, &leftTrackedRemoteState_old, &leftRemoteTracking_new,
 //                                        &rightTrackedRemoteState_new, &rightTrackedRemoteState_old, &rightRemoteTracking_new,
 //                                        ovrButton_X, ovrButton_Y, ovrButton_A, ovrButton_B);
 //                    break;
-			}
+    }
+}
 
-			ovrSubmitFrameDescription2 frameDesc = { 0 };
-			if (!useScreenLayer()) {
+void submitFrame(ovrSubmitFrameDescription2 *frameDesc)
+{
+	// Hand over the eye images to the time warp.
+	vrapi_SubmitFrame2(gAppState.Ovr, frameDesc);
+}
 
-                ovrLayerProjection2 layer = vrapi_DefaultLayerProjection2();
-                layer.HeadPose = tracking.HeadPose;
-                for ( int eye = 0; eye < VRAPI_FRAME_LAYER_EYE_MAX; eye++ )
-                {
-                    ovrFramebuffer * frameBuffer = &gAppState.Renderer.FrameBuffer[gAppState.Renderer.NumBuffers == 1 ? 0 : eye];
-                    layer.Textures[eye].ColorSwapChain = frameBuffer->ColorTextureSwapChain;
-                    layer.Textures[eye].SwapChainIndex = frameBuffer->TextureSwapChainIndex;
+//Need to replicate this code in gl_oculusquest.cpp
+void vr_main()
+{
+	if (!destroyed)
+	{
+		processHaptics();
 
-                    ovrMatrix4f projectionMatrix;
-                    projectionMatrix = ovrMatrix4f_CreateProjectionFov(vrFOV, vrFOV,
-                                                                       0.0f, 0.0f, 0.1f, 0.0f);
+		ovrTracking2 tracking;
+		getHMDOrientation(&tracking);
+        getTrackedRemotesOrientation();
 
-                    layer.Textures[eye].TexCoordsFromTanAngles = ovrMatrix4f_TanAngleMatrixFromProjection(&projectionMatrix);
+        ovrSubmitFrameDescription2 frameDesc = setupFrameDescriptor(&tracking);
 
-                    layer.Textures[eye].TextureRect.x = 0;
-                    layer.Textures[eye].TextureRect.y = 0;
-                    layer.Textures[eye].TextureRect.width = 1.0f;
-                    layer.Textures[eye].TextureRect.height = 1.0f;
-                }
-                layer.Header.Flags |= VRAPI_FRAME_LAYER_FLAG_CHROMATIC_ABERRATION_CORRECTION;
+		//Call the game drawing code
+		RenderFrame();
 
-                //Call the game drawing code to populate the cylinder layer texture
-                RenderFrame();
-
-                // Set up the description for this frame.
-                const ovrLayerHeader2 *layers[] =
-                        {
-                                &layer.Header
-                        };
-
-                ovrSubmitFrameDescription2 frameDesc = {};
-                frameDesc.Flags = 0;
-                frameDesc.SwapInterval = gAppState.SwapInterval;
-                frameDesc.FrameIndex = gAppState.FrameIndex;
-                frameDesc.DisplayTime = gAppState.DisplayTime;
-                frameDesc.LayerCount = 1;
-                frameDesc.Layers = layers;
-
-                // Hand over the eye images to the time warp.
-                vrapi_SubmitFrame2(gAppState.Ovr, &frameDesc);
-
-			} else {
-				// Set-up the compositor layers for this frame.
-				// NOTE: Multiple independent layers are allowed, but they need to be added
-				// in a depth consistent order.
-				memset( gAppState.Layers, 0, sizeof( ovrLayer_Union2 ) * ovrMaxLayerCount );
-				gAppState.LayerCount = 0;
-
-				// Add a simple cylindrical layer
-				gAppState.Layers[gAppState.LayerCount++].Cylinder =
-						BuildCylinderLayer( &gAppState.Scene.CylinderRenderer,
-											gAppState.Scene.CylinderWidth, gAppState.Scene.CylinderHeight, &tracking, radians(playerYaw) );
-
-				//Call the game drawing code to populate the cylinder layer texture
-				RenderFrame();
-
-				// Compose the layers for this frame.
-				const ovrLayerHeader2 * layerHeaders[ovrMaxLayerCount] = { 0 };
-				for ( int i = 0; i < gAppState.LayerCount; i++ )
-				{
-					layerHeaders[i] = &gAppState.Layers[i].Header;
-				}
-
-				// Set up the description for this frame.
-				frameDesc.Flags = 0;
-				frameDesc.SwapInterval = gAppState.SwapInterval;
-				frameDesc.FrameIndex = gAppState.FrameIndex;
-				frameDesc.DisplayTime = gAppState.DisplayTime;
-				frameDesc.LayerCount = gAppState.LayerCount;
-				frameDesc.Layers = layerHeaders;
-
-                // Hand over the eye images to the time warp.
-                vrapi_SubmitFrame2(gAppState.Ovr, &frameDesc);
-            }
-        }
-        else
-		{
-		    //We are now shutting down
-		    if (runStatus == 0)
-            {
-                //Give us half a second (36 frames)
-                shutdownCountdown = 36;
-                runStatus++;
-            } else	if (runStatus == 1)
-            {
-                if (--shutdownCountdown == 0) {
-                    runStatus++;
-                }
-            } else	if (runStatus == 2)
-            {
-				//TODO
-                //Host_Shutdown();
-                runStatus++;
-            } else if (runStatus == 3)
-            {
-                ovrRenderer_Destroy( &gAppState.Renderer );
-                ovrEgl_DestroyContext( &gAppState.Egl );
-                (*java.Vm)->DetachCurrentThread( java.Vm );
-                vrapi_Shutdown();
-                exit( 0 );
-            }
-		}
+		// Hand over the eye images to the time warp.
+		submitFrame(&frameDesc);
 	}
 }
 
