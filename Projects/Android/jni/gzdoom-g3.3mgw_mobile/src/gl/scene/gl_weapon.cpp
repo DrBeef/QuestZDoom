@@ -54,6 +54,16 @@ EXTERN_CVAR (Bool, r_drawplayersprites)
 EXTERN_CVAR(Float, transsouls)
 EXTERN_CVAR(Int, gl_fuzztype)
 EXTERN_CVAR (Bool, r_deathcamera)
+EXTERN_CVAR(Int, r_PlayerSprites3DMode)
+EXTERN_CVAR(Float, gl_fatItemWidth)
+
+enum PlayerSprites3DMode
+{
+	CROSSED,
+	BACK_ONLY,
+	ITEM_ONLY,
+	FAT_ITEM,
+};
 
 
 //==========================================================================
@@ -111,6 +121,7 @@ void GLSceneDrawer::DrawPSprite (player_t * player,DPSprite *psp, float sx, floa
 	// killough 12/98: fix psprite positioning problem
 	ftexturemid = 100.f - sy - r.top - psp->GetYAdjust(screenblocks >= 11);
 
+	AActor * wi=player->ReadyWeapon;
 	scale = (SCREENHEIGHT*vw) / (SCREENWIDTH * 200.0f);
 	y1 = viewwindowy + vh / 2 - (ftexturemid * scale);
 	y2 = y1 + (r.height * scale) + 1;
@@ -132,17 +143,103 @@ void GLSceneDrawer::DrawPSprite (player_t * player,DPSprite *psp, float sx, floa
 		
 	}
 
-	if (tex->GetTransparent() || OverrideShader != -1)
+	if ((tex->GetTransparent() || OverrideShader != -1) && !s3d::Stereo3DMode::getCurrentMode().RenderPlayerSpritesCrossed())
 	{
 		gl_RenderState.AlphaFunc(GL_GEQUAL, 0.f);
 	}
 	gl_RenderState.Apply();
-	FQuadDrawer qd;
-	qd.Set(0, x1, y1, 0, fU1, fV1);
-	qd.Set(1, x1, y2, 0, fU1, fV2);
-	qd.Set(2, x2, y1, 0, fU2, fV1);
-	qd.Set(3, x2, y2, 0, fU2, fV2);
-	qd.Render(GL_TRIANGLE_STRIP);
+
+	if (r_PlayerSprites3DMode != ITEM_ONLY && r_PlayerSprites3DMode != FAT_ITEM)
+	{
+		FQuadDrawer qd;
+		qd.Set(0, x1, y1, 0, fU1, fV1);
+		qd.Set(1, x1, y2, 0, fU1, fV2);
+		qd.Set(2, x2, y1, 0, fU2, fV1);
+		qd.Set(3, x2, y2, 0, fU2, fV2);
+		qd.Render(GL_TRIANGLE_STRIP);
+	}
+
+	if (psp->GetID() == PSP_WEAPON && s3d::Stereo3DMode::getCurrentMode().RenderPlayerSpritesCrossed())
+	{
+		if (r_PlayerSprites3DMode == BACK_ONLY)
+			return;
+
+		FState* spawn = wi->FindState(NAME_Spawn);
+
+		lump = sprites[spawn->sprite].GetSpriteFrame(0, 0, 0., &mirror);
+		if (!lump.isValid()) return;
+
+		tex = FMaterial::ValidateTexture(lump, true, false);
+		if (!tex) return;
+
+		gl_RenderState.SetMaterial(tex, CLAMP_XY_NOMIP, 0, OverrideShader, alphatexture);
+
+		float z1 = 0.0f;
+		float z2 = (y2 - y1) * MIN(3, tex->GetWidth() / tex->GetHeight());
+
+		if (!(mirror) != !(psp->Flags & PSPF_FLIP))
+		{
+			fU2 = tex->GetSpriteUL();
+			fV1 = tex->GetSpriteVT();
+			fU1 = tex->GetSpriteUR();
+			fV2 = tex->GetSpriteVB();
+		}
+		else
+		{
+			fU1 = tex->GetSpriteUL();
+			fV1 = tex->GetSpriteVT();
+			fU2 = tex->GetSpriteUR();
+			fV2 = tex->GetSpriteVB();
+		}
+
+		if (r_PlayerSprites3DMode == FAT_ITEM)
+		{
+			x1 = vw / 2 + (x1 - vw / 2) * gl_fatItemWidth;
+			x2 = vw / 2 + (x2 - vw / 2) * gl_fatItemWidth;
+
+			for (float x = x1; x < x2; x += 1)
+			{
+				FQuadDrawer qd2;
+				qd2.Set(0, x, y1, -z1, fU1, fV1);
+				qd2.Set(1, x, y2, -z1, fU1, fV2);
+				qd2.Set(2, x, y1, -z2, fU2, fV1);
+				qd2.Set(3, x, y2, -z2, fU2, fV2);
+				qd2.Render(GL_TRIANGLE_STRIP);
+			}
+		}
+		else
+		{
+			float crossAt;
+			if (r_PlayerSprites3DMode == ITEM_ONLY)
+			{
+				crossAt = 0.0f;
+				sy = 0.0f;
+			}
+			else
+			{
+				sy = y2 - y1;
+				crossAt = sy * 0.25f;
+			}
+
+			y1 -= crossAt;
+			y2 -= crossAt;
+
+			FQuadDrawer qd2;
+			qd2.Set(0, vw / 2 - crossAt, y1, -z1, fU1, fV1);
+			qd2.Set(1, vw / 2 + sy / 2, y2, -z1, fU1, fV2);
+			qd2.Set(2, vw / 2 - crossAt, y1, -z2, fU2, fV1);
+			qd2.Set(3, vw / 2 + sy / 2, y2, -z2, fU2, fV2);
+			qd2.Render(GL_TRIANGLE_STRIP);
+
+			FQuadDrawer qd3;
+			qd3.Set(0, vw / 2 + crossAt, y1, -z1, fU1, fV1);
+			qd3.Set(1, vw / 2 - sy / 2, y2, -z1, fU1, fV2);
+			qd3.Set(2, vw / 2 + crossAt, y1, -z2, fU2, fV1);
+			qd3.Set(3, vw / 2 - sy / 2, y2, -z2, fU2, fV2);
+			qd3.Render(GL_TRIANGLE_STRIP);
+		}
+	}
+
 	gl_RenderState.AlphaFunc(GL_GEQUAL, 0.5f);
 }
 
@@ -218,8 +315,6 @@ void GLSceneDrawer::DrawPlayerSprites(sector_t * viewsector, bool hudModelStep)
 	AActor * playermo=players[consoleplayer].camera;
 	player_t * player=playermo->player;
 	
-	s3d::Stereo3DMode::getCurrentMode().AdjustPlayerSprites();
-
 	AActor *camera = r_viewpoint.camera;
 
 	// this is the same as the software renderer
@@ -229,6 +324,11 @@ void GLSceneDrawer::DrawPlayerSprites(sector_t * viewsector, bool hudModelStep)
 		(player->cheats & CF_CHASECAM) || 
 		(r_deathcamera && camera->health <= 0))
 		return;
+
+	if (!hudModelStep)
+	{
+		s3d::Stereo3DMode::getCurrentMode().AdjustPlayerSprites();
+	}
 
 	float bobx, boby, wx, wy;
 	DPSprite *weapon;
@@ -482,11 +582,17 @@ void GLSceneDrawer::DrawPlayerSprites(sector_t * viewsector, bool hudModelStep)
 			DrawPSprite(player, psp, sx, sy, hudModelStep, OverrideShader, !!(RenderStyle.Flags & STYLEF_RedIsAlpha));
 		}
 	}
+
 	gl_RenderState.SetObjectColor(0xffffffff);
 	gl_RenderState.SetAddColor(0);
 	gl_RenderState.SetDynLight(0, 0, 0);
 	gl_RenderState.EnableBrightmap(false);
 	glset.lightmode = oldlightmode;
+
+	if (!hudModelStep)
+	{
+		s3d::Stereo3DMode::getCurrentMode().UnAdjustPlayerSprites();
+	}
 }
 
 //==========================================================================

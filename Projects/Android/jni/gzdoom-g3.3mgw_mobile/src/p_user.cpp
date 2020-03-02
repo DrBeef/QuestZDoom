@@ -126,7 +126,7 @@ ColorSetList ColorSets;
 PainFlashList PainFlashes;
 
 // [Nash] FOV cvar setting
-CUSTOM_CVAR(Float, fov, 90.f, CVAR_ARCHIVE | CVAR_USERINFO | CVAR_NOINITCALL)
+CUSTOM_CVAR(Float, fov, 104.f, CVAR_ARCHIVE | CVAR_USERINFO | CVAR_NOINITCALL)
 {
 	player_t *p = &players[consoleplayer];
 	p->SetFOV(fov);

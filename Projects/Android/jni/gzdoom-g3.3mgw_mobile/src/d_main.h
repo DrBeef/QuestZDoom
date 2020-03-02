@@ -45,7 +45,9 @@ struct CRestartException
 	char dummy;
 };
 
-extern "C" void D_DoomMain (void);
+
+extern "C" void VR_DoomMain(int argc, char** argv);
+void D_DoomMain (void);
 
 
 void D_Display ();

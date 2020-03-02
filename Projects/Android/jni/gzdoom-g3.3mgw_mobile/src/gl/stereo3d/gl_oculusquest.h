@@ -57,10 +57,6 @@ public:
 	bool submitFrame() const;
 
 protected:
-	VSMatrix projectionMatrix;
-	VSMatrix eyeToHeadTransform;
-	VSMatrix otherEyeToHeadTransform;
-
 	mutable uint32_t framebuffer;
 	int eye;
 

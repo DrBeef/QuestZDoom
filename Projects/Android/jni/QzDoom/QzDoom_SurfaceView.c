@@ -883,7 +883,7 @@ void getVROrigins(vec3_t _weaponoffset, vec3_t _weaponangles, vec3_t _hmdPositio
 }
 
 
-void D_DoomMain (void);
+void VR_DoomMain(int argc, char** argv);
 
 void VR_GetMove( float *forward, float *side, float *up, float *yaw, float *pitch, float *roll )
 {
@@ -1533,7 +1533,7 @@ void * AppThreadFunction(void * parm ) {
 	}
 
 	//Should now be all set up and ready - start the Doom main loop
-	D_DoomMain();
+	VR_DoomMain(argc, argv);
 
 	//We are done, shutdown cleanly
 	shutdownVR();

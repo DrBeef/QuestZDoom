@@ -2339,7 +2339,14 @@ static void CheckCmdLine()
 //
 //==========================================================================
 
-void D_DoomMain (void)
+void VR_DoomMain(int argc, char** argv)
+{
+	Args = new FArgs(argc, argv);
+	C_InitConsole (80*8, 25*8, false);
+	D_DoomMain ();
+}
+
+void D_DoomMain ()
 {
 	int p;
 	const char *v;

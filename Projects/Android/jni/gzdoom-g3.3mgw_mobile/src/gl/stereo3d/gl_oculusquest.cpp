@@ -123,25 +123,11 @@ namespace s3d
 /* virtual */
     VSMatrix OculusQuestEyePose::GetProjection(FLOATTYPE fov, FLOATTYPE aspectRatio, FLOATTYPE fovRatio) const
     {
-        // Ignore those arguments and get the projection from the SDK
-        // VSMatrix vs1 = ShiftedEyePose::GetProjection(fov, aspectRatio, fovRatio);
-        return projectionMatrix;
+        return EyePose::GetProjection(fov, aspectRatio, fovRatio);
     }
 
     void OculusQuestEyePose::initialize()
     {
-        float zNear = 5.0;
-        float zFar = 65536.0;
-/*        HmdMatrix44_t projection = vrsystem->GetProjectionMatrix(
-                EVREye(eye), zNear, zFar);
-        HmdMatrix44_t proj_transpose;
-        for (int i = 0; i < 4; ++i) {
-            for (int j = 0; j < 4; ++j) {
-                proj_transpose.m[i][j] = projection.m[j][i];
-            }
-        }*/
-        projectionMatrix.loadIdentity();
-        //projectionMatrix.multMatrix(&proj_transpose.m[0][0]);
     }
 
     void OculusQuestEyePose::dispose()
@@ -212,9 +198,9 @@ namespace s3d
         new_projection.translate(-1.0, 1.0, 0);
         new_projection.scale(2.0 / SCREENWIDTH, -2.0 / SCREENHEIGHT, -1.0);
 
-        VSMatrix proj(activeEye->projectionMatrix);
-        proj.multMatrix(new_projection);
-        new_projection = proj;
+//        VSMatrix proj(activeEye->projectionMatrix);
+  //      proj.multMatrix(new_projection);
+    //    new_projection = proj;
 
         return new_projection;
     }

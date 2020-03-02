@@ -161,17 +161,6 @@ import static android.system.Os.setenv;
 
 	public void create()
 	{
-		//This will copy the shareware version of quake2 if user doesn't have anything installed
-/*		copy_asset("/sdcard/QzDoom", "pak0.pak");
-		copy_asset("/sdcard/QzDoom", "config.cfg");
-		copy_asset("/sdcard/QzDoom", "autoexec.cfg");
-
-		//The custom weapon PAK file
-		copy_asset("/sdcard/QzDoom", "pak6.pak");
-		copy_asset("/sdcard/QzDoom", "pak99.pak");
-
-		*/
-
 		copy_asset("/sdcard/QzDoom", "commandline.txt");
 
 		//Read these from a file and pass through
