@@ -163,6 +163,10 @@ import static android.system.Os.setenv;
 	{
 		copy_asset("/sdcard/QzDoom", "commandline.txt");
 
+		new File("/sdcard/QzDoom/res").mkdirs();
+		copy_asset("/sdcard/QzDoom", "res/lzdoom.pk3");
+		copy_asset("/sdcard/QzDoom", "res/lz_game_support.pk3");
+
 		//Read these from a file and pass through
 		commandLineParams = new String("doom");
 

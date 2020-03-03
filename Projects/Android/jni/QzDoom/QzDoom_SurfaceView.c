@@ -1501,17 +1501,21 @@ void * AppThreadFunction(void * parm ) {
 	//Using a symmetrical render target
 	cylinderSize[0] = cylinderSize[1] = m_height = m_width = (int)(vrapi_GetSystemPropertyInt(&java, VRAPI_SYS_PROP_SUGGESTED_EYE_TEXTURE_WIDTH) *  SS_MULTIPLIER);
 
-	//Use floor based tracking space
-	vrapi_SetTrackingSpace(gAppState.Ovr, VRAPI_TRACKING_SPACE_LOCAL_FLOOR);
-
+	gAppState.CpuLevel = CPU_LEVEL;
+	gAppState.GpuLevel = GPU_LEVEL;
+	gAppState.MainThreadTid = gettid();
 
 	ovrEgl_CreateContext(&gAppState.Egl, NULL);
 
 	EglInitExtensions();
 
-	gAppState.CpuLevel = CPU_LEVEL;
-	gAppState.GpuLevel = GPU_LEVEL;
-	gAppState.MainThreadTid = gettid();
+	//First handle any messages in the queue
+	while ( gAppState.Ovr == NULL ) {
+		processMessageQueue();
+	}
+
+	//Use floor based tracking space
+	vrapi_SetTrackingSpace(gAppState.Ovr, VRAPI_TRACKING_SPACE_LOCAL_FLOOR);
 
 	ovrRenderer_Create(m_width, m_height, &gAppState.Renderer, &java);
 
