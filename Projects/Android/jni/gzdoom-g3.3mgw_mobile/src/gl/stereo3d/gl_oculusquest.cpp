@@ -60,10 +60,11 @@ EXTERN_CVAR(Int, gl_multisample);
 EXTERN_CVAR(Float, vr_vunits_per_meter)
 EXTERN_CVAR(Float, vr_floor_offset)
 
-//EXTERN_CVAR(Bool, oculusquest_rightHanded)
-//EXTERN_CVAR(Bool, oculusquest_moveFollowsOffHand)
+EXTERN_CVAR(Int, vr_control_scheme)
+EXTERN_CVAR(Bool, vr_moveFollowsOffHand)
 //EXTERN_CVAR(Bool, oculusquest_drawControllers)
-//EXTERN_CVAR(Float, oculusquest_weaponRotate);
+EXTERN_CVAR(Float, vr_weaponRotate);
+EXTERN_CVAR(Float, vr_snapTurn);
 //EXTERN_CVAR(Float, oculusquest_weaponScale);
 
 CVAR(Float, oculusquest_kill_momentum, 0.0f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
@@ -117,6 +118,7 @@ namespace s3d
 /* virtual */
     void OculusQuestEyePose::GetViewShift(FLOATTYPE yaw, FLOATTYPE outViewShift[3]) const
     {
+        doomYawDegrees = yaw;
         outViewShift[0] = outViewShift[1] = outViewShift[2] = 0;
     }
 
@@ -266,15 +268,14 @@ namespace s3d
             , crossHairDrawer(new F2DDrawer)
             , cached2DDrawer(nullptr)
     {
-        eye_ptrs.Push(&leftEyeView); // initially default behavior to Mono non-stereo rendering
+        eye_ptrs.Push(&leftEyeView);
+        eye_ptrs.Push(&rightEyeView);
 
         //Get this from my code
         Android_GetScreenRes(&sceneWidth, &sceneHeight);
 
         leftEyeView.initialize();
         rightEyeView.initialize();
-
-        eye_ptrs.Push(&rightEyeView); // NOW we render to two eyes
 
         crossHairDrawer->Clear();
     }
@@ -365,10 +366,10 @@ namespace s3d
 
     bool OculusQuestMode::GetWeaponTransform(VSMatrix* out) const
     {
-        long oculusquest_rightHanded = 1;
+        long oculusquest_rightHanded = vr_control_scheme < 10;
         if (GetHandTransform(oculusquest_rightHanded ? 1 : 0, out))
         {
-            //out->rotate(oculusquest_weaponRotate, 1, 0, 0);
+            //out->rotate(vr_weaponRotate, 1, 0, 0); - not needed, done in the C
             if (!oculusquest_rightHanded)
                 out->scale(-1.0f, 1.0f, 1.0f);
             return true;
@@ -640,7 +641,13 @@ namespace s3d
         //Get controller state here
         ovrTracking2 tracking;
         getHMDOrientation(&tracking);
-        getTrackedRemotesOrientation();
+
+        //Set up stuff used in the tracking code
+        vr_weapon_pitchadjust = vr_weaponRotate;
+        vr_snapturn_angle = vr_snapTurn;
+        vr_walkdirection = !vr_moveFollowsOffHand; //FIX THIS!
+        doomYawDegrees = GLRenderer->mAngles.Yaw.Degrees;
+        getTrackedRemotesOrientation(vr_control_scheme);
 
         frameDesc = setupFrameDescriptor(&tracking);
 

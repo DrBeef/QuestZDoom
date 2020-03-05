@@ -50,7 +50,7 @@ CUSTOM_CVAR(Bool, vr_enable_quadbuffered, false, CVAR_ARCHIVE | CVAR_GLOBALCONFI
 }
 
 // intraocular distance in meters
-CVAR(Float, vr_ipd, 0.062f, CVAR_ARCHIVE|CVAR_GLOBALCONFIG) // METERS
+CVAR(Float, vr_ipd, 0.064f, CVAR_ARCHIVE|CVAR_GLOBALCONFIG) // METERS
 
 // distance between viewer and the display screen
 CVAR(Float, vr_screendist, 0.80f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG) // METERS
@@ -60,7 +60,7 @@ CVAR(Float, vr_vunits_per_meter, 30.0f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG) // MET
 
 CVAR(Float, vr_floor_offset, 0.0f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG) // METERS
 
-CVAR(Bool, vr_rightHanded, true, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
+CVAR(Int, vr_control_scheme, 0, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 
 CVAR(Bool, vr_moveFollowsOffHand, true, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 
@@ -69,6 +69,8 @@ CVAR(Bool, vr_drawControllers, false, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 CVAR(Float, vr_weaponRotate, -30, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 
 CVAR(Float, vr_weaponScale, 1.0f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
+
+CVAR(Float, vr_snapTurn, 45.0f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 
 // Manage changing of 3D modes:
 namespace s3d {

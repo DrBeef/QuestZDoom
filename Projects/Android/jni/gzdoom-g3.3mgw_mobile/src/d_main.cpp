@@ -711,7 +711,7 @@ void D_Display ()
 
 	if (viewactive)
 	{
-		DAngle fov = 90.f;
+		DAngle fov = 104.f;
 		AActor *cam = players[consoleplayer].camera;
 		if (cam)
 		{
@@ -1071,7 +1071,7 @@ void D_DoomLoop ()
 			// process one or more tics
 			if (singletics)
 			{
-				I_StartTic ();
+				//I_StartTic ();
 				D_ProcessEvents ();
 				G_BuildTiccmd (&netcmds[consoleplayer][maketic%BACKUPTICS]);
 				if (advancedemo)
@@ -1091,7 +1091,7 @@ void D_DoomLoop ()
 				TryRunTics (); // will run at least one tic
 			}
 			// Update display, next frame, with current state.
-			I_StartTic ();
+			//I_StartTic ();
 			D_Display ();
 			S_UpdateMusic();
 			if (wantToRestart)
@@ -2724,7 +2724,7 @@ void D_DoomMain ()
 
 			V_Init2();
 			gl_PatchMenu();
-			UpdateJoystickMenu(NULL);
+			//UpdateJoystickMenu(NULL);
 
 			v = Args->CheckValue ("-loadgame");
 			if (v)
@@ -2799,8 +2799,8 @@ void D_DoomMain ()
 
 		D_DoAnonStats();
 
-		if (I_FriendlyWindowTitle)
-			I_SetWindowTitle(DoomStartupInfo.Name.GetChars());
+//		if (I_FriendlyWindowTitle)
+//			I_SetWindowTitle(DoomStartupInfo.Name.GetChars());
 
 		D_DoomLoop ();		// this only returns if a 'restart' CCMD is given.
 		// 

@@ -1,1 +1,1 @@
-qzdoom --supersampling 1.4 -iwad freedom2.wad
+qzdoom --supersampling 1.3 -iwad DOOM.WAD

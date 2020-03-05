@@ -44,7 +44,7 @@ LOCAL_C_INCLUDES := \
  $(GZDOOM_TOP_PATH)/src/scripting \
  $(GZDOOM_TOP_PATH)/src/scripting/vm \
  $(GZDOOM_TOP_PATH)/src/posix \
- $(GZDOOM_TOP_PATH)/src/posix\sdl \
+ $(GZDOOM_TOP_PATH)/src/posix\oculusquest \
  $(SDL_INCLUDE_PATHS) \
  $(SUPPORT_LIBS)/fluidsynth-lite/include \
  $(SUPPORT_LIBS)/openal/include/AL \
@@ -71,17 +71,17 @@ PLAT_POSIX_SOURCES = \
 	posix/i_cd.cpp \
 	posix/i_steam.cpp
 
-PLAT_SDL_SOURCES = \
-	posix/sdl/crashcatcher.c \
-	posix/sdl/hardware.cpp \
-	posix/sdl/i_gui.cpp \
-	posix/sdl/i_input.cpp \
-	posix/sdl/i_joystick.cpp \
-	posix/sdl/i_main.cpp \
-	posix/sdl/i_system.cpp \
-	posix/sdl/sdlglvideo.cpp \
-	posix/sdl/sdlvideo.cpp \
-	posix/sdl/st_start.cpp
+PLAT_OCULUSQUEST_SOURCES = \
+	posix/oculusquest/crashcatcher.c \
+	posix/oculusquest/hardware.cpp \
+	posix/oculusquest/i_gui.cpp \
+	posix/oculusquest/i_input.cpp \
+	posix/oculusquest/i_joystick.cpp \
+	posix/oculusquest/i_main.cpp \
+	posix/oculusquest/i_system.cpp \
+	posix/oculusquest/glvideo.cpp \
+	posix/oculusquest/video.cpp \
+	posix/oculusquest/st_start.cpp
 
 SWRENDER_SOURCES = \
 	swrenderer/r_swcanvas.cpp \
@@ -595,7 +595,7 @@ LOCAL_SRC_FILES = \
     $(QZDOOM_SRC) \
     $(ANDROID_SRC_FILES) \
     $(PLAT_POSIX_SOURCES) \
-    $(PLAT_SDL_SOURCES) \
+    $(PLAT_OCULUSQUEST_SOURCES) \
     $(FASTMATH_SOURCES) \
     $(PCH_SOURCES) \
 	x86.cpp \

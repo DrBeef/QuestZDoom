@@ -14,27 +14,16 @@ Authors		:	Simon Brown
 #include <VrApi_Types.h>
 
 #include "VrInput.h"
-#include "VrCvars.h"
 
-//#include "../quake2/src/client/header/client.h"
-
-//extern cvar_t	*cl_forwardspeed;
-//cvar_t	*sv_cheats;
-//extern cvar_t	*vr_weapon_stabilised;
-
+#include "doomkeys.h"
 
 void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew, ovrInputStateTrackedRemote *pDominantTrackedRemoteOld, ovrTracking* pDominantTracking,
                           ovrInputStateTrackedRemote *pOffTrackedRemoteNew, ovrInputStateTrackedRemote *pOffTrackedRemoteOld, ovrTracking* pOffTracking,
                           int domButton1, int domButton2, int offButton1, int offButton2 )
 
 {
-	//Ensure handedness is set correctly
-	//Cvar_Set("hand", vr_control_scheme->value < 10 ? "0" : "1");
 
-	//Get the cvar
-    //sv_cheats = Cvar_Get("cheats", "0", CVAR_ARCHIVE);
-
-/*    static bool dominantGripPushed = false;
+    static bool dominantGripPushed = false;
 	static float dominantGripPushTime = 0.0f;
     static bool inventoryManagementMode = false;
 
@@ -44,17 +33,12 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 			(pOffTrackedRemoteNew->Buttons & offButton2)) {
 
 		showingScreenLayer = !showingScreenLayer;
-
-        //Check we are in multiplayer
-        if (isMultiplayer()) {
-            sendButtonActionSimple("score");
-        }
     }
 
 	//Menu button
-	handleTrackedControllerButton(&leftTrackedRemoteState_new, &leftTrackedRemoteState_old, ovrButton_Enter, K_ESCAPE);
+	handleTrackedControllerButton(&leftTrackedRemoteState_new, &leftTrackedRemoteState_old, ovrButton_Enter, KEY_ESCAPE);
 
-    if (cls.key_dest == key_menu)
+/*    if (cls.key_dest == key_menu)
     {
         int leftJoyState = (pOffTrackedRemoteNew->Joystick.x > 0.7f ? 1 : 0);
         if (leftJoyState != (pOffTrackedRemoteOld->Joystick.x > 0.7f ? 1 : 0)) {
@@ -77,7 +61,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
         handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, ovrButton_Trigger, K_ENTER);
         handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, domButton2, K_ESCAPE);
     }
-    else
+    else */
     {
         float distance = sqrtf(powf(pOffTracking->HeadPose.Pose.Position.x - pDominantTracking->HeadPose.Pose.Position.x, 2) +
                                powf(pOffTracking->HeadPose.Pose.Position.y - pDominantTracking->HeadPose.Pose.Position.y, 2) +
@@ -91,12 +75,12 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             {
                 if (distance < 0.50f)
                 {
-                    Cvar_ForceSet("vr_weapon_stabilised", "1.0");
+                    weaponStabilised = true;
                 }
             }
             else
             {
-                Cvar_ForceSet("vr_weapon_stabilised", "0.0");
+                weaponStabilised = false;
             }
         }
 
@@ -109,19 +93,19 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 
 			{
 				vec2_t v;
-				rotateAboutOrigin(-weaponoffset[0], weaponoffset[2], (cl.refdef.viewangles[YAW] - hmdorientation[YAW]), v);
+//				rotateAboutOrigin(-weaponoffset[0], weaponoffset[2], (doomYawDegrees - hmdorientation[YAW]), v);
 				weaponoffset[0] = v[0];
 				weaponoffset[2] = v[1];
 			}
 
             //Set gun angles - We need to calculate all those we might need (including adjustments) for the client to then take its pick
             const ovrQuatf quatRemote = pDominantTracking->HeadPose.Pose.Orientation;
-            QuatToYawPitchRoll(quatRemote, vr_weapon_pitchadjust->value, weaponangles);
-            weaponangles[YAW] += (cl.refdef.viewangles[YAW] - hmdorientation[YAW]);
+            QuatToYawPitchRoll(quatRemote, vr_weapon_pitchadjust, weaponangles);
+            weaponangles[YAW] += (doomYawDegrees - hmdorientation[YAW]);
             weaponangles[ROLL] *= -1.0f;
 
 
-            if (vr_weapon_stabilised->value == 1.0f)
+            if (weaponStabilised)
             {
                 float z = pOffTracking->HeadPose.Pose.Position.z - pDominantTracking->HeadPose.Pose.Position.z;
                 float x = pOffTracking->HeadPose.Pose.Position.x - pDominantTracking->HeadPose.Pose.Position.x;
@@ -129,15 +113,13 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                 float zxDist = length(x, z);
 
                 if (zxDist != 0.0f && z != 0.0f) {
-                    VectorSet(weaponangles, -degrees(atanf(y / zxDist)), (cl.refdef.viewangles[YAW] - hmdorientation[YAW]) - degrees(atan2f(x, -z)), weaponangles[ROLL]);
+                    VectorSet(weaponangles, -degrees(atanf(y / zxDist)), (doomYawDegrees - hmdorientation[YAW]) - degrees(atan2f(x, -z)), weaponangles[ROLL]);
                 }
             }
 
             if ((pDominantTrackedRemoteNew->Buttons & ovrButton_GripTrigger) !=
                 (pDominantTrackedRemoteOld->Buttons & ovrButton_GripTrigger)) {
 
-                sendButtonActionSimple("inven");
-                inventoryManagementMode = (pDominantTrackedRemoteNew->Buttons & ovrButton_GripTrigger) > 0;
             }
         }
 
@@ -149,16 +131,16 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             flashlightoffset[2] = pOffTracking->HeadPose.Pose.Position.z - hmdPosition[2];
 
 			vec2_t v;
-			rotateAboutOrigin(-flashlightoffset[0], flashlightoffset[2], (cl.refdef.viewangles[YAW] - hmdorientation[YAW]), v);
+			rotateAboutOrigin(-flashlightoffset[0], flashlightoffset[2], (doomYawDegrees - hmdorientation[YAW]), v);
 			flashlightoffset[0] = v[0];
 			flashlightoffset[2] = v[1];
 
             QuatToYawPitchRoll(pOffTracking->HeadPose.Pose.Orientation, 15.0f, flashlightangles);
 
-            flashlightangles[YAW] += (cl.refdef.viewangles[YAW] - hmdorientation[YAW]);
+            flashlightangles[YAW] += (doomYawDegrees - hmdorientation[YAW]);
 
-			if (vr_walkdirection->value == 0) {
-				controllerYawHeading = -cl.refdef.viewangles[YAW] + flashlightangles[YAW];
+			if (vr_walkdirection == 0) {
+				controllerYawHeading = -doomYawDegrees + flashlightangles[YAW];
 			}
 			else
 			{
@@ -175,7 +157,8 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 
             //This section corrects for the fact that the controller actually controls direction of movement, but we want to move relative to the direction the
             //player is facing for positional tracking
-            float multiplier = (vr_positional_factor->value) / (cl_forwardspeed->value *
+            float vr_positional_factor = 1700;
+            float multiplier = (vr_positional_factor) / (1.0 *
 					((pOffTrackedRemoteNew->Buttons & ovrButton_Trigger) ? 1.5f : 1.0f));
 
             vec2_t v;
@@ -189,8 +172,8 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                   positional_movementForward);
 
             //Jump (B Button)
-            handleTrackedControllerButton(pDominantTrackedRemoteNew,
-                                          pDominantTrackedRemoteOld, domButton2, K_SPACE);
+//            handleTrackedControllerButton(pDominantTrackedRemoteNew,
+//                                          pDominantTrackedRemoteOld, domButton2, K_SPACE);
 
             //We need to record if we have started firing primary so that releasing trigger will stop firing, if user has pushed grip
             //in meantime, then it wouldn't stop the gun firing and it would get stuck
@@ -272,12 +255,6 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 				(pDominantTrackedRemoteOld->Buttons & ovrButton_Joystick)
 				&& (pDominantTrackedRemoteNew->Buttons & ovrButton_Joystick)) {
 
-			    if (vr_lasersight->value != 0.0)
-                {
-                    Cvar_ForceSet("vr_lasersight", "0.0");
-                } else {
-                    Cvar_ForceSet("vr_lasersight", "1.0");
-			    }
 			}
 
 			//Apply a filter and quadratic scaler so small movements are easier to make
@@ -311,10 +288,6 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                 (pOffTrackedRemoteOld->Buttons & ovrButton_Joystick)
                 && (pOffTrackedRemoteNew->Buttons & ovrButton_Joystick)) {
 
-                //If cheats enabled, give all weapons/pickups to player
-                if (sv_cheats->value == 1.0f) {
-                    Cbuf_AddText("give all\n");
-                }
 
             }
 
@@ -323,17 +296,17 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             static bool firingPrimary = false;
 
 			//Run
-			handleTrackedControllerButton(pOffTrackedRemoteNew,
-										  pOffTrackedRemoteOld,
-										  ovrButton_Trigger, K_SHIFT);
+//			handleTrackedControllerButton(pOffTrackedRemoteNew,
+//										  pOffTrackedRemoteOld,
+//										  ovrButton_Trigger, K_SHIFT);
 
             static int increaseSnap = true;
 			if (pDominantTrackedRemoteNew->Joystick.x > 0.6f)
 			{
 				if (increaseSnap)
 				{
-					snapTurn -= vr_snapturn_angle->value;
-                    if (vr_snapturn_angle->value > 10.0f) {
+					snapTurn -= vr_snapturn_angle;
+                    if (vr_snapturn_angle > 10.0f) {
                         increaseSnap = false;
                     }
 
@@ -351,10 +324,10 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 			{
 				if (decreaseSnap)
 				{
-					snapTurn += vr_snapturn_angle->value;
+					snapTurn += vr_snapturn_angle;
 
 					//If snap turn configured for less than 10 degrees
-					if (vr_snapturn_angle->value > 10.0f) {
+					if (vr_snapturn_angle > 10.0f) {
                         decreaseSnap = false;
                     }
 
@@ -369,7 +342,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 			}
         }
     }
-*/
+
     //Save state
     rightTrackedRemoteState_old = rightTrackedRemoteState_new;
     leftTrackedRemoteState_old = leftTrackedRemoteState_new;

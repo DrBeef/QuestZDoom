@@ -166,6 +166,8 @@ import static android.system.Os.setenv;
 		new File("/sdcard/QzDoom/res").mkdirs();
 		copy_asset("/sdcard/QzDoom", "res/lzdoom.pk3");
 		copy_asset("/sdcard/QzDoom", "res/lz_game_support.pk3");
+		copy_asset("/sdcard/QzDoom", "res/lights.pk3");
+		copy_asset("/sdcard/QzDoom", "res/brightmaps.pk3");
 
 		//Read these from a file and pass through
 		commandLineParams = new String("doom");

@@ -41,6 +41,8 @@
 
 
 #include <stdio.h>
+#include <gl/system/gl_framebuffer.h>
+#include <QzDoom/VrCommon.h>
 
 #include "i_system.h"
 #include "x86.h"
@@ -170,8 +172,8 @@ static uint32_t Col2RGB8_2[63][256];
 // There's also only one, not four.
 DFrameBuffer *screen;
 
-CVAR (Int, vid_defwidth, 640, CVAR_ARCHIVE|CVAR_GLOBALCONFIG)
-CVAR (Int, vid_defheight, 480, CVAR_ARCHIVE|CVAR_GLOBALCONFIG)
+CVAR (Int, vid_defwidth, 1280, CVAR_ARCHIVE|CVAR_GLOBALCONFIG)
+CVAR (Int, vid_defheight, 1280, CVAR_ARCHIVE|CVAR_GLOBALCONFIG)
 CVAR (Int, vid_defbits, 8, CVAR_ARCHIVE|CVAR_GLOBALCONFIG)
 CVAR (Bool, vid_fps, false, 0)
 CVAR (Bool, ticker, false, 0)
@@ -1432,6 +1434,7 @@ bool IVideo::SetResolution (int width, int height, int bits)
 		oldbits = bits;
 	}
 
+
 	I_ClosestResolution (&width, &height, bits);
 	if (!I_CheckResolution (width, height, bits))
 	{ // Try specified resolution
@@ -1446,6 +1449,8 @@ bool IVideo::SetResolution (int width, int height, int bits)
 			bits = oldbits;
 		}
 	}
+
+
 	return V_DoModeSetup (width, height, bits);
 }
 
@@ -1523,8 +1528,10 @@ void V_Init (bool restart)
 		{
 			if (height == 0)
 			{
-				width = vid_defwidth;
-				height = vid_defheight;
+				uint32_t uWidth, uHeight;
+				Android_GetScreenRes(&uWidth, &uHeight);
+				width = uWidth;
+				height = uHeight;
 			}
 			else
 			{

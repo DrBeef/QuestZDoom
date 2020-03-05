@@ -25,7 +25,6 @@ Copyright	:	Copyright 2015 Oculus VR, LLC. All Rights reserved.
 
 #include "argtable3.h"
 #include "VrInput.h"
-#include "VrCvars.h"
 
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
@@ -48,7 +47,30 @@ Copyright	:	Copyright 2015 Oculus VR, LLC. All Rights reserved.
 #include "VrCompositor.h"
 #include "VrInput.h"
 
-//#include "../qzdoom/src/client/header/client.h"
+
+//Define all variables here that were externs in the VrCommon.h
+bool qzdoom_initialised;
+long long global_time;
+float playerHeight;
+float playerYaw;
+bool showingScreenLayer;
+float vrFOV;
+vec3_t worldPosition;
+vec3_t hmdPosition;
+vec3_t hmdorientation;
+vec3_t positionDeltaThisFrame;
+vec3_t weaponangles;
+vec3_t weaponoffset;
+bool weaponStabilised;
+float vr_weapon_pitchadjust;
+bool vr_walkdirection;
+float vr_snapturn_angle;
+float doomYawDegrees;
+vec3_t flashlightangles;
+vec3_t flashlightoffset;
+int ducked;
+bool player_moving;
+
 
 #if !defined( EGL_OPENGL_ES3_BIT_KHR )
 #define EGL_OPENGL_ES3_BIT_KHR		0x0040
@@ -148,7 +170,7 @@ void setUseScreenLayer(bool use)
 
 bool useScreenLayer()
 {
-	return useVirtualScreen || forceVirtualScreen;
+	return useVirtualScreen || showingScreenLayer;
 }
 
 static void UnEscapeQuotes( char *arg )
@@ -618,34 +640,17 @@ void ovrFramebuffer_ClearEdgeTexels( ovrFramebuffer * frameBuffer )
 	// Clear to fully opaque black.
 	GL( /*gles_*/glClearColor( 0.0f, 0.0f, 0.0f, 1.0f ) );
 
-	//Glide comfort mask in and out
-	static float currentVLevel = 0.0f;
-	if (player_moving)
-	{
-//		if (currentVLevel <  vr_comfort_mask->value)
-//			currentVLevel += vr_comfort_mask->value * 0.05;
-	} else{
-//		if (currentVLevel >  0.0f)
-//			currentVLevel -= vr_comfort_mask->value * 0.05;
-	}
-
-
-	bool useMask = (currentVLevel > 0.0f && currentVLevel <= 1.0f);
-
-	float width = useMask ? (frameBuffer->Width / 2.0f) * currentVLevel : 1;
-	float height = useMask ? (frameBuffer->Height / 2.0f) * currentVLevel : 1;
-
 	// bottom
-	GL( /*gles_*/glScissor( 0, 0, frameBuffer->Width, width ) );
+	GL( /*gles_*/glScissor( 0, 0, frameBuffer->Width, 1 ) );
 	GL( /*gles_*/glClear( GL_COLOR_BUFFER_BIT ) );
 	// top
-	GL( /*gles_*/glScissor( 0, frameBuffer->Height - height, frameBuffer->Width, height ) );
+	GL( /*gles_*/glScissor( 0, frameBuffer->Height - 1, frameBuffer->Width, 1 ) );
 	GL( /*gles_*/glClear( GL_COLOR_BUFFER_BIT ) );
 	// left
-	GL( /*gles_*/glScissor( 0, 0, width, frameBuffer->Height ) );
+	GL( /*gles_*/glScissor( 0, 0, 1, frameBuffer->Height ) );
 	GL( /*gles_*/glClear( GL_COLOR_BUFFER_BIT ) );
 	// right
-	GL( /*gles_*/glScissor( frameBuffer->Width - width, 0, width, frameBuffer->Height ) );
+	GL( /*gles_*/glScissor( frameBuffer->Width - 1, 0, 1, frameBuffer->Height ) );
 	GL( /*gles_*/glClear( GL_COLOR_BUFFER_BIT ) );
 
 
@@ -1292,7 +1297,9 @@ void VR_Init()
 	//init randomiser
 	srand(time(NULL));
 
-	//Create Cvars
+	//Initialise our cvar holders
+	vr_weapon_pitchadjust = -20.0;
+
 /*	vr_snapturn_angle = Cvar_Get( "vr_snapturn_angle", "45", CVAR_ARCHIVE);
 	vr_positional_factor = Cvar_Get( "vr_positional_factor", "2000", CVAR_ARCHIVE);
     vr_walkdirection = Cvar_Get( "vr_walkdirection", "0", CVAR_ARCHIVE);
@@ -1302,7 +1309,6 @@ void VR_Init()
 	vr_weaponscale = Cvar_Get( "vr_weaponscale", "0.56", CVAR_ARCHIVE);
     vr_weapon_stabilised = Cvar_Get( "vr_weapon_stabilised", "0.0", CVAR_LATCH);
 	vr_lasersight = Cvar_Get( "vr_lasersight", "0", CVAR_LATCH);
-    vr_comfort_mask = Cvar_Get( "vr_comfort_mask", "0.0", CVAR_ARCHIVE);
 
     //The Engine (which is a derivative of Quake) uses a very specific unit size:
     //Wolfenstein 3D, DOOM and QUAKE use the same coordinate/unit system:
@@ -1706,22 +1712,22 @@ void incrementFrameIndex()
 														  gAppState.FrameIndex);
 }
 
-void getTrackedRemotesOrientation() {//Get info for tracked remotes
+void getTrackedRemotesOrientation(int vr_control_scheme) {//Get info for tracked remotes
     acquireTrackedRemotesData(gAppState.Ovr, gAppState.DisplayTime);
 
     //Call additional control schemes here
-//           switch ((int)vr_control_scheme->value)
+    switch ((int)vr_control_scheme)
     {
-//                case RIGHT_HANDED_DEFAULT:
+            case RIGHT_HANDED_DEFAULT:
             HandleInput_Default(&rightTrackedRemoteState_new, &rightTrackedRemoteState_old, &rightRemoteTracking_new,
                                 &leftTrackedRemoteState_new, &leftTrackedRemoteState_old, &leftRemoteTracking_new,
                                 ovrButton_A, ovrButton_B, ovrButton_X, ovrButton_Y);
-//                    break;
-//                case LEFT_HANDED_DEFAULT:
-//                    HandleInput_Default(&leftTrackedRemoteState_new, &leftTrackedRemoteState_old, &leftRemoteTracking_new,
-//                                        &rightTrackedRemoteState_new, &rightTrackedRemoteState_old, &rightRemoteTracking_new,
-//                                        ovrButton_X, ovrButton_Y, ovrButton_A, ovrButton_B);
-//                    break;
+                    break;
+            case LEFT_HANDED_DEFAULT:
+            HandleInput_Default(&leftTrackedRemoteState_new, &leftTrackedRemoteState_old, &leftRemoteTracking_new,
+                                        &rightTrackedRemoteState_new, &rightTrackedRemoteState_old, &rightRemoteTracking_new,
+                                        ovrButton_X, ovrButton_Y, ovrButton_A, ovrButton_B);
+                    break;
     }
 }
 
@@ -1733,7 +1739,7 @@ void submitFrame(ovrSubmitFrameDescription2 *frameDesc)
 
 //Need to replicate this code in gl_oculusquest.cpp
 void vr_main()
-{
+{/*
 	if (!destroyed)
 	{
 		processHaptics();
@@ -1750,6 +1756,7 @@ void vr_main()
 		// Hand over the eye images to the time warp.
 		submitFrame(&frameDesc);
 	}
+ */
 }
 
 static void ovrAppThread_Create( ovrAppThread * appThread, JNIEnv * env, jobject activityObject, jclass activityClass )

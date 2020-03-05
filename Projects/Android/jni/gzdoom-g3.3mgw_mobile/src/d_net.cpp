@@ -990,7 +990,7 @@ void NetUpdate (void)
 	// build new ticcmds for console player
 	for (i = 0; i < newtics; i++)
 	{
-		I_StartTic ();
+		//I_StartTic ();
 		D_ProcessEvents ();
 		if (pauseext || (maketic - gametic) / ticdup >= BACKUPTICS/2-1)
 			break;			// can't hold any more

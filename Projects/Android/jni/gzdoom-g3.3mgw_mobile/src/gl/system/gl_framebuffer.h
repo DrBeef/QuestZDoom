@@ -4,7 +4,7 @@
 #ifdef _WIN32
 #include "win32gliface.h"
 #else
-#include "sdlglvideo.h"
+#include "glvideo.h"
 #endif
 
 #include <memory>
@@ -19,9 +19,9 @@ class OpenGLFrameBuffer : public Win32GLFrameBuffer
 	typedef Win32GLFrameBuffer Super;
 #else
 //#include "sdlglvideo.h"
-class OpenGLFrameBuffer : public SDLGLFB
+class OpenGLFrameBuffer : public OculusQuestGLFB
 {
-	typedef SDLGLFB Super;	//[C]commented, DECLARE_CLASS defines this in linux
+	typedef OculusQuestGLFB Super;	//[C]commented, DECLARE_CLASS defines this in linux
 #endif
 
 

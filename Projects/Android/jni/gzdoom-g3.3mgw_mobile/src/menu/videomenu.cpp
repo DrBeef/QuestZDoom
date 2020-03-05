@@ -150,6 +150,8 @@ static void BuildModesList (int hiwidth, int hiheight, int hi_bits)
 	}
 	showbits = BitTranslate[DummyDepthCvar];
 
+	return;
+
 	if (Video != NULL)
 	{
 		Video->StartModeIterator (showbits, screen->IsFullscreen());

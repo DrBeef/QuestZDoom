@@ -51,7 +51,7 @@ static void CATCH(int a, int b, int c, int d, int e)
 	LOGI("CAUGHT BAD");
 }
 
-int glesLoad = 2; // TODO fix this!
+int glesLoad = 3; // TODO fix this!
 
 void* SDL_GL_GetProcAddress(const char* proc);
 static void *MOBILE_GetProcAddress(const char* name)

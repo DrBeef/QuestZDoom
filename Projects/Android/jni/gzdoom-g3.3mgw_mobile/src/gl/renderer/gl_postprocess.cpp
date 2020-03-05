@@ -796,6 +796,9 @@ void FGLRenderer::Flush()
 	}
 	else
 	{
+		const bool is2D = (gamestate != GS_LEVEL);
+		if (is2D) stereo3dMode.SetUp();
+
 		// Render 2D to eye textures
 		for (int eye_ix = 0; eye_ix < stereo3dMode.eye_count(); ++eye_ix)
 		{
@@ -803,6 +806,9 @@ void FGLRenderer::Flush()
 			mBuffers->BindEyeFB(eye_ix);
 			glViewport(mScreenViewport.left, mScreenViewport.top, mScreenViewport.width, mScreenViewport.height);
 			glScissor(mScreenViewport.left, mScreenViewport.top, mScreenViewport.width, mScreenViewport.height);
+
+			//Only adjust HUD if we are 3D (otherwise we are rendering to a cylinder compositor layer)
+			if (!is2D)	stereo3dMode.getEyePose(eye_ix)->AdjustHud();
 			m2DDrawer->Draw();
 			FGLDebug::PopGroup();
 		}
@@ -812,6 +818,7 @@ void FGLRenderer::Flush()
 		FGLDebug::PushGroup("PresentEyes");
 		stereo3dMode.Present();
 		FGLDebug::PopGroup();
+		if (is2D) stereo3dMode.TearDown();
 	}
 }
 

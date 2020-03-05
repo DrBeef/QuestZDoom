@@ -15,16 +15,13 @@ Authors		:	Simon Brown
 
 #include "VrInput.h"
 
-//#include <doomtype.h>
-
-//keys.h
-//void Key_Event (int key, bool down, unsigned time);
+void Joy_GenerateButtonEvents(int oldbuttons, int newbuttons, int numbuttons, int base);
 
 void handleTrackedControllerButton(ovrInputStateTrackedRemote * trackedRemoteState, ovrInputStateTrackedRemote * prevTrackedRemoteState, uint32_t button, int key)
 {
     if ((trackedRemoteState->Buttons & button) != (prevTrackedRemoteState->Buttons & button))
     {
-        //Key_Event(key, (trackedRemoteState->Buttons & button) != 0, global_time);
+        //Joy_GenerateButtonEvents();
     }
 }
 

@@ -82,7 +82,7 @@ OpenGLFrameBuffer::OpenGLFrameBuffer(void *hMonitor, int width, int height, int 
 #else
 OpenGLFrameBuffer::OpenGLFrameBuffer(void *hMonitor, int width, int height, int bits, int refreshHz, bool fullscreen) :
 #endif
-	Super(hMonitor, width, height, bits, refreshHz, fullscreen, false) 
+	Super(hMonitor, width, height, bits, refreshHz, fullscreen, false)
 {
 	// SetVSync needs to be at the very top to workaround a bug in Nvidia's OpenGL driver.
 	// If wglSwapIntervalEXT is called after glBindFramebuffer in a frame the setting is not changed!

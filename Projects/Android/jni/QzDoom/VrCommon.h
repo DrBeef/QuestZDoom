@@ -27,34 +27,41 @@ extern "C"
 #define ALOGV(...)
 #endif
 
-bool qzdoom_initialised;
+extern bool qzdoom_initialised;
 
-long long global_time;
+extern long long global_time;
 
-float playerHeight;
-float playerYaw;
+extern float playerHeight;
+extern float playerYaw;
 
-bool showingScreenLayer;
-float vrFOV;
+extern bool showingScreenLayer;
+extern float vrFOV;
 
-vec3_t worldPosition;
+extern vec3_t worldPosition;
 
-vec3_t hmdPosition;
-vec3_t hmdorientation;
-vec3_t positionDeltaThisFrame;
+extern vec3_t hmdPosition;
+extern vec3_t hmdorientation;
+extern vec3_t positionDeltaThisFrame;
 
-vec3_t weaponangles;
-vec3_t weaponoffset;
+extern vec3_t weaponangles;
+extern vec3_t weaponoffset;
 
-vec3_t flashlightangles;
-vec3_t flashlightoffset;
+extern bool weaponStabilised;
+extern float vr_weapon_pitchadjust;
+extern bool vr_walkdirection;
+extern float vr_snapturn_angle;
+extern float doomYawDegrees;
+
+
+extern vec3_t flashlightangles;
+extern vec3_t flashlightoffset;
 
 #define DUCK_NOTDUCKED 0
 #define DUCK_BUTTON 1
 #define DUCK_CROUCHED 2
-int ducked;
+extern int ducked;
 
-bool player_moving;
+extern bool player_moving;
 
 void shutdownVR();
 
@@ -75,7 +82,7 @@ void setUseScreenLayer(bool use);
 
 void processHaptics();
 void getHMDOrientation(ovrTracking2 *tracking);
-void getTrackedRemotesOrientation();
+void getTrackedRemotesOrientation(int vr_control_scheme);
 
 void incrementFrameIndex();
 

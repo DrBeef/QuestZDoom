@@ -18,10 +18,10 @@ class OpenGLSWFrameBuffer : public Win32GLFrameBuffer
 {
 	typedef Win32GLFrameBuffer Super;
 #else
-#include "sdlglvideo.h"
-class OpenGLSWFrameBuffer : public SDLGLFB
+#include "glvideo.h"
+class OpenGLSWFrameBuffer : public OculusQuestGLFB
 {
-	typedef SDLGLFB Super;	//[C]commented, DECLARE_CLASS defines this in linux
+	typedef OculusQuestGLFB Super;	//[C]commented, DECLARE_CLASS defines this in linux
 #endif
 
 
