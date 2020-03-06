@@ -624,7 +624,6 @@ LOCAL_SRC_FILES = \
 p_acs.cpp_CFLAGS := -O1
 
 LOCAL_LDLIBS := -ldl -llog -lOpenSLES -landroid
-#LOCAL_LDLIBS +=-lGLESv1_CM
 LOCAL_LDLIBS += -lGLESv3
 
 LOCAL_LDLIBS +=  -lEGL

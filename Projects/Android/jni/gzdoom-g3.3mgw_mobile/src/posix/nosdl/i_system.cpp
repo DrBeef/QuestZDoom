@@ -34,8 +34,6 @@
 #include <fcntl.h>
 #include <signal.h>
 
-//#include <SDL.h>
-
 #include "doomerrors.h"
 #include <math.h>
 

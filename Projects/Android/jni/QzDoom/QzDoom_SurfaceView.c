@@ -37,12 +37,6 @@ Copyright	:	Copyright 2015 Oculus VR, LLC. All Rights reserved.
 #include "VrApi_SystemUtils.h"
 #include "VrApi_Input.h"
 #include "VrApi_Types.h"
-
-//#include <src/gl/loader.h>
-
-//#include <SDL2/SDL.h>
-//#include <SDL2/SDL_main.h>
-
 #include "VrCompositor.h"
 #include "VrInput.h"
 

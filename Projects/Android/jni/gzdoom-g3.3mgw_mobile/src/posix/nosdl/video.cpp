@@ -47,8 +47,6 @@
 #include "version.h"
 #include <QzDoom/VrCommon.h>
 
-#include <SDL.h>
-
 
 // MACROS ------------------------------------------------------------------
 

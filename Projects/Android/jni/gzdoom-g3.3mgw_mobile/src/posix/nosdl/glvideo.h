@@ -3,7 +3,7 @@
 
 #include "hardware.h"
 #include "v_video.h"
-#include <SDL.h>
+
 #include "gl/system/gl_system.h"
 
 EXTERN_CVAR (Float, dimamount)
@@ -18,7 +18,7 @@ class NoSDLGLVideo : public IVideo
 	NoSDLGLVideo (int parm);
 	~NoSDLGLVideo ();
 
-	EDisplayType GetDisplayType () { return DISPLAY_Both; }
+	EDisplayType GetDisplayType () { return DISPLAY_FullscreenOnly; }
 	void SetWindowedScale (float scale);
 
 	DFrameBuffer *CreateFrameBuffer (int width, int height, bool bgra, bool fs, DFrameBuffer *old);
@@ -72,8 +72,6 @@ public:
 
 	virtual void ScaleCoordsFromWindow(int16_t &x, int16_t &y);
 
-//	SDL_Window *GetSDLWindow() override { return Screen; }
-
 	virtual int GetTrueHeight() { return GetClientHeight(); }
 protected:
 	void SetGammaTable(uint16_t *tbl);
@@ -91,7 +89,6 @@ protected:
 	void UpdateColors ();
 
 	int m_Lock;
-	Uint16 m_origGamma[3][256];
 	bool m_supportsGamma;
 };
 #endif
