@@ -40,9 +40,8 @@ Copyright	:	Copyright 2015 Oculus VR, LLC. All Rights reserved.
 
 //#include <src/gl/loader.h>
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_main.h>
-//#include <src/client/header/client.h>
+//#include <SDL2/SDL.h>
+//#include <SDL2/SDL_main.h>
 
 #include "VrCompositor.h"
 #include "VrInput.h"
@@ -509,7 +508,8 @@ static void ovrFramebuffer_Clear( ovrFramebuffer * frameBuffer )
 	frameBuffer->Height = 0;
 	frameBuffer->Multisamples = 0;
 	frameBuffer->TextureSwapChainLength = 0;
-	frameBuffer->TextureSwapChainIndex = 0;
+	frameBuffer->ProcessingTextureSwapChainIndex = 0;
+	frameBuffer->ReadyTextureSwapChainIndex = 0;
 	frameBuffer->ColorTextureSwapChain = NULL;
 	frameBuffer->DepthBuffers = NULL;
 	frameBuffer->FrameBuffers = NULL;
@@ -598,7 +598,7 @@ void ovrFramebuffer_Destroy( ovrFramebuffer * frameBuffer )
 void ovrFramebuffer_SetCurrent( ovrFramebuffer * frameBuffer )
 {
     //LOAD_GLES2(glBindFramebuffer);
-	GL( /*gles_*/glBindFramebuffer( GL_DRAW_FRAMEBUFFER, frameBuffer->FrameBuffers[frameBuffer->TextureSwapChainIndex] ) );
+	GL( /*gles_*/glBindFramebuffer( GL_DRAW_FRAMEBUFFER, frameBuffer->FrameBuffers[frameBuffer->ProcessingTextureSwapChainIndex] ) );
 }
 
 void ovrFramebuffer_SetNone()
@@ -620,7 +620,8 @@ void ovrFramebuffer_Resolve( ovrFramebuffer * frameBuffer )
 void ovrFramebuffer_Advance( ovrFramebuffer * frameBuffer )
 {
 	// Advance to the next texture from the set.
-	frameBuffer->TextureSwapChainIndex = ( frameBuffer->TextureSwapChainIndex + 1 ) % frameBuffer->TextureSwapChainLength;
+    frameBuffer->ReadyTextureSwapChainIndex = frameBuffer->ProcessingTextureSwapChainIndex;
+	frameBuffer->ProcessingTextureSwapChainIndex = ( frameBuffer->ProcessingTextureSwapChainIndex + 1 ) % frameBuffer->TextureSwapChainLength;
 }
 
 
@@ -1327,47 +1328,6 @@ static ovrApp gAppState;
 static ovrJava java;
 static bool destroyed = false;
 
-
-void RenderFrame()
-{
-	//Qcommon_BeginFrame (time * 1000);
-
-	ovrRenderer *renderer = useScreenLayer() ? &gAppState.Scene.CylinderRenderer : &gAppState.Renderer;
-
-	// Render the eye images.
-	for (int eye = 0; eye < renderer->NumBuffers; eye++) {
-		ovrFramebuffer *frameBuffer = &(renderer->FrameBuffer[eye]);
-		ovrFramebuffer_SetCurrent(frameBuffer);
-
-		{
-			GL(glEnable(GL_SCISSOR_TEST));
-			GL(glDepthMask(GL_TRUE));
-			GL(glEnable(GL_DEPTH_TEST));
-			GL(glDepthFunc(GL_LEQUAL));
-
-			//Weusing the size of the render target
-			GL(glViewport(0, 0, frameBuffer->Width, frameBuffer->Height));
-			GL(glScissor(0, 0, frameBuffer->Width, frameBuffer->Height));
-
-			GL(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
-			GL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-			GL(glDisable(GL_SCISSOR_TEST));
-
-			//Now do the drawing for this eye (or draw for left eye twice if using screen layer)
-			//Qcommon_Frame(useScreenLayer() ? 0 : eye);
-		}
-
-		//Clear edge to prevent smearing
-		ovrFramebuffer_ClearEdgeTexels(frameBuffer);
-		ovrFramebuffer_Resolve(frameBuffer);
-		ovrFramebuffer_Advance(frameBuffer);
-	}
-
-
-	ovrFramebuffer_SetNone();
-}
-
-
 void prepareEyeBuffer(int eye )
 {
 	ovrRenderer *renderer = useScreenLayer() ? &gAppState.Scene.CylinderRenderer : &gAppState.Renderer;
@@ -1482,9 +1442,9 @@ void * AppThreadFunction(void * parm ) {
 	jclass cls = (*java.Env)->GetObjectClass(java.Env, java.ActivityObject);
 
 	/* This interface could expand with ABI negotiation, callbacks, etc. */
-	SDL_Android_Init(java.Env, cls);
+//	SDL_Android_Init(java.Env, cls);
 
-	SDL_SetMainReady();
+//	SDL_SetMainReady();
 
 	// Note that AttachCurrentThread will reset the thread name.
 	prctl(PR_SET_NAME, (long) "OVR::Main", 0, 0, 0);
@@ -1634,75 +1594,6 @@ void shutdownVR() {
 	vrapi_Shutdown();
 }
 
-ovrSubmitFrameDescription2 setupFrameDescriptor(ovrTracking2 *tracking) {
-	ovrSubmitFrameDescription2 frameDesc = {0 };
-	if (!useScreenLayer()) {
-
-		ovrLayerProjection2 layer = vrapi_DefaultLayerProjection2();
-		layer.HeadPose = (*tracking).HeadPose;
-		for ( int eye = 0; eye < VRAPI_FRAME_LAYER_EYE_MAX; eye++ )
-		{
-			ovrFramebuffer * frameBuffer = &gAppState.Renderer.FrameBuffer[gAppState.Renderer.NumBuffers == 1 ? 0 : eye];
-			layer.Textures[eye].ColorSwapChain = frameBuffer->ColorTextureSwapChain;
-			layer.Textures[eye].SwapChainIndex = frameBuffer->TextureSwapChainIndex;
-
-			ovrMatrix4f projectionMatrix;
-			projectionMatrix = ovrMatrix4f_CreateProjectionFov(vrFOV, vrFOV,
-															   0.0f, 0.0f, 0.1f, 0.0f);
-
-			layer.Textures[eye].TexCoordsFromTanAngles = ovrMatrix4f_TanAngleMatrixFromProjection(&projectionMatrix);
-
-			layer.Textures[eye].TextureRect.x = 0;
-			layer.Textures[eye].TextureRect.y = 0;
-			layer.Textures[eye].TextureRect.width = 1.0f;
-			layer.Textures[eye].TextureRect.height = 1.0f;
-		}
-		layer.Header.Flags |= VRAPI_FRAME_LAYER_FLAG_CHROMATIC_ABERRATION_CORRECTION;
-
-		// Set up the description for this frame.
-		const ovrLayerHeader2 *layers[] =
-				{
-						&layer.Header
-				};
-
-		ovrSubmitFrameDescription2 frameDesc = {};
-		frameDesc.Flags = 0;
-		frameDesc.SwapInterval = gAppState.SwapInterval;
-		frameDesc.FrameIndex = gAppState.FrameIndex;
-		frameDesc.DisplayTime = gAppState.DisplayTime;
-		frameDesc.LayerCount = 1;
-		frameDesc.Layers = layers;
-
-	} else {
-		// Set-up the compositor layers for this frame.
-		// NOTE: Multiple independent layers are allowed, but they need to be added
-		// in a depth consistent order.
-		memset( gAppState.Layers, 0, sizeof( ovrLayer_Union2 ) * ovrMaxLayerCount );
-		gAppState.LayerCount = 0;
-
-		// Add a simple cylindrical layer
-		gAppState.Layers[gAppState.LayerCount++].Cylinder =
-				BuildCylinderLayer(&gAppState.Scene.CylinderRenderer,
-								   gAppState.Scene.CylinderWidth, gAppState.Scene.CylinderHeight, tracking, radians(playerYaw) );
-
-		// Compose the layers for this frame.
-		const ovrLayerHeader2 * layerHeaders[ovrMaxLayerCount] = { 0 };
-		for ( int i = 0; i < gAppState.LayerCount; i++ )
-		{
-			layerHeaders[i] = &gAppState.Layers[i].Header;
-		}
-
-		// Set up the description for this frame.
-		frameDesc.Flags = 0;
-		frameDesc.SwapInterval = gAppState.SwapInterval;
-		frameDesc.FrameIndex = gAppState.FrameIndex;
-		frameDesc.DisplayTime = gAppState.DisplayTime;
-		frameDesc.LayerCount = gAppState.LayerCount;
-		frameDesc.Layers = layerHeaders;
-	}
-	return frameDesc;
-}
-
 void incrementFrameIndex()
 {
 	// This is the only place the frame index is incremented, right before
@@ -1731,33 +1622,81 @@ void getTrackedRemotesOrientation(int vr_control_scheme) {//Get info for tracked
     }
 }
 
-void submitFrame(ovrSubmitFrameDescription2 *frameDesc)
+void submitFrame(ovrTracking2 *tracking)
 {
-	// Hand over the eye images to the time warp.
-	vrapi_SubmitFrame2(gAppState.Ovr, frameDesc);
+    ovrSubmitFrameDescription2 frameDesc = {0};
+    
+    if (!useScreenLayer()) {
+
+        ovrLayerProjection2 layer = vrapi_DefaultLayerProjection2();
+        layer.HeadPose = (*tracking).HeadPose;
+        for ( int eye = 0; eye < VRAPI_FRAME_LAYER_EYE_MAX; eye++ )
+        {
+            ovrFramebuffer * frameBuffer = &gAppState.Renderer.FrameBuffer[gAppState.Renderer.NumBuffers == 1 ? 0 : eye];
+            layer.Textures[eye].ColorSwapChain = frameBuffer->ColorTextureSwapChain;
+            layer.Textures[eye].SwapChainIndex = frameBuffer->ReadyTextureSwapChainIndex;
+
+            ovrMatrix4f projectionMatrix;
+            projectionMatrix = ovrMatrix4f_CreateProjectionFov(vrFOV, vrFOV,
+                                                               0.0f, 0.0f, 0.1f, 0.0f);
+
+            layer.Textures[eye].TexCoordsFromTanAngles = ovrMatrix4f_TanAngleMatrixFromProjection(&projectionMatrix);
+
+            layer.Textures[eye].TextureRect.x = 0;
+            layer.Textures[eye].TextureRect.y = 0;
+            layer.Textures[eye].TextureRect.width = 1.0f;
+            layer.Textures[eye].TextureRect.height = 1.0f;
+        }
+        layer.Header.Flags |= VRAPI_FRAME_LAYER_FLAG_CHROMATIC_ABERRATION_CORRECTION;
+
+        // Set up the description for this frame.
+        const ovrLayerHeader2 *layers[] =
+                {
+                        &layer.Header
+                };
+
+        frameDesc.Flags = 0;
+        frameDesc.SwapInterval = gAppState.SwapInterval;
+        frameDesc.FrameIndex = gAppState.FrameIndex;
+        frameDesc.DisplayTime = gAppState.DisplayTime;
+        frameDesc.LayerCount = 1;
+        frameDesc.Layers = layers;
+
+        // Hand over the eye images to the time warp.
+        vrapi_SubmitFrame2(gAppState.Ovr, &frameDesc);
+
+    } else {
+        // Set-up the compositor layers for this frame.
+        // NOTE: Multiple independent layers are allowed, but they need to be added
+        // in a depth consistent order.
+        memset( gAppState.Layers, 0, sizeof( ovrLayer_Union2 ) * ovrMaxLayerCount );
+        gAppState.LayerCount = 0;
+
+        // Add a simple cylindrical layer
+        gAppState.Layers[gAppState.LayerCount++].Cylinder =
+                BuildCylinderLayer(&gAppState.Scene.CylinderRenderer,
+                                   gAppState.Scene.CylinderWidth, gAppState.Scene.CylinderHeight, tracking, radians(playerYaw) );
+
+        // Compose the layers for this frame.
+        const ovrLayerHeader2 * layerHeaders[ovrMaxLayerCount] = { 0 };
+        for ( int i = 0; i < gAppState.LayerCount; i++ )
+        {
+            layerHeaders[i] = &gAppState.Layers[i].Header;
+        }
+
+        // Set up the description for this frame.
+        frameDesc.Flags = 0;
+        frameDesc.SwapInterval = gAppState.SwapInterval;
+        frameDesc.FrameIndex = gAppState.FrameIndex;
+        frameDesc.DisplayTime = gAppState.DisplayTime;
+        frameDesc.LayerCount = gAppState.LayerCount;
+        frameDesc.Layers = layerHeaders;
+
+        // Hand over the eye images to the time warp.
+        vrapi_SubmitFrame2(gAppState.Ovr, &frameDesc);
+    }
 }
 
-//Need to replicate this code in gl_oculusquest.cpp
-void vr_main()
-{/*
-	if (!destroyed)
-	{
-		processHaptics();
-
-		ovrTracking2 tracking;
-		getHMDOrientation(&tracking);
-        getTrackedRemotesOrientation();
-
-        ovrSubmitFrameDescription2 frameDesc = setupFrameDescriptor(&tracking);
-
-		//Call the game drawing code
-		RenderFrame();
-
-		// Hand over the eye images to the time warp.
-		submitFrame(&frameDesc);
-	}
- */
-}
 
 static void ovrAppThread_Create( ovrAppThread * appThread, JNIEnv * env, jobject activityObject, jclass activityClass )
 {
@@ -1791,7 +1730,7 @@ Activity lifecycle
 ================================================================================
 */
 
-JNIEXPORT jint JNICALL SDL_JNI_OnLoad(JavaVM* vm, void* reserved);
+//JNIEXPORT jint JNICALL SDL_JNI_OnLoad(JavaVM* vm, void* reserved);
 
 int JNI_OnLoad(JavaVM* vm, void* reserved)
 {
@@ -1802,7 +1741,7 @@ int JNI_OnLoad(JavaVM* vm, void* reserved)
 		return -1;
 	}
 
-	return SDL_JNI_OnLoad(vm, reserved);
+	return JNI_VERSION_1_4;
 }
 
 JNIEXPORT jlong JNICALL Java_com_drbeef_qzdoom_GLES3JNILib_onCreate( JNIEnv * env, jclass activityClass, jobject activity,

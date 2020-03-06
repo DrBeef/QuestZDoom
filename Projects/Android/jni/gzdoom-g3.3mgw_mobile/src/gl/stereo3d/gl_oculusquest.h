@@ -102,7 +102,7 @@ protected:
 	mutable int cachedViewwidth, cachedViewheight, cachedViewwindowx, cachedViewwindowy;
 	mutable F2DDrawer * cached2DDrawer;
 	mutable F2DDrawer * crossHairDrawer;
-	mutable ovrSubmitFrameDescription2 frameDesc;
+	mutable ovrTracking2 tracking;
 
 private:
 	typedef Stereo3DMode super;

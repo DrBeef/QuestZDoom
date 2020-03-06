@@ -12,11 +12,11 @@ EXTERN_CVAR (Color, dimcolor)
 struct FRenderer;
 FRenderer *gl_CreateInterface();
 
-class SDLGLVideo : public IVideo
+class NoSDLGLVideo : public IVideo
 {
  public:
-	SDLGLVideo (int parm);
-	~SDLGLVideo ();
+	NoSDLGLVideo (int parm);
+	~NoSDLGLVideo ();
 
 	EDisplayType GetDisplayType () { return DISPLAY_Both; }
 	void SetWindowedScale (float scale);
@@ -34,23 +34,22 @@ private:
 	int IteratorBits;
 };
 
-class SDLBaseFB : public DFrameBuffer
+class NoSDLBaseFB : public DFrameBuffer
 {
 	typedef DFrameBuffer Super;
 public:
 	using DFrameBuffer::DFrameBuffer;
-	virtual SDL_Window *GetSDLWindow() = 0;
-	
-	friend class SDLGLVideo;
+
+	friend class NoSDLGLVideo;
 };
 
-class SDLGLFB : public SDLBaseFB
+class NoSDLGLFB : public NoSDLBaseFB
 {
-	typedef SDLBaseFB Super;
+	typedef NoSDLBaseFB Super;
 public:
 	// this must have the same parameters as the Windows version, even if they are not used!
-	SDLGLFB (void *hMonitor, int width, int height, int, int, bool fullscreen, bool bgra); 
-	~SDLGLFB ();
+	NoSDLGLFB (void *hMonitor, int width, int height, int, int, bool fullscreen, bool bgra); 
+	~NoSDLGLFB ();
 
 	void ForceBuffering (bool force);
 	bool Lock(bool buffered);
@@ -66,14 +65,14 @@ public:
 	
 	void NewRefreshRate ();
 
-	friend class SDLGLVideo;
+	friend class NoSDLGLVideo;
 
 	int GetClientWidth();
 	int GetClientHeight();
 
 	virtual void ScaleCoordsFromWindow(int16_t &x, int16_t &y);
 
-	SDL_Window *GetSDLWindow() override { return Screen; }
+//	SDL_Window *GetSDLWindow() override { return Screen; }
 
 	virtual int GetTrueHeight() { return GetClientHeight(); }
 protected:
@@ -81,13 +80,13 @@ protected:
 	void ResetGammaTable();
 	void InitializeState();
 
-	SDLGLFB () {}
+	NoSDLGLFB () {}
 	uint8_t GammaTable[3][256];
 	bool UpdatePending;
 
-	SDL_Window *Screen;
+//	SDL_Window *Screen;
 
-	SDL_GLContext GLContext;
+//	SDL_GLContext GLContext;
 
 	void UpdateColors ();
 

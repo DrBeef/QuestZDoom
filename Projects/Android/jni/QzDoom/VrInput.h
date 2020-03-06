@@ -21,9 +21,6 @@ float positional_movementSideways;
 float positional_movementForward;
 float snapTurn;
 
-void sendButtonAction(const char* action, long buttonDown);
-void sendButtonActionSimple(const char* action);
-
 void acquireTrackedRemotesData(const ovrMobile *Ovr, double displayTime);
 
 void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew, ovrInputStateTrackedRemote *pDominantTrackedRemoteOld, ovrTracking* pDominantTracking,

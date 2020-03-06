@@ -34,7 +34,7 @@
 #include <fcntl.h>
 #include <signal.h>
 
-#include <SDL.h>
+//#include <SDL.h>
 
 #include "doomerrors.h"
 #include <math.h>
@@ -152,7 +152,7 @@ void Mac_I_FatalError(const char* errortext);
 void Linux_I_FatalError(const char* errortext)
 {
 	// Close window or exit fullscreen and release mouse capture
-	SDL_Quit();
+	//SDL_Quit();
 
 	const char *str;
 	if((str=getenv("KDE_FULL_SESSION")) && strcmp(str, "true") == 0)
@@ -174,7 +174,7 @@ void Linux_I_FatalError(const char* errortext)
 		FString message;
 		message << GAMESIG " ";
 		message << GetVersionString() << ": No IWAD found";
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, message, errortext, NULL);
+		//SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, message, errortext, NULL);
 	}
 }
 #endif
@@ -452,17 +452,17 @@ int I_FindAttr(findstate_t* const fileinfo)
 
 void I_PutInClipboard (const char *str)
 {
-	SDL_SetClipboardText(str);
+	//SDL_SetClipboardText(str);
 }
 
 FString I_GetFromClipboard (bool use_primary_selection)
 {
-	if(char *ret = SDL_GetClipboardText())
+/*	if(char *ret = SDL_GetClipboardText())
 	{
 		FString text(ret);
 		SDL_free(ret);
 		return text;
-	}
+	}*/
 	return "";
 }
 

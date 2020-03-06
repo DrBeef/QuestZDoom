@@ -418,7 +418,7 @@ namespace s3d
         leftEyeView.submitFrame();
         rightEyeView.submitFrame();
 
-        submitFrame(&frameDesc);
+        submitFrame(&tracking);
     }
 
     static int mAngleFromRadians(double radians)
@@ -639,7 +639,6 @@ namespace s3d
 
 
         //Get controller state here
-        ovrTracking2 tracking;
         getHMDOrientation(&tracking);
 
         //Set up stuff used in the tracking code
@@ -648,8 +647,6 @@ namespace s3d
         vr_walkdirection = !vr_moveFollowsOffHand; //FIX THIS!
         doomYawDegrees = GLRenderer->mAngles.Yaw.Degrees;
         getTrackedRemotesOrientation(vr_control_scheme);
-
-        frameDesc = setupFrameDescriptor(&tracking);
 
 /*        player_t* player = r_viewpoint.camera ? r_viewpoint.camera->player : nullptr;
         {

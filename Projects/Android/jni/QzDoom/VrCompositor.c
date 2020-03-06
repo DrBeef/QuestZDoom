@@ -465,7 +465,7 @@ ovrLayerProjection2 ovrRenderer_RenderGroundPlaneToEyeBuffer( ovrRenderer * rend
 	{
 		ovrFramebuffer * frameBuffer = &renderer->FrameBuffer[eye];
 		layer.Textures[eye].ColorSwapChain = frameBuffer->ColorTextureSwapChain;
-		layer.Textures[eye].SwapChainIndex = frameBuffer->TextureSwapChainIndex;
+		layer.Textures[eye].SwapChainIndex = frameBuffer->ProcessingTextureSwapChainIndex;
 		layer.Textures[eye].TexCoordsFromTanAngles = ovrMatrix4f_TanAngleMatrixFromProjection( &tracking->Eye[eye].ProjectionMatrix );
 	}
 	layer.Header.Flags |= VRAPI_FRAME_LAYER_FLAG_CHROMATIC_ABERRATION_CORRECTION;
@@ -572,7 +572,7 @@ ovrLayerCylinder2 BuildCylinderLayer( ovrRenderer * cylinderRenderer,
 		ovrMatrix4f modelViewMatrix = ovrMatrix4f_Multiply( &tracking->Eye[eye].ViewMatrix, &cylinderTransform );
 		layer.Textures[eye].TexCoordsFromTanAngles = ovrMatrix4f_Inverse( &modelViewMatrix );
 		layer.Textures[eye].ColorSwapChain = cylinderFrameBuffer->ColorTextureSwapChain;
-		layer.Textures[eye].SwapChainIndex = cylinderFrameBuffer->TextureSwapChainIndex;
+		layer.Textures[eye].SwapChainIndex = cylinderFrameBuffer->ReadyTextureSwapChainIndex;
 
 		// Texcoord scale and bias is just a representation of the aspect ratio. The positioning
 		// of the cylinder is handled entirely by the TexCoordsFromTanAngles matrix.

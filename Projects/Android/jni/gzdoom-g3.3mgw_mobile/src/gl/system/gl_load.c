@@ -53,17 +53,8 @@ static void CATCH(int a, int b, int c, int d, int e)
 
 int glesLoad = 3; // TODO fix this!
 
-void* SDL_GL_GetProcAddress(const char* proc);
 static void *MOBILE_GetProcAddress(const char* name)
 {
-/*    static int jwzLoaded = 0;
-    if( ! jwzLoaded )
-    {
-        void jwzgles_reset (void);
-        jwzgles_reset ();
-        jwzLoaded = 1;
-    }
-*/
     static void* h = NULL;
 
     if (h == NULL)
@@ -80,7 +71,7 @@ static void *MOBILE_GetProcAddress(const char* name)
         }
         else if( glesLoad == 3 )
         {
-           return SDL_GL_GetProcAddress( name );
+            h = dlopen("libGLESv3.so", RTLD_LAZY | RTLD_LOCAL);
         }
 
         if (h == NULL)
@@ -95,7 +86,7 @@ static void *MOBILE_GetProcAddress(const char* name)
 
     if( glesLoad == 1 )
         sprintf(newName,"jwzgles_%s",name);
-    else if( glesLoad == 2 )
+    else
         sprintf(newName,"%s",name);
     //
 
@@ -117,66 +108,7 @@ static void *MOBILE_GetProcAddress(const char* name)
 
 #endif
 
-#if defined(_WIN32)
-
-#ifdef APIENTRY
-#undef APIENTRY
-#endif
-#include <windows.h>
-
-
-#ifdef _MSC_VER
-// disable inlining here because it creates an incredible amount of bloat in this file.
-#pragma inline_depth(0)
-#pragma warning(disable: 4055)
-#pragma warning(disable: 4054)
-#pragma warning(disable: 4996)
-#endif
-
-static int TestPointer(const PROC pTest)
-{
-	ptrdiff_t iTest;
-	if(!pTest) return 0;
-	iTest = (ptrdiff_t)pTest;
-	
-	if(iTest == 1 || iTest == 2 || iTest == 3 || iTest == -1) return 0;
-	
-	return 1;
-}
-
-static PROC WinGetProcAddress(const char *name)
-{
-	HMODULE glMod = NULL;
-	PROC pFunc = wglGetProcAddress((LPCSTR)name);
-	if(TestPointer(pFunc))
-	{
-		return pFunc;
-	}
-	glMod = GetModuleHandleA("OpenGL32.dll");
-	return (PROC)GetProcAddress(glMod, (LPCSTR)name);
-}
-
-
-
-#define IntGetProcAddress(name) WinGetProcAddress(name)
-#else
-	#if defined(__APPLE__)
-	    #define IntGetProcAddress(name) AppleGLGetProcAddress(name)
-	#elif defined(__ANDROID__)
-		#define IntGetProcAddress(name) MOBILE_GetProcAddress((const char*)name)
-	#else
-		#if defined(__sgi) || defined(__sun) || defined(__unix__)
-			void* SDL_GL_GetProcAddress(const char* proc);
-			#define IntGetProcAddress(name) SDL_GL_GetProcAddress((const char*)name)
-			//#define IntGetProcAddress(name) PosixGetProcAddress((const GLubyte*)name)
-/* END OF MANUAL CHANGES, DO NOT REMOVE! */
-		#else /* GLX */
-		    #include <GL/glx.h>
-
-			#define IntGetProcAddress(name) (*glXGetProcAddressARB)((const GLubyte*)name)
-		#endif
-	#endif
-#endif
+#define IntGetProcAddress(name) MOBILE_GetProcAddress((const char*)name)
 
 int ogl_ext_ARB_buffer_storage = ogl_LOAD_FAILED;
 int ogl_ext_ARB_shader_storage_buffer_object = ogl_LOAD_FAILED;

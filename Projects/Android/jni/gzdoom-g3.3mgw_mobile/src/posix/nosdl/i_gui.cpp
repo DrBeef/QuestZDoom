@@ -33,7 +33,7 @@
 
 #include <string.h>
 
-#include <SDL.h>
+//#include <SDL.h>
 
 #include "bitmap.h"
 #include "v_palette.h"
@@ -41,7 +41,7 @@
 
 bool I_SetCursor(FTexture *cursorpic)
 {
-	static SDL_Cursor *cursor;
+/*	static SDL_Cursor *cursor;
 	static SDL_Surface *cursorSurface;
 
 	if (cursorpic != NULL && cursorpic->UseType != ETextureType::Null)
@@ -81,6 +81,6 @@ bool I_SetCursor(FTexture *cursorpic)
 			SDL_FreeSurface(cursorSurface);
 			cursorSurface = NULL;
 		}
-	}
+	}*/
 	return true;
 }

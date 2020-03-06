@@ -105,15 +105,15 @@ CUSTOM_CVAR (Float, bgamma, 1.f, CVAR_ARCHIVE|CVAR_GLOBALCONFIG)
 
 // PRIVATE DATA DEFINITIONS ------------------------------------------------
 
-static cycle_t BlitCycles;
-static cycle_t SDLFlipCycles;
+//static cycle_t BlitCycles;
+//static cycle_t SDLFlipCycles;
 
 // CODE --------------------------------------------------------------------
 
 // FrameBuffer implementation -----------------------------------------------
 
-OculusQuestFB::OculusQuestFB (int width, int height, bool bgra, bool fullscreen, SDL_Window *oldwin)
-	: OculusQuestBaseFB (width, height, bgra)
+NoSDLFB::NoSDLFB (int width, int height, bool bgra, bool fullscreen/*, SDL_Window *oldwin*/)
+	: NoSDLBaseFB (width, height, bgra)
 {
 	int i;
 	
@@ -124,8 +124,8 @@ OculusQuestFB::OculusQuestFB (int width, int height, bool bgra, bool fullscreen,
 	FlashAmount = 0;
 
 
-	Renderer = NULL;
-	Texture = NULL;
+//	Renderer = NULL;
+//	Texture = NULL;
 
 	for (i = 0; i < 256; i++)
 	{
@@ -141,61 +141,61 @@ OculusQuestFB::OculusQuestFB (int width, int height, bool bgra, bool fullscreen,
 }
 
 
-OculusQuestFB::~OculusQuestFB ()
+NoSDLFB::~NoSDLFB ()
 {
 }
 
-bool OculusQuestFB::IsValid ()
+bool NoSDLFB::IsValid ()
 {
 	return DFrameBuffer::IsValid();
 }
 
-int OculusQuestFB::GetPageCount ()
+int NoSDLFB::GetPageCount ()
 {
 	return 1;
 }
 
-bool OculusQuestFB::Lock (bool buffered)
+bool NoSDLFB::Lock (bool buffered)
 {
 	return DSimpleCanvas::Lock ();
 }
 
-bool OculusQuestFB::Relock ()
+bool NoSDLFB::Relock ()
 {
 	return DSimpleCanvas::Lock ();
 }
 
-void OculusQuestFB::Unlock ()
+void NoSDLFB::Unlock ()
 {
 	--LockCount;
 }
 
-void OculusQuestFB::Update ()
+void NoSDLFB::Update ()
 {
 }
 
-void OculusQuestFB::UpdateColors ()
+void NoSDLFB::UpdateColors ()
 {
 }
 
-PalEntry *OculusQuestFB::GetPalette ()
+PalEntry *NoSDLFB::GetPalette ()
 {
 	return SourcePalette;
 }
 
-void OculusQuestFB::UpdatePalette ()
+void NoSDLFB::UpdatePalette ()
 {
 	NeedPalUpdate = true;
 }
 
-bool OculusQuestFB::SetGamma (float gamma)
+bool NoSDLFB::SetGamma (float gamma)
 {
 	Gamma = gamma;
 	NeedGammaUpdate = true;
 	return true;
 }
 
-bool OculusQuestFB::SetFlash (PalEntry rgb, int amount)
+bool NoSDLFB::SetFlash (PalEntry rgb, int amount)
 {
 	Flash = rgb;
 	FlashAmount = amount;
@@ -203,35 +203,35 @@ bool OculusQuestFB::SetFlash (PalEntry rgb, int amount)
 	return true;
 }
 
-void OculusQuestFB::GetFlash (PalEntry &rgb, int &amount)
+void NoSDLFB::GetFlash (PalEntry &rgb, int &amount)
 {
 	rgb = Flash;
 	amount = FlashAmount;
 }
 
 // Q: Should I gamma adjust the returned palette?
-void OculusQuestFB::GetFlashedPalette (PalEntry pal[256])
+void NoSDLFB::GetFlashedPalette (PalEntry pal[256])
 {
 }
 
-void OculusQuestFB::SetFullscreen (bool fullscreen)
+void NoSDLFB::SetFullscreen (bool fullscreen)
 {
 }
 
-bool OculusQuestFB::IsFullscreen ()
+bool NoSDLFB::IsFullscreen ()
 {
 	return true;
 }
 
-void OculusQuestFB::ResetSDLRenderer ()
+void NoSDLFB::ResetSDLRenderer ()
 {
 }
 
-void OculusQuestFB::SetVSync (bool vsync)
+void NoSDLFB::SetVSync (bool vsync)
 {
 }
 
-void OculusQuestFB::ScaleCoordsFromWindow(int16_t &x, int16_t &y)
+void NoSDLFB::ScaleCoordsFromWindow(int16_t &x, int16_t &y)
 {
 	uint32_t w, h;
 	Android_GetScreenRes(&w, &h);

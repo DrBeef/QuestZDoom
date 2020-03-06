@@ -1,13 +1,13 @@
 #include "hardware.h"
 #include "v_video.h"
-#include "sdlglvideo.h"
+#include "glvideo.h"
 
-class SDLFB : public SDLBaseFB
+class NoSDLFB : public NoSDLBaseFB
 {
-	typedef SDLBaseFB Super;
+	typedef NoSDLBaseFB Super;
 public:
-	SDLFB(int width, int height, bool bgra, bool fullscreen, SDL_Window *oldwin);
-	~SDLFB();
+	NoSDLFB(int width, int height, bool bgra, bool fullscreen/*, SDL_Window *oldwin*/);
+	~NoSDLFB();
 
 	bool Lock(bool buffer);
 	void Unlock();
@@ -25,12 +25,12 @@ public:
 	int GetPageCount();
 	bool IsFullscreen();
 
-	friend class SDLGLVideo;
+	friend class NoSDLGLVideo;
 
 	virtual void SetVSync(bool vsync);
 	virtual void ScaleCoordsFromWindow(int16_t &x, int16_t &y);
 
-	SDL_Window *GetSDLWindow() override { return Screen; }
+//	SDL_Window *GetSDLWindow() override { return Screen; }
 
 private:
 	PalEntry SourcePalette[256];
@@ -40,13 +40,13 @@ private:
 	float Gamma;
 	bool UpdatePending;
 
-	SDL_Window *Screen;
-	SDL_Renderer *Renderer;
-	union
-	{
-		SDL_Texture *Texture;
-		SDL_Surface *Surface;
-	};
+//	SDL_Window *Screen;
+//	SDL_Renderer *Renderer;
+//	union
+//	{
+//		SDL_Texture *Texture;
+//		SDL_Surface *Surface;
+//	};
 
 	bool UsingRenderer;
 	bool NeedPalUpdate;
@@ -56,5 +56,5 @@ private:
 	void UpdateColors();
 	void ResetSDLRenderer();
 
-	SDLFB() {}
+	NoSDLFB() {}
 };

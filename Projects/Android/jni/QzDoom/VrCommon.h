@@ -86,10 +86,9 @@ void getTrackedRemotesOrientation(int vr_control_scheme);
 
 void incrementFrameIndex();
 
-ovrSubmitFrameDescription2 setupFrameDescriptor(ovrTracking2 *tracking);
 void prepareEyeBuffer(int eye );
 void finishEyeBuffer(int eye );
-void submitFrame(ovrSubmitFrameDescription2 *frameDesc);
+void submitFrame(ovrTracking2 *tracking);
 
 #ifdef __cplusplus
 } // extern "C"

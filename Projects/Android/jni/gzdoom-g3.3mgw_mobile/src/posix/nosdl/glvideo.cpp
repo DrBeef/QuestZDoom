@@ -114,29 +114,23 @@ CUSTOM_CVAR(Bool, gl_es, false, CVAR_ARCHIVE | CVAR_GLOBALCONFIG | CVAR_NOINITCA
 
 // CODE --------------------------------------------------------------------
 
-OculusQuestGLVideo::OculusQuestGLVideo (int parm)
+NoSDLGLVideo::NoSDLGLVideo (int parm)
 {
 	IteratorBits = 0;
-	
-	//I think we have to do this still
-    if( SDL_Init( SDL_INIT_VIDEO ) < 0 ) {
-        fprintf( stderr, "Video initialization failed: %s\n",
-             SDL_GetError( ) );
-    }
 }
 
-OculusQuestGLVideo::~OculusQuestGLVideo ()
+NoSDLGLVideo::~NoSDLGLVideo ()
 {
 	if (GLRenderer != NULL) GLRenderer->FlushTextures();
 }
 
-void OculusQuestGLVideo::StartModeIterator (int bits, bool fs)
+void NoSDLGLVideo::StartModeIterator (int bits, bool fs)
 {
 	IteratorMode = 0;
 	IteratorBits = bits;
 }
 
-bool OculusQuestGLVideo::NextMode (int *width, int *height, bool *letterbox)
+bool NoSDLGLVideo::NextMode (int *width, int *height, bool *letterbox)
 {
 	if (IteratorBits != 8)
 		return false;
@@ -151,7 +145,7 @@ bool OculusQuestGLVideo::NextMode (int *width, int *height, bool *letterbox)
 	return false;
 }
 
-DFrameBuffer *OculusQuestGLVideo::CreateFrameBuffer (int width, int height, bool bgra, bool fullscreen, DFrameBuffer *old)
+DFrameBuffer *NoSDLGLVideo::CreateFrameBuffer (int width, int height, bool bgra, bool fullscreen, DFrameBuffer *old)
 {
 	static int retry = 0;
 	static int owidth, oheight;
@@ -169,7 +163,7 @@ DFrameBuffer *OculusQuestGLVideo::CreateFrameBuffer (int width, int height, bool
 //		flashAmount = 0;
 	}
 	
-	OculusQuestBaseFB *fb;
+	NoSDLBaseFB *fb;
 	const char *hwBuffers = Args->CheckValue("-hwbuffers");
 	int buffers = 1;
 	if (hwBuffers)
@@ -183,11 +177,11 @@ DFrameBuffer *OculusQuestGLVideo::CreateFrameBuffer (int width, int height, bool
 	return fb;
 }
 
-void OculusQuestGLVideo::SetWindowedScale (float scale)
+void NoSDLGLVideo::SetWindowedScale (float scale)
 {
 }
 
-bool OculusQuestGLVideo::SetResolution (int width, int height, int bits)
+bool NoSDLGLVideo::SetResolution (int width, int height, int bits)
 {
 	// FIXME: Is it possible to do this without completely destroying the old
 	// interface?
@@ -196,7 +190,7 @@ bool OculusQuestGLVideo::SetResolution (int width, int height, int bits)
 	if (GLRenderer != NULL) GLRenderer->FlushTextures();
 	I_ShutdownGraphics();
 
-	Video = new OculusQuestGLVideo(0);
+	Video = new NoSDLGLVideo(0);
 	if (Video == NULL) I_FatalError ("Failed to initialize display");
 
 #if (defined(WINDOWS)) || defined(WIN32)
@@ -219,7 +213,7 @@ bool OculusQuestGLVideo::SetResolution (int width, int height, int bits)
 extern "C" extern int glesLoad;
 #endif
 
-void OculusQuestGLVideo::SetupPixelFormat(bool allowsoftware, int multisample, const int *glver)
+void NoSDLGLVideo::SetupPixelFormat(bool allowsoftware, int multisample, const int *glver)
 {
 		
 #ifdef __MOBILE__
@@ -252,73 +246,73 @@ void OculusQuestGLVideo::SetupPixelFormat(bool allowsoftware, int multisample, c
 
 // FrameBuffer implementation -----------------------------------------------
 
-OculusQuestGLFB::OculusQuestGLFB (void *, int width, int height, int, int, bool fullscreen, bool bgra)
-	: OculusQuestBaseFB (width, height, bgra)
+NoSDLGLFB::NoSDLGLFB (void *, int width, int height, int, int, bool fullscreen, bool bgra)
+	: NoSDLBaseFB (width, height, bgra)
 {
 }
 
-OculusQuestGLFB::~OculusQuestGLFB ()
+NoSDLGLFB::~NoSDLGLFB ()
 {
 }
 
 
-void OculusQuestGLFB::InitializeState() 
+void NoSDLGLFB::InitializeState() 
 {
 }
 
-void OculusQuestGLFB::SetGammaTable(uint16_t *tbl)
+void NoSDLGLFB::SetGammaTable(uint16_t *tbl)
 {
 }
 
-void OculusQuestGLFB::ResetGammaTable()
+void NoSDLGLFB::ResetGammaTable()
 {
 }
 
-bool OculusQuestGLFB::Lock(bool buffered)
+bool NoSDLGLFB::Lock(bool buffered)
 {
 	m_Lock++;
 	return true;
 }
 
-bool OculusQuestGLFB::Lock () 
+bool NoSDLGLFB::Lock () 
 { 	
 	return Lock(false); 
 }
 
-void OculusQuestGLFB::Unlock () 	
+void NoSDLGLFB::Unlock () 	
 { 
 	--m_Lock;
 }
 
-bool OculusQuestGLFB::IsLocked () 
+bool NoSDLGLFB::IsLocked () 
 { 
 	return m_Lock>0;// true;
 }
 
-bool OculusQuestGLFB::IsFullscreen ()
+bool NoSDLGLFB::IsFullscreen ()
 {
 	return true;
 }
 
 
-bool OculusQuestGLFB::IsValid ()
+bool NoSDLGLFB::IsValid ()
 {
-	return DFrameBuffer::IsValid() && Screen != NULL;
+	return DFrameBuffer::IsValid();
 }
 
-void OculusQuestGLFB::SetVSync( bool vsync )
-{
-}
-
-void OculusQuestGLFB::NewRefreshRate ()
+void NoSDLGLFB::SetVSync( bool vsync )
 {
 }
 
-void OculusQuestGLFB::SwapBuffers()
+void NoSDLGLFB::NewRefreshRate ()
 {
 }
 
-int OculusQuestGLFB::GetClientWidth()
+void NoSDLGLFB::SwapBuffers()
+{
+}
+
+int NoSDLGLFB::GetClientWidth()
 {
 	uint32_t w, h;
 	Android_GetScreenRes(&w, &h);
@@ -326,7 +320,7 @@ int OculusQuestGLFB::GetClientWidth()
 	return width;
 }
 
-int OculusQuestGLFB::GetClientHeight()
+int NoSDLGLFB::GetClientHeight()
 {
 	uint32_t w, h;
 	Android_GetScreenRes(&w, &h);
@@ -334,7 +328,7 @@ int OculusQuestGLFB::GetClientHeight()
 	return height;
 }
 
-void OculusQuestGLFB::ScaleCoordsFromWindow(int16_t &x, int16_t &y)
+void NoSDLGLFB::ScaleCoordsFromWindow(int16_t &x, int16_t &y)
 {
 	uint32_t w, h;
 	Android_GetScreenRes(&w, &h);

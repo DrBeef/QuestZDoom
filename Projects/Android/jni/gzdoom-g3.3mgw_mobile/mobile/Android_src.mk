@@ -44,7 +44,7 @@ LOCAL_C_INCLUDES := \
  $(GZDOOM_TOP_PATH)/src/scripting \
  $(GZDOOM_TOP_PATH)/src/scripting/vm \
  $(GZDOOM_TOP_PATH)/src/posix \
- $(GZDOOM_TOP_PATH)/src/posix\oculusquest \
+ $(GZDOOM_TOP_PATH)/src/posix\nosdl \
  $(SDL_INCLUDE_PATHS) \
  $(SUPPORT_LIBS)/fluidsynth-lite/include \
  $(SUPPORT_LIBS)/openal/include/AL \
@@ -71,17 +71,15 @@ PLAT_POSIX_SOURCES = \
 	posix/i_cd.cpp \
 	posix/i_steam.cpp
 
-PLAT_OCULUSQUEST_SOURCES = \
-	posix/oculusquest/crashcatcher.c \
-	posix/oculusquest/hardware.cpp \
-	posix/oculusquest/i_gui.cpp \
-	posix/oculusquest/i_input.cpp \
-	posix/oculusquest/i_joystick.cpp \
-	posix/oculusquest/i_main.cpp \
-	posix/oculusquest/i_system.cpp \
-	posix/oculusquest/glvideo.cpp \
-	posix/oculusquest/video.cpp \
-	posix/oculusquest/st_start.cpp
+PLAT_NOSDL_SOURCES = \
+	posix/nosdl/crashcatcher.c \
+	posix/nosdl/hardware.cpp \
+	posix/nosdl/i_gui.cpp \
+	posix/nosdl/i_joystick.cpp \
+	posix/nosdl/i_system.cpp \
+	posix/nosdl/glvideo.cpp \
+	posix/nosdl/video.cpp \
+	posix/nosdl/st_start.cpp
 
 SWRENDER_SOURCES = \
 	swrenderer/r_swcanvas.cpp \
@@ -595,7 +593,7 @@ LOCAL_SRC_FILES = \
     $(QZDOOM_SRC) \
     $(ANDROID_SRC_FILES) \
     $(PLAT_POSIX_SOURCES) \
-    $(PLAT_OCULUSQUEST_SOURCES) \
+    $(PLAT_NOSDL_SOURCES) \
     $(FASTMATH_SOURCES) \
     $(PCH_SOURCES) \
 	x86.cpp \
@@ -634,8 +632,8 @@ LOCAL_LDLIBS +=  -lEGL
 # This is stop a linker warning for mp123 lib failing build
 #LOCAL_LDLIBS += -Wl,--no-warn-shared-textrel
 
-LOCAL_STATIC_LIBRARIES :=  sndfile mpg123 fluidsynth-static SDL2_net libjpeg zlib_lz lzma_lz gdtoa_lz dumb_lz gme_lz bzip2_lz 
-LOCAL_SHARED_LIBRARIES :=  openal SDL2 vrapi
+LOCAL_STATIC_LIBRARIES :=  sndfile mpg123 fluidsynth-static libjpeg zlib_lz lzma_lz gdtoa_lz dumb_lz gme_lz bzip2_lz 
+LOCAL_SHARED_LIBRARIES :=  openal vrapi
 
 LOCAL_STATIC_LIBRARIES +=
 

@@ -32,7 +32,6 @@
 **
 */
 
-#include <SDL.h>
 #include <signal.h>
 #include <time.h>
 
@@ -100,25 +99,17 @@ void I_ShutdownGraphics ()
 	}
 	if (Video)
 		delete Video, Video = NULL;
-
-	SDL_QuitSubSystem (SDL_INIT_VIDEO);
 }
 
 void I_InitGraphics ()
 {
-	if (SDL_InitSubSystem (SDL_INIT_VIDEO) < 0)
-	{
-		I_FatalError ("Could not initialize SDL video:\n%s\n", SDL_GetError());
-		return;
-	}
-
 	UCVarValue val;
 
 	val.Bool = !!Args->CheckParm ("-devparm");
 	ticker.SetGenericRepDefault (val, CVAR_Bool);
 	
 	currentrenderer = vid_renderer;
-	Video = new OculusQuestGLVideo(0);
+	Video = new NoSDLGLVideo(0);
 	
 	if (Video == NULL)
 		I_FatalError ("Failed to initialize display");
@@ -153,28 +144,7 @@ void I_CreateRenderer()
 
 DFrameBuffer *I_SetMode (int &width, int &height, DFrameBuffer *old)
 {
-	bool fs = false;
-	switch (Video->GetDisplayType ())
-	{
-	case DISPLAY_WindowOnly:
-		fs = false;
-		break;
-	case DISPLAY_FullscreenOnly:
-		fs = true;
-		break;
-	case DISPLAY_Both:
-		fs = fullscreen;
-		break;
-	}
-	DFrameBuffer *res = Video->CreateFrameBuffer (width, height, swtruecolor, fs, old);
-
-	/* Right now, CreateFrameBuffer cannot return NULL
-	if (res == NULL)
-	{
-		I_FatalError ("Mode %dx%d is unavailable\n", width, height);
-	}
-	*/
-	return res;
+	return Video->CreateFrameBuffer (width, height, swtruecolor, true, old);
 }
 
 bool I_CheckResolution (int width, int height, int bits)

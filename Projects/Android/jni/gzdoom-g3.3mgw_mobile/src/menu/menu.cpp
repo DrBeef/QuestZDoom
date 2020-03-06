@@ -253,8 +253,8 @@ bool DMenu::CallMenuEvent(int mkey, bool fromcontroller)
 
 static void SetMouseCapture(bool on)
 {
-	if (on) I_SetMouseCapture();
-	else I_ReleaseMouseCapture();
+//	if (on) I_SetMouseCapture();
+//	else I_ReleaseMouseCapture();
 }
 DEFINE_ACTION_FUNCTION_NATIVE(DMenu, SetMouseCapture, SetMouseCapture)
 {
@@ -382,7 +382,7 @@ void M_ActivateMenu(DMenu *menu)
 	if (CurrentMenu != nullptr && CurrentMenu->mMouseCapture)
 	{
 		CurrentMenu->mMouseCapture = false;
-		I_ReleaseMouseCapture();
+		//I_ReleaseMouseCapture();
 	}
 	CurrentMenu = menu;
 	GC::WriteBarrier(CurrentMenu);

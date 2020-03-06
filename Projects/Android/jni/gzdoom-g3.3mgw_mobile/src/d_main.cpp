@@ -1064,7 +1064,7 @@ void D_DoomLoop ()
 			if (gametic > lasttic)
 			{
 				lasttic = gametic;
-				I_StartFrame ();
+				//I_StartFrame (); // not used
 			}
 			I_SetFrameTime();
 
@@ -2338,6 +2338,9 @@ static void CheckCmdLine()
 // D_DoomMain
 //
 //==========================================================================
+
+// The command line arguments.
+FArgs *Args;
 
 void VR_DoomMain(int argc, char** argv)
 {

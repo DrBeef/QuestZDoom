@@ -189,11 +189,13 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 					if (inventoryManagementMode)
                     {
                         if (firingPrimary)
-                            sendButtonActionSimple("invuse");
+                        {
+                            //Select inventory item
+                        }
                     }
                     else
                     {
-                        sendButtonAction("+attack", firingPrimary);
+                        //fire primary
                     }
 				}
 			}
@@ -202,8 +204,10 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             if ((pDominantTrackedRemoteNew->Buttons & domButton1) !=
                 (pDominantTrackedRemoteOld->Buttons & domButton1) &&
                 ducked != DUCK_CROUCHED) {
+
                 ducked = (pDominantTrackedRemoteNew->Buttons & domButton1) ? DUCK_BUTTON : DUCK_NOTDUCKED;
-                sendButtonAction("+movedown", (pDominantTrackedRemoteNew->Buttons & domButton1));
+
+                //Trigger Duck
             }
 
 			//Weapon/Inventory Chooser
@@ -217,11 +221,11 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 					{
 					    if (inventoryManagementMode)
                         {
-                            sendButtonActionSimple("invprev");
+                            //Previous Inventory Item
                         }
                         else
                         {
-                            sendButtonActionSimple("weapprev");
+                            //Next Inventory Item
 					    }
 						
 					}
@@ -229,11 +233,11 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 					{
                         if (inventoryManagementMode)
                         {
-                            sendButtonActionSimple("invnext");
+                            //Next Inventory Item
                         } 
                         else
                         {
-                            sendButtonActionSimple("weapnext");
+                            //Next Weapon
                         }
 					}
 					itemSwitched = true;
@@ -279,7 +283,8 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             //show help computer while X/A pressed
             if ((pOffTrackedRemoteNew->Buttons & offButton1) !=
                  (pOffTrackedRemoteOld->Buttons & offButton1)) {
-                sendButtonActionSimple("cmd help");
+
+                //Help Computer
             }
 
 

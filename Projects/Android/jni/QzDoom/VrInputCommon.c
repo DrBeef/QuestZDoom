@@ -81,27 +81,9 @@ float nonLinearFilter(float in)
     return val;
 }
 
-void sendButtonActionSimple(const char* action)
-{
-    char command[256];
-    snprintf( command, sizeof( command ), "%s\n", action );
-//    Cbuf_AddText( command );
-}
-
 bool between(float min, float val, float max)
 {
     return (min < val) && (val < max);
-}
-
-void sendButtonAction(const char* action, long buttonDown)
-{
-    char command[256];
-    snprintf( command, sizeof( command ), "%s\n", action );
-    if (!buttonDown)
-    {
-        command[0] = '-';
-    }
-//    Cbuf_AddText( command );
 }
 
 void acquireTrackedRemotesData(const ovrMobile *Ovr, double displayTime) {//The amount of yaw changed by controller

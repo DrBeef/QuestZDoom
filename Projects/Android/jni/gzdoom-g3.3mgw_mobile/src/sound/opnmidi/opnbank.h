@@ -27,18 +27,6 @@
 #include <string.h>
 #include <stdint.h>
 
-#ifdef ADLMIDI_buildAsApp
-#include <SDL2/SDL.h>
-class MutexType
-{
-    SDL_mutex* mut;
-public:
-    MutexType() : mut(SDL_CreateMutex()) { }
-    ~MutexType() { SDL_DestroyMutex(mut); }
-    void Lock() { SDL_mutexP(mut); }
-    void Unlock() { SDL_mutexV(mut); }
-};
-#endif
 
 enum { opnNoteOnMaxTime = 40000 };
 
