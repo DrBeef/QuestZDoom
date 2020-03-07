@@ -35,7 +35,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
          (pOffTrackedRemoteOld->Buttons & offButton2)) &&
 			(pOffTrackedRemoteNew->Buttons & offButton2)) {
 
-		showingScreenLayer = !showingScreenLayer;
+
     }
 
 	//Menu button
@@ -153,13 +153,11 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 
             //This section corrects for the fact that the controller actually controls direction of movement, but we want to move relative to the direction the
             //player is facing for positional tracking
-            float vr_positional_factor = 1700;
-            float multiplier = (vr_positional_factor) / (1.0 *
-					((pOffTrackedRemoteNew->Buttons & ovrButton_Trigger) ? 1.5f : 1.0f));
+            float vr_positional_factor = 8.5f;
 
             vec2_t v;
-            rotateAboutOrigin(-positionDeltaThisFrame[0] * multiplier,
-                              positionDeltaThisFrame[2] * multiplier, - hmdorientation[YAW], v);
+            rotateAboutOrigin(-positionDeltaThisFrame[0] * vr_positional_factor,
+                              positionDeltaThisFrame[2] * vr_positional_factor, - hmdorientation[YAW], v);
             positional_movementSideways = v[0];
             positional_movementForward = v[1];
 

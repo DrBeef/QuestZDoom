@@ -51,6 +51,7 @@
 #include "d_event.h"
 
 #include "QzDoom/VrCommon.h"
+#include "LSMatrix.h"
 
 
 EXTERN_CVAR(Int, screenblocks);
@@ -120,6 +121,95 @@ namespace s3d
     {
         doomYawDegrees = yaw;
         outViewShift[0] = outViewShift[1] = outViewShift[2] = 0;
+
+        // Pitch and Roll are identical between vr and Doom worlds.
+        // But yaw can differ, depending on starting state, and controller movement.
+        float doomYawDegrees = yaw;
+        deltaYawDegrees = doomYawDegrees - hmdorientation[YAW];
+        while (deltaYawDegrees > 180)
+            deltaYawDegrees -= 360;
+        while (deltaYawDegrees < -180)
+            deltaYawDegrees += 360;
+
+        DAngle vr_to_doom_angle = DAngle(-deltaYawDegrees);
+
+        const Stereo3DMode * mode3d = &Stereo3DMode::getCurrentMode();
+        if (mode3d->IsMono())
+            return;
+        const OculusQuestMode  * vrMode = static_cast<const OculusQuestMode *>(mode3d);
+
+        ovrTracking2 tracking;
+        vrMode->getTracking(&tracking);
+
+        /*
+        // extract rotation component from hmd transform
+        LSMatrix44 vr_X_hmd(hmdPose);
+        LSMatrix44 hmdRot = vr_X_hmd.getWithoutTranslation(); // .transpose();
+
+        /// In these eye methods, just get local inter-eye stereoscopic shift, not full position shift ///
+
+        // compute local eye shift
+        LSMatrix44 eyeShift2;
+        eyeShift2.loadIdentity();
+        eyeShift2 = eyeShift2 * eyeToHeadTransform; // eye to head
+        eyeShift2 = eyeShift2 * hmdRot; // head to vr
+
+        LSVec3 eye_EyePos = LSVec3(0, 0, 0); // eye position in eye frame
+        LSVec3 hmd_EyePos = LSMatrix44(eyeToHeadTransform) * eye_EyePos;
+        LSVec3 hmd_HmdPos = LSVec3(0, 0, 0); // hmd position in hmd frame
+        LSVec3 vr_EyePos = vr_X_hmd * hmd_EyePos;
+        LSVec3 vr_HmdPos = vr_X_hmd * hmd_HmdPos;
+        LSVec3 hmd_OtherEyePos = LSMatrix44(otherEyeToHeadTransform) * eye_EyePos;
+        LSVec3 vr_OtherEyePos = vr_X_hmd * hmd_OtherEyePos;
+        LSVec3 vr_EyeOffset = vr_EyePos - vr_HmdPos;
+
+        VSMatrix doomInvr = VSMatrix();
+        doomInvr.loadIdentity();
+        // permute axes
+        float permute[] = { // Convert from vr to Doom axis convention, including mirror inversion
+                -1,  0,  0,  0, // X-right in vr -> X-left in Doom
+                0,  0,  1,  0, // Z-backward in vr -> Y-backward in Doom
+                0,  1,  0,  0, // Y-up in vr -> Z-up in Doom
+                0,  0,  0,  1};
+        doomInvr.multMatrix(permute);
+        doomInvr.scale(vr_vunits_per_meter, vr_vunits_per_meter, vr_vunits_per_meter); // Doom units are not meters
+        double pixelstretch = level.info ? level.info->pixelstretch : 1.2;
+        doomInvr.scale(pixelstretch, pixelstretch, 1.0); // Doom universe is scaled by 1990s pixel aspect ratio
+        doomInvr.rotate(deltaYawDegrees, 0, 0, 1);
+
+        LSVec3 doom_EyeOffset = LSMatrix44(doomInvr) * vr_EyeOffset;
+
+        if (doTrackHmdVerticalPosition) {
+            // In vr, the real world floor level is at y==0
+            // In Doom, the virtual player foot level is viewheight below the current viewpoint (on the Z axis)
+            // We want to align those two heights here
+            const player_t & player = players[consoleplayer];
+            double vh = player.viewheight; // Doom thinks this is where you are
+            double hh = (vr_X_hmd[1][3] - vr_floor_offset) * vr_vunits_per_meter; // HMD is actually here
+            doom_EyeOffset[2] += hh - vh;
+            // TODO: optionally allow player to jump and crouch by actually jumping and crouching
+        }
+
+        if (doTrackHmdHorizontalPosition) {
+            // shift viewpoint when hmd position shifts
+            static bool is_initial_origin_set = false;
+            if (! is_initial_origin_set) {
+                // initialize origin to first noted HMD location
+                // TODO: implement recentering based on a CCMD
+                vr_origin = vr_HmdPos;
+                is_initial_origin_set = true;
+            }
+            vr_dpos = vr_HmdPos - vr_origin;
+
+            LSVec3 doom_dpos = LSMatrix44(doomInvr) * vr_dpos;
+            doom_EyeOffset[0] += doom_dpos[0];
+            doom_EyeOffset[1] += doom_dpos[1];
+        }
+
+        outViewShift[0] = doom_EyeOffset[0];
+        outViewShift[1] = doom_EyeOffset[1];
+        outViewShift[2] = doom_EyeOffset[2];
+         */
     }
 
 /* virtual */
@@ -175,12 +265,12 @@ namespace s3d
 
         // Follow HMD orientation, EXCEPT for roll angle (keep weapon upright)
         /*if (activeEye->currentPose) {
-            float openVrRollDegrees = RAD2DEG(-eulerAnglesFromMatrix(activeEye->currentPose->mDeviceToAbsoluteTracking).v[2]);
-            new_projection.rotate(-openVrRollDegrees, 0, 0, 1);
+            float vrRollDegrees = RAD2DEG(-eulerAnglesFromMatrix(activeEye->currentPose->mDeviceToAbsoluteTracking).v[2]);
+            new_projection.rotate(-vrRollDegrees, 0, 0, 1);
 
             if (doFixPitch) {
-                float openVrPitchDegrees = RAD2DEG(-eulerAnglesFromMatrix(activeEye->currentPose->mDeviceToAbsoluteTracking).v[1]);
-                new_projection.rotate(-openVrPitchDegrees, 1, 0, 0);
+                float vrPitchDegrees = RAD2DEG(-eulerAnglesFromMatrix(activeEye->currentPose->mDeviceToAbsoluteTracking).v[1]);
+                new_projection.rotate(-vrPitchDegrees, 1, 0, 0);
             }
             if (pitchOffset != 0)
                 new_projection.rotate(-pitchOffset, 1, 0, 0);
@@ -213,24 +303,6 @@ namespace s3d
         const Stereo3DMode * mode3d = &Stereo3DMode::getCurrentMode();
         if (mode3d->IsMono())
             return;
-        const OculusQuestMode * oculusQuestMode = static_cast<const OculusQuestMode *>(mode3d);
-        if (oculusQuestMode
-            && oculusQuestMode->crossHairDrawer
-            // Don't draw the crosshair if there is none
-            && CrosshairImage != NULL
-            && gamestate != GS_TITLELEVEL
-            && r_viewpoint.camera->health > 0)
-        {
-            const float crosshair_distance_meters = 10.0f; // meters
-            const float crosshair_width_meters = 0.2f * crosshair_distance_meters;
-            gl_RenderState.mProjectionMatrix = getQuadInWorld(
-                    crosshair_distance_meters,
-                    crosshair_width_meters,
-                    false,
-                    0.0);
-            gl_RenderState.ApplyMatrices();
-            oculusQuestMode->crossHairDrawer->Draw();
-        }
 
         // Update HUD matrix to render on a separate quad
         const float menu_distance_meters = 1.0f;
@@ -278,6 +350,11 @@ namespace s3d
         rightEyeView.initialize();
 
         crossHairDrawer->Clear();
+    }
+
+    void OculusQuestMode::getTracking(ovrTracking2 *_tracking) const
+    {
+        *_tracking = tracking;
     }
 
 /* virtual */
@@ -586,7 +663,7 @@ namespace s3d
                 gl_multisample = 4;
         }
 
-        if (gamestate == GS_LEVEL) {
+        if (gamestate == GS_LEVEL && !isMenuActive()) {
             cachedScreenBlocks = screenblocks;
             screenblocks = 12; // always be full-screen during 3D scene render
             setUseScreenLayer(false);
@@ -660,7 +737,11 @@ namespace s3d
 
         //G_AddViewAngle(joyint(-1280 * I_OculusQuestGetYaw() * delta * 30 / 1000));
 */
-        updateHmdPose();
+
+        //Always update roll (as the game tic cmd doesn't support roll
+        GLRenderer->mAngles.Roll = hmdorientation[ROLL];
+
+        //updateHmdPose();
     }
 
 
@@ -682,18 +763,12 @@ namespace s3d
         /* */
         // Pitch
         {
-            double pixelstretch = level.info ? level.info->pixelstretch : 1.2;
-            double hmdPitchInDoom = -atan(tan(DEG2RAD(hmdorientation[PITCH])) / pixelstretch);
             double viewPitchInDoom = GLRenderer->mAngles.Pitch.Radians();
             double dPitch =
-                    // hmdPitchInDoom
                     - DEG2RAD(hmdorientation[PITCH])
                     - viewPitchInDoom;
             G_AddViewPitch(mAngleFromRadians(dPitch));
         }
-
-        // Roll can be local, because it doesn't affect gameplay.
-        GLRenderer->mAngles.Roll = hmdorientation[ROLL];
 
         {
             GLRenderer->mAngles.Pitch = hmdorientation[PITCH];

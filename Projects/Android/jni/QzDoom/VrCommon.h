@@ -34,7 +34,6 @@ extern long long global_time;
 extern float playerHeight;
 extern float playerYaw;
 
-extern bool showingScreenLayer;
 extern float vrFOV;
 
 extern vec3_t worldPosition;

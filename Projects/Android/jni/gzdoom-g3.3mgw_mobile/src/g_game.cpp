@@ -99,6 +99,7 @@
 #include "d_main.h"
 
 #include <QzDoom/VrInput.h>
+#include <cmath>
 
 
 static FRandom pr_dmspawn ("DMSpawn");
@@ -570,7 +571,13 @@ static inline int joyint(double val)
 }
 
 
-extern "C" void VR_GetMove( float *forward, float *side, float *up, float *yaw, float *pitch, float *roll );
+extern "C" void VR_GetMove( float *joy_forward, float *joy_side, float *hmd_forward, float *hmd_side, float *up, float *yaw, float *pitch, float *roll );
+
+static int mAngleFromRadians(double radians)
+{
+	double m = std::round(65535.0 * radians / (2.0 * M_PI));
+	return int(m);
+}
 
 //
 // G_BuildTiccmd
@@ -660,22 +667,19 @@ void G_BuildTiccmd (ticcmd_t *cmd)
 			forward -= forwardmove[speed];
 	}
 
-	float vrforward=0;
-	float vrside=0;
+	float joyforward=0;
+	float hmdforward=0;
+	float joyside=0;
+	float hmdside=0;
 	float up=0;
 	float yaw=0;
 	float pitch=0;
 	float roll=0;
 
-	VR_GetMove(&vrforward, &vrside, &up, &yaw, &pitch, &roll);
-
 	if (Button_MoveRight.bDown)
 		side += sidemove[speed];
 	if (Button_MoveLeft.bDown)
 		side -= sidemove[speed];
-
-	side += vrside;
-	forward += vrforward;
 
 	// buttons
 	if (Button_Attack.bDown)		cmd->ucmd.buttons |= BT_ATTACK;
@@ -706,44 +710,44 @@ void G_BuildTiccmd (ticcmd_t *cmd)
 	if (Button_ShowScores.bDown)	cmd->ucmd.buttons |= BT_SHOWSCORES;
 
 	// Handle joysticks/game controllers.
-	float joyaxes[NUM_JOYAXIS];
+	if (0) {
+		float joyaxes[NUM_JOYAXIS];
+		I_GetAxes(joyaxes);
 
-	I_GetAxes(joyaxes);
+		// Remap some axes depending on button state.
+		if (Button_Strafe.bDown || (Button_Mlook.bDown && lookstrafe)) {
+			joyaxes[JOYAXIS_Side] = joyaxes[JOYAXIS_Yaw];
+			joyaxes[JOYAXIS_Yaw] = 0;
+		}
+		if (Button_Mlook.bDown) {
+			joyaxes[JOYAXIS_Pitch] = joyaxes[JOYAXIS_Forward];
+			joyaxes[JOYAXIS_Forward] = 0;
+		}
 
-	// Remap some axes depending on button state.
-	if (Button_Strafe.bDown || (Button_Mlook.bDown && lookstrafe))
-	{
-		joyaxes[JOYAXIS_Side] = joyaxes[JOYAXIS_Yaw];
-		joyaxes[JOYAXIS_Yaw] = 0;
-	}
-	if (Button_Mlook.bDown)
-	{
-		joyaxes[JOYAXIS_Pitch] = joyaxes[JOYAXIS_Forward];
-		joyaxes[JOYAXIS_Forward] = 0;
-	}
+		if (joyaxes[JOYAXIS_Pitch] != 0) {
+			G_AddViewPitch(joyint(joyaxes[JOYAXIS_Pitch] * 2048));
+		}
+		if (joyaxes[JOYAXIS_Yaw] != 0) {
+			G_AddViewAngle(joyint(-1280 * joyaxes[JOYAXIS_Yaw]));
+		}
 
-	if (joyaxes[JOYAXIS_Pitch] != 0)
-	{
-		G_AddViewPitch(joyint(joyaxes[JOYAXIS_Pitch] * 2048));
-	}
-	if (joyaxes[JOYAXIS_Yaw] != 0)
-	{
-		G_AddViewAngle(joyint(-1280 * joyaxes[JOYAXIS_Yaw]));
-	}
+		side -= joyint(sidemove[speed] * joyaxes[JOYAXIS_Side]);
+		forward += joyint(joyaxes[JOYAXIS_Forward] * forwardmove[speed]);
+		fly += joyint(joyaxes[JOYAXIS_Up] * 2048);
 
-	side -= joyint(sidemove[speed] * joyaxes[JOYAXIS_Side]);
-	forward += joyint(joyaxes[JOYAXIS_Forward] * forwardmove[speed]);
-	fly += joyint(joyaxes[JOYAXIS_Up] * 2048);
-
-	// Handle mice.
-	if (!Button_Mlook.bDown && !freelook)
-	{
-		forward += (int)((float)mousey * m_forward);
+		// Handle mice.
+		if (!Button_Mlook.bDown && !freelook)
+		{
+			forward += (int)((float)mousey * m_forward);
+		}
 	}
 
-#ifdef __MOBILE__
-    //Mobile_IN_Move(cmd);
-#endif
+	VR_GetMove(&joyforward, &joyside, &hmdforward, &hmdside, &up, &yaw, &pitch, &roll);
+	side += (joyint(sidemove[speed] * joyside) + joyint(sidemove[speed] * hmdside));
+	forward += (joyint(joyforward * forwardmove[speed]) + joyint(hmdforward * forwardmove[speed]));
+
+	G_SetViewAngle(mAngleFromRadians(-DEG2RAD(hmdorientation[YAW])));
+	G_SetViewPitch(mAngleFromRadians(-DEG2RAD(hmdorientation[PITCH])));
 
 	cmd->ucmd.pitch = LocalViewPitch >> 16;
 
@@ -894,6 +898,51 @@ void G_AddViewAngle (int yaw, bool mouse)
 	{
 		LocalKeyboardTurner = (!mouse || smooth_mouse);
 	}
+}
+
+
+void G_SetViewPitch (int look)
+{
+	if (gamestate == GS_TITLELEVEL)
+	{
+		return;
+	}
+	look = LookAdjust(look);
+	if  (look > 0)
+	{
+		// Avoid overflowing
+		if (LocalViewPitch > INT_MAX - look)
+		{
+			LocalViewPitch = 0x78000000;
+		}
+		else
+		{
+			LocalViewPitch = MIN(look, 0x78000000);
+		}
+	}
+	else if (look < 0)
+	{
+		// Avoid overflowing
+		if (LocalViewPitch < INT_MIN - look)
+		{
+			LocalViewPitch = -0x78000000;
+		}
+		else
+		{
+			LocalViewPitch = MAX(look, -0x78000000);
+		}
+	}
+}
+
+void G_SetViewAngle (int yaw)
+{
+	if (gamestate == GS_TITLELEVEL)
+	{
+		return;
+
+	}
+	yaw = LookAdjust(yaw);
+	LocalViewAngle = yaw;
 }
 
 CVAR (Bool, bot_allowspy, false, 0)

@@ -46,7 +46,6 @@ bool qzdoom_initialised;
 long long global_time;
 float playerHeight;
 float playerYaw;
-bool showingScreenLayer;
 float vrFOV;
 vec3_t worldPosition;
 vec3_t hmdPosition;
@@ -153,8 +152,6 @@ LAMBDA1VR Stuff
 
 //This is now controlled by the engine
 static bool useVirtualScreen = true;
-//And this is controlled by the user
-static bool forceVirtualScreen = false;
 
 void setUseScreenLayer(bool use)
 {
@@ -163,7 +160,7 @@ void setUseScreenLayer(bool use)
 
 bool useScreenLayer()
 {
-	return useVirtualScreen || showingScreenLayer;
+	return useVirtualScreen;
 }
 
 static void UnEscapeQuotes( char *arg )
@@ -885,11 +882,13 @@ void getVROrigins(vec3_t _weaponoffset, vec3_t _weaponangles, vec3_t _hmdPositio
 
 void VR_DoomMain(int argc, char** argv);
 
-void VR_GetMove( float *forward, float *side, float *up, float *yaw, float *pitch, float *roll )
+void VR_GetMove( float *joy_forward, float *joy_side, float *hmd_forward, float *hmd_side, float *up, float *yaw, float *pitch, float *roll )
 {
-    *forward = remote_movementForward + positional_movementForward;
+    *joy_forward = remote_movementForward;
+    *hmd_forward = positional_movementForward;
     *up = remote_movementUp;
-    *side = remote_movementSideways + positional_movementSideways;
+    *joy_side = remote_movementSideways;
+    *hmd_side = positional_movementSideways;
 	*yaw = hmdorientation[YAW] + snapTurn;
 	*pitch = hmdorientation[PITCH];
 	*roll = hmdorientation[ROLL];
@@ -1280,7 +1279,6 @@ void VR_Init()
 {
 	//Initialise all our variables
 	playerYaw = 0.0f;
-	showingScreenLayer = true;
 	remote_movementSideways = 0.0f;
 	remote_movementForward = 0.0f;
 	remote_movementUp = 0.0f;
