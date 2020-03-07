@@ -427,45 +427,6 @@ namespace s3d
         return int(m);
     }
 
-    void OculusQuestMode::updateHmdPose(
-            double hmdYawRadians,
-            double hmdPitchRadians,
-            double hmdRollRadians) const
-    {
-        hmdYaw = hmdYawRadians;
-        double hmdpitch = hmdPitchRadians;
-        double hmdroll = hmdRollRadians;
-
-        double hmdYawDelta = 0;
-        {
-            // Set HMD angle game state parameters for NEXT frame
-            static double previousHmdYaw = 0;
-            static bool havePreviousYaw = false;
-            if (!havePreviousYaw) {
-                previousHmdYaw = hmdYaw;
-                havePreviousYaw = true;
-            }
-            hmdYawDelta = hmdYaw - previousHmdYaw;
-            G_AddViewAngle(mAngleFromRadians(-hmdYawDelta));
-            previousHmdYaw = hmdYaw;
-        }
-
-        /* */
-        // Pitch
-        {
-            double pixelstretch = level.info ? level.info->pixelstretch : 1.2;
-            double hmdPitchInDoom = -atan(tan(hmdpitch) / pixelstretch);
-            double viewPitchInDoom = GLRenderer->mAngles.Pitch.Radians();
-            double dPitch =
-                    // hmdPitchInDoom
-                    -hmdpitch
-                    - viewPitchInDoom;
-            G_AddViewPitch(mAngleFromRadians(-dPitch));
-        }
-
-        // Roll can be local, because it doesn't affect gameplay.
-        GLRenderer->mAngles.Roll = RAD2DEG(-hmdroll);
-    }
 
 /*    void Joy_GenerateUIButtonEvents(int oldbuttons, int newbuttons, int numbuttons, const int *keys)
     {
@@ -637,7 +598,6 @@ namespace s3d
 
         processHaptics();
 
-
         //Get controller state here
         getHMDOrientation(&tracking);
 
@@ -699,7 +659,54 @@ namespace s3d
         lastTime = time;
 
         //G_AddViewAngle(joyint(-1280 * I_OculusQuestGetYaw() * delta * 30 / 1000));
-*/    }
+*/
+        updateHmdPose();
+    }
+
+
+    void OculusQuestMode::updateHmdPose() const
+    {
+        double hmdYawDeltaDegrees = 0;
+        {
+            static double previousHmdYaw = 0;
+            static bool havePreviousYaw = false;
+            if (!havePreviousYaw) {
+                previousHmdYaw = hmdorientation[YAW];
+                havePreviousYaw = true;
+            }
+            hmdYawDeltaDegrees = hmdorientation[YAW] - previousHmdYaw;
+            G_AddViewAngle(mAngleFromRadians(DEG2RAD(-hmdYawDeltaDegrees)));
+            previousHmdYaw = hmdorientation[YAW];
+        }
+
+        /* */
+        // Pitch
+        {
+            double pixelstretch = level.info ? level.info->pixelstretch : 1.2;
+            double hmdPitchInDoom = -atan(tan(DEG2RAD(hmdorientation[PITCH])) / pixelstretch);
+            double viewPitchInDoom = GLRenderer->mAngles.Pitch.Radians();
+            double dPitch =
+                    // hmdPitchInDoom
+                    - DEG2RAD(hmdorientation[PITCH])
+                    - viewPitchInDoom;
+            G_AddViewPitch(mAngleFromRadians(dPitch));
+        }
+
+        // Roll can be local, because it doesn't affect gameplay.
+        GLRenderer->mAngles.Roll = hmdorientation[ROLL];
+
+        {
+            GLRenderer->mAngles.Pitch = hmdorientation[PITCH];
+
+            double viewYaw = r_viewpoint.Angles.Yaw.Degrees - hmdYawDeltaDegrees;
+            while (viewYaw <= -180.0)
+                viewYaw += 360.0;
+            while (viewYaw > 180.0)
+                viewYaw -= 360.0;
+            r_viewpoint.Angles.Yaw = viewYaw;
+        }
+
+    }
 
 /* virtual */
     void OculusQuestMode::TearDown() const

@@ -555,8 +555,8 @@ ovrLayerCylinder2 BuildCylinderLayer( ovrRenderer * cylinderRenderer,
 
 	const float density = 4500.0f;
 	const float rotateYaw = 0.0f;
-	const float radius = 2.0f;
-	const ovrVector3f translation = { 0.0f, playerHeight, -0.5f };
+	const float radius = 4.0f;
+	const ovrVector3f translation = { 0.0f, playerHeight, -2.5f };
 
 	ovrMatrix4f cylinderTransform = 
 		CylinderModelMatrix( textureWidth, textureHeight, translation,

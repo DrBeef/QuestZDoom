@@ -17,6 +17,11 @@ Authors		:	Simon Brown
 
 #include "doomkeys.h"
 
+int getGameState();
+int isMenuActive();
+void Joy_GenerateButtonEvents(int oldbuttons, int newbuttons, int numbuttons, int base);
+
+
 void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew, ovrInputStateTrackedRemote *pDominantTrackedRemoteOld, ovrTracking* pDominantTracking,
                           ovrInputStateTrackedRemote *pOffTrackedRemoteNew, ovrInputStateTrackedRemote *pOffTrackedRemoteOld, ovrTracking* pOffTracking,
                           int domButton1, int domButton2, int offButton1, int offButton2 )
@@ -24,8 +29,6 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 {
 
     static bool dominantGripPushed = false;
-	static float dominantGripPushTime = 0.0f;
-    static bool inventoryManagementMode = false;
 
     //Show screen view (if in multiplayer toggle scoreboard)
     if (((pOffTrackedRemoteNew->Buttons & offButton2) !=
@@ -38,31 +41,29 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 	//Menu button
 	handleTrackedControllerButton(&leftTrackedRemoteState_new, &leftTrackedRemoteState_old, ovrButton_Enter, KEY_ESCAPE);
 
-/*    if (cls.key_dest == key_menu)
+    if (getGameState() != 0 || isMenuActive()) //gamestate != GS_LEVEL
     {
-        int leftJoyState = (pOffTrackedRemoteNew->Joystick.x > 0.7f ? 1 : 0);
-        if (leftJoyState != (pOffTrackedRemoteOld->Joystick.x > 0.7f ? 1 : 0)) {
-            Key_Event(K_RIGHTARROW, leftJoyState, global_time);
-        }
-        leftJoyState = (pOffTrackedRemoteNew->Joystick.x < -0.7f ? 1 : 0);
-        if (leftJoyState != (pOffTrackedRemoteOld->Joystick.x < -0.7f ? 1 : 0)) {
-            Key_Event(K_LEFTARROW, leftJoyState, global_time);
-        }
-        leftJoyState = (pOffTrackedRemoteNew->Joystick.y < -0.7f ? 1 : 0);
-        if (leftJoyState != (pOffTrackedRemoteOld->Joystick.y < -0.7f ? 1 : 0)) {
-            Key_Event(K_DOWNARROW, leftJoyState, global_time);
-        }
-        leftJoyState = (pOffTrackedRemoteNew->Joystick.y > 0.7f ? 1 : 0);
-        if (leftJoyState != (pOffTrackedRemoteOld->Joystick.y > 0.7f ? 1 : 0)) {
-            Key_Event(K_UPARROW, leftJoyState, global_time);
+        Joy_GenerateButtonEvents((pOffTrackedRemoteOld->Joystick.x > 0.7f ? 1 : 0), (pOffTrackedRemoteNew->Joystick.x > 0.7f ? 1 : 0), 1, KEY_PAD_DPAD_RIGHT);
+
+        Joy_GenerateButtonEvents((pOffTrackedRemoteOld->Joystick.x < -0.7f ? 1 : 0), (pOffTrackedRemoteNew->Joystick.x < -0.7f ? 1 : 0), 1, KEY_PAD_DPAD_LEFT);
+
+        Joy_GenerateButtonEvents((pOffTrackedRemoteOld->Joystick.y < -0.7f ? 1 : 0), (pOffTrackedRemoteNew->Joystick.y < -0.7f ? 1 : 0), 1, KEY_PAD_DPAD_DOWN);
+
+        Joy_GenerateButtonEvents((pOffTrackedRemoteOld->Joystick.y > 0.7f ? 1 : 0), (pOffTrackedRemoteNew->Joystick.y > 0.7f ? 1 : 0), 1, KEY_PAD_DPAD_UP);
+
+        handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, domButton1, KEY_PAD_A);
+        handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, ovrButton_Trigger, KEY_PAD_A);
+        handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, domButton2, KEY_PAD_B);
+    }
+    else
+    {
+        //Dominant Grip works like a shift key
+        if ((pDominantTrackedRemoteNew->Buttons & ovrButton_GripTrigger) !=
+            (pDominantTrackedRemoteOld->Buttons & ovrButton_GripTrigger)) {
+
+            dominantGripPushed = true;
         }
 
-        handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, domButton1, K_ENTER);
-        handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, ovrButton_Trigger, K_ENTER);
-        handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, domButton2, K_ESCAPE);
-    }
-    else */
-    {
         float distance = sqrtf(powf(pOffTracking->HeadPose.Pose.Position.x - pDominantTracking->HeadPose.Pose.Position.x, 2) +
                                powf(pOffTracking->HeadPose.Pose.Position.y - pDominantTracking->HeadPose.Pose.Position.y, 2) +
                                powf(pOffTracking->HeadPose.Pose.Position.z - pDominantTracking->HeadPose.Pose.Position.z, 2));
@@ -116,11 +117,6 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                     VectorSet(weaponangles, -degrees(atanf(y / zxDist)), (doomYawDegrees - hmdorientation[YAW]) - degrees(atan2f(x, -z)), weaponangles[ROLL]);
                 }
             }
-
-            if ((pDominantTrackedRemoteNew->Buttons & ovrButton_GripTrigger) !=
-                (pDominantTrackedRemoteOld->Buttons & ovrButton_GripTrigger)) {
-
-            }
         }
 
         float controllerYawHeading = 0.0f;
@@ -172,8 +168,8 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                   positional_movementForward);
 
             //Jump (B Button)
-//            handleTrackedControllerButton(pDominantTrackedRemoteNew,
-//                                          pDominantTrackedRemoteOld, domButton2, K_SPACE);
+            handleTrackedControllerButton(pDominantTrackedRemoteNew,
+                                          pDominantTrackedRemoteOld, domButton2, KEY_SPACE);
 
             //We need to record if we have started firing primary so that releasing trigger will stop firing, if user has pushed grip
             //in meantime, then it wouldn't stop the gun firing and it would get stuck
@@ -186,17 +182,6 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 
 					firingPrimary = (pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger);
 
-					if (inventoryManagementMode)
-                    {
-                        if (firingPrimary)
-                        {
-                            //Select inventory item
-                        }
-                    }
-                    else
-                    {
-                        //fire primary
-                    }
 				}
 			}
 
@@ -219,26 +204,9 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 				if (!itemSwitched) {
 					if (between(0.8f, pDominantTrackedRemoteNew->Joystick.y, 1.0f))
 					{
-					    if (inventoryManagementMode)
-                        {
-                            //Previous Inventory Item
-                        }
-                        else
-                        {
-                            //Next Inventory Item
-					    }
-						
 					}
 					else
 					{
-                        if (inventoryManagementMode)
-                        {
-                            //Next Inventory Item
-                        } 
-                        else
-                        {
-                            //Next Weapon
-                        }
 					}
 					itemSwitched = true;
 				}

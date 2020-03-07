@@ -19,10 +19,7 @@ void Joy_GenerateButtonEvents(int oldbuttons, int newbuttons, int numbuttons, in
 
 void handleTrackedControllerButton(ovrInputStateTrackedRemote * trackedRemoteState, ovrInputStateTrackedRemote * prevTrackedRemoteState, uint32_t button, int key)
 {
-    if ((trackedRemoteState->Buttons & button) != (prevTrackedRemoteState->Buttons & button))
-    {
-        //Joy_GenerateButtonEvents();
-    }
+    Joy_GenerateButtonEvents(prevTrackedRemoteState->Buttons & button ? 1 : 0, trackedRemoteState->Buttons & button ? 1 : 0, 1, key);
 }
 
 

@@ -1314,9 +1314,6 @@ void VR_Init()
  */
 }
 
-/* Called before SDL_main() to initialize JNI bindings in SDL library */
-extern void SDL_Android_Init(JNIEnv* env, jclass cls);
-
 static ovrAppThread * gAppThread = NULL;
 static ovrApp gAppState;
 static ovrJava java;
@@ -1434,11 +1431,6 @@ void * AppThreadFunction(void * parm ) {
 	java.ActivityObject = gAppThread->ActivityObject;
 
 	jclass cls = (*java.Env)->GetObjectClass(java.Env, java.ActivityObject);
-
-	/* This interface could expand with ABI negotiation, callbacks, etc. */
-//	SDL_Android_Init(java.Env, cls);
-
-//	SDL_SetMainReady();
 
 	// Note that AttachCurrentThread will reset the thread name.
 	prctl(PR_SET_NAME, (long) "OVR::Main", 0, 0, 0);
@@ -1723,8 +1715,6 @@ Activity lifecycle
 
 ================================================================================
 */
-
-//JNIEXPORT jint JNICALL SDL_JNI_OnLoad(JavaVM* vm, void* reserved);
 
 int JNI_OnLoad(JavaVM* vm, void* reserved)
 {

@@ -98,6 +98,8 @@
 #include "events.h"
 #include "d_main.h"
 
+#include <QzDoom/VrInput.h>
+
 
 static FRandom pr_dmspawn ("DMSpawn");
 static FRandom pr_pspawn ("PlayerSpawn");
@@ -156,6 +158,11 @@ CVAR(Int, nametagcolor, CR_GOLD, CVAR_ARCHIVE)
 gameaction_t	gameaction;
 gamestate_t 	gamestate = GS_STARTUP;
 FName			SelectedSlideshow;		// what to start when ga_slideshow
+
+int getGameState()
+{
+	return (int)gamestate;
+}
 
 int 			paused;
 bool			pauseext;
@@ -563,9 +570,7 @@ static inline int joyint(double val)
 }
 
 
-#ifdef __MOBILE__
-extern void Mobile_IN_Move(ticcmd_t* cmd );
-#endif
+extern "C" void VR_GetMove( float *forward, float *side, float *up, float *yaw, float *pitch, float *roll );
 
 //
 // G_BuildTiccmd
@@ -655,10 +660,22 @@ void G_BuildTiccmd (ticcmd_t *cmd)
 			forward -= forwardmove[speed];
 	}
 
+	float vrforward=0;
+	float vrside=0;
+	float up=0;
+	float yaw=0;
+	float pitch=0;
+	float roll=0;
+
+	VR_GetMove(&vrforward, &vrside, &up, &yaw, &pitch, &roll);
+
 	if (Button_MoveRight.bDown)
 		side += sidemove[speed];
 	if (Button_MoveLeft.bDown)
 		side -= sidemove[speed];
+
+	side += vrside;
+	forward += vrforward;
 
 	// buttons
 	if (Button_Attack.bDown)		cmd->ucmd.buttons |= BT_ATTACK;

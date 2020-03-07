@@ -54,7 +54,7 @@ struct event_t
 	int 		y;			// mouse/joystick y move
 };
 
- 
+
 enum gameaction_t : int
 {
 	ga_nothing,

@@ -91,14 +91,13 @@ public:
 
 protected:
 	OculusQuestMode();
-	// void updateDoomViewDirection() const;
-	void updateHmdPose(double hmdYawRadians, double hmdPitchRadians, double hmdRollRadians) const;
+
+	void updateHmdPose() const;
 
 	OculusQuestEyePose leftEyeView;
 	OculusQuestEyePose rightEyeView;
 
 	mutable int cachedScreenBlocks;
-	mutable double hmdYaw; // cached latest value in radians
 	mutable int cachedViewwidth, cachedViewheight, cachedViewwindowx, cachedViewwindowy;
 	mutable F2DDrawer * cached2DDrawer;
 	mutable F2DDrawer * crossHairDrawer;
@@ -106,7 +105,6 @@ protected:
 
 private:
 	typedef Stereo3DMode super;
-	bool hmdWasFound;
 	uint32_t sceneWidth, sceneHeight;
 };
 

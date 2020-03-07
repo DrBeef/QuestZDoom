@@ -222,7 +222,7 @@ extern int camtexcount;
 
 void OpenGLFrameBuffer::Swap()
 {
-	bool swapbefore = gl_finishbeforeswap && camtexcount == 0;
+/*	bool swapbefore = gl_finishbeforeswap && camtexcount == 0;
 	Finish.Reset();
 	Finish.Clock();
 #ifndef __MOBILE__
@@ -246,6 +246,7 @@ void OpenGLFrameBuffer::Swap()
 	camtexcount = 0;
 	FHardwareTexture::UnbindAll();
 	mDebug->Update();
+ */
 }
 
 //==========================================================================

@@ -93,6 +93,9 @@ enum gamestate_t : int
 
 extern	gamestate_t 	gamestate;
 
+extern "C" int getGameState();
+
+
 // wipegamestate can be set to -1
 //	to force a wipe on the next draw
 extern gamestate_t wipegamestate;
