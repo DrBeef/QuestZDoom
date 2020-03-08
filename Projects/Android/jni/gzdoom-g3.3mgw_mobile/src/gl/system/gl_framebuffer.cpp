@@ -222,6 +222,11 @@ extern int camtexcount;
 
 void OpenGLFrameBuffer::Swap()
 {
+	//glFinish();
+
+
+	glFlush();
+
 /*	bool swapbefore = gl_finishbeforeswap && camtexcount == 0;
 	Finish.Reset();
 	Finish.Clock();

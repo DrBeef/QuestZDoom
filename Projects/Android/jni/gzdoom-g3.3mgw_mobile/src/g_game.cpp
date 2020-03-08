@@ -667,15 +667,6 @@ void G_BuildTiccmd (ticcmd_t *cmd)
 			forward -= forwardmove[speed];
 	}
 
-	float joyforward=0;
-	float hmdforward=0;
-	float joyside=0;
-	float hmdside=0;
-	float up=0;
-	float yaw=0;
-	float pitch=0;
-	float roll=0;
-
 	if (Button_MoveRight.bDown)
 		side += sidemove[speed];
 	if (Button_MoveLeft.bDown)
@@ -742,12 +733,13 @@ void G_BuildTiccmd (ticcmd_t *cmd)
 		}
 	}
 
-	VR_GetMove(&joyforward, &joyside, &hmdforward, &hmdside, &up, &yaw, &pitch, &roll);
-	side += (joyint(sidemove[speed] * joyside) + joyint(sidemove[speed] * hmdside));
-	forward += (joyint(joyforward * forwardmove[speed]) + joyint(hmdforward * forwardmove[speed]));
+	float joyforward=0;
+	float joyside=0;
+	float dummy=0;
 
-	G_SetViewAngle(mAngleFromRadians(-DEG2RAD(hmdorientation[YAW])));
-	G_SetViewPitch(mAngleFromRadians(-DEG2RAD(hmdorientation[PITCH])));
+	VR_GetMove(&joyforward, &joyside, &dummy, &dummy, &dummy, &dummy, &dummy, &dummy);
+	side += joyint(sidemove[speed] * joyside);
+	forward += joyint(joyforward * forwardmove[speed]);
 
 	cmd->ucmd.pitch = LocalViewPitch >> 16;
 

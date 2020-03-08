@@ -122,21 +122,21 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
         float controllerYawHeading = 0.0f;
         //off-hand stuff
         {
-            flashlightoffset[0] = pOffTracking->HeadPose.Pose.Position.x - hmdPosition[0];
-            flashlightoffset[1] = pOffTracking->HeadPose.Pose.Position.y - hmdPosition[1];
-            flashlightoffset[2] = pOffTracking->HeadPose.Pose.Position.z - hmdPosition[2];
+            offhandoffset[0] = pOffTracking->HeadPose.Pose.Position.x - hmdPosition[0];
+            offhandoffset[1] = pOffTracking->HeadPose.Pose.Position.y - hmdPosition[1];
+            offhandoffset[2] = pOffTracking->HeadPose.Pose.Position.z - hmdPosition[2];
 
 			vec2_t v;
-			rotateAboutOrigin(-flashlightoffset[0], flashlightoffset[2], (doomYawDegrees - hmdorientation[YAW]), v);
-			flashlightoffset[0] = v[0];
-			flashlightoffset[2] = v[1];
+			rotateAboutOrigin(-offhandoffset[0], offhandoffset[2], (doomYawDegrees - hmdorientation[YAW]), v);
+			offhandoffset[0] = v[0];
+			offhandoffset[2] = v[1];
 
-            QuatToYawPitchRoll(pOffTracking->HeadPose.Pose.Orientation, 15.0f, flashlightangles);
+            QuatToYawPitchRoll(pOffTracking->HeadPose.Pose.Orientation, 15.0f, offhandangles);
 
-            flashlightangles[YAW] += (doomYawDegrees - hmdorientation[YAW]);
+            offhandangles[YAW] += (doomYawDegrees - hmdorientation[YAW]);
 
 			if (vr_walkdirection == 0) {
-				controllerYawHeading = -doomYawDegrees + flashlightangles[YAW];
+				controllerYawHeading = -doomYawDegrees + offhandangles[YAW];
 			}
 			else
 			{
@@ -153,7 +153,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 
             //This section corrects for the fact that the controller actually controls direction of movement, but we want to move relative to the direction the
             //player is facing for positional tracking
-            float vr_positional_factor = 8.5f;
+            float vr_positional_factor = 1.0f;//4.0f;
 
             vec2_t v;
             rotateAboutOrigin(-positionDeltaThisFrame[0] * vr_positional_factor,

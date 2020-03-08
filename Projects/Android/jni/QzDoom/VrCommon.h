@@ -52,8 +52,8 @@ extern float vr_snapturn_angle;
 extern float doomYawDegrees;
 
 
-extern vec3_t flashlightangles;
-extern vec3_t flashlightoffset;
+extern vec3_t offhandangles;
+extern vec3_t offhandoffset;
 
 #define DUCK_NOTDUCKED 0
 #define DUCK_BUTTON 1

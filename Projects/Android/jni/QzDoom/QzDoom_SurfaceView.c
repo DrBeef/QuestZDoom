@@ -58,8 +58,8 @@ float vr_weapon_pitchadjust;
 bool vr_walkdirection;
 float vr_snapturn_angle;
 float doomYawDegrees;
-vec3_t flashlightangles;
-vec3_t flashlightoffset;
+vec3_t offhandangles;
+vec3_t offhandoffset;
 int ducked;
 bool player_moving;
 
@@ -91,12 +91,10 @@ PFNEGLGETSYNCATTRIBKHRPROC		eglGetSyncAttribKHR;
 #endif
 
 //Let's go to the maximum!
-int CPU_LEVEL			= 2;
-int GPU_LEVEL			= 3;
-int NUM_MULTI_SAMPLES	= 1;
+int CPU_LEVEL			= 4;
+int GPU_LEVEL			= 4;
+int NUM_MULTI_SAMPLES	= 4;
 float SS_MULTIPLIER    = 1.25f;
-
-vec2_t cylinderSize = {1280, 720};
 
 jclass clazz;
 
@@ -1258,14 +1256,8 @@ int m_height;
 
 void Android_GetScreenRes(uint32_t *width, uint32_t *height)
 {
-    if (useScreenLayer())
-    {
-        *width = cylinderSize[0];
-        *height = cylinderSize[1];
-    } else {
-        *width = m_width;
-        *height = m_height;
-    }
+    *width = m_width;
+    *height = m_height;
 }
 
 void Android_MessageBox(const char *title, const char *text)
@@ -1449,7 +1441,7 @@ void * AppThreadFunction(void * parm ) {
 	vrapi_SetPropertyInt(&gAppState.Java, VRAPI_EAT_NATIVE_GAMEPAD_EVENTS, 0);
 
 	//Using a symmetrical render target
-	cylinderSize[0] = cylinderSize[1] = m_height = m_width = (int)(vrapi_GetSystemPropertyInt(&java, VRAPI_SYS_PROP_SUGGESTED_EYE_TEXTURE_WIDTH) *  SS_MULTIPLIER);
+	m_height = m_width = (int)(vrapi_GetSystemPropertyInt(&java, VRAPI_SYS_PROP_SUGGESTED_EYE_TEXTURE_WIDTH) *  SS_MULTIPLIER);
 
 	gAppState.CpuLevel = CPU_LEVEL;
 	gAppState.GpuLevel = GPU_LEVEL;
@@ -1475,7 +1467,7 @@ void * AppThreadFunction(void * parm ) {
 	}
 
 	// Create the scene if not yet created.
-	ovrScene_Create( cylinderSize[0], cylinderSize[1], &gAppState.Scene, &java );
+	ovrScene_Create( m_width, m_height, &gAppState.Scene, &java );
 
 	chdir("/sdcard/QzDoom");
 

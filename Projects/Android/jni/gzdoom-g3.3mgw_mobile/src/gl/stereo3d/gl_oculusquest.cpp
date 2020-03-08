@@ -63,22 +63,12 @@ EXTERN_CVAR(Float, vr_floor_offset)
 
 EXTERN_CVAR(Int, vr_control_scheme)
 EXTERN_CVAR(Bool, vr_moveFollowsOffHand)
-//EXTERN_CVAR(Bool, oculusquest_drawControllers)
 EXTERN_CVAR(Float, vr_weaponRotate);
 EXTERN_CVAR(Float, vr_snapTurn);
-//EXTERN_CVAR(Float, oculusquest_weaponScale);
+EXTERN_CVAR(Float, vr_ipd);
 
-CVAR(Float, oculusquest_kill_momentum, 0.0f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
-const float DEAD_ZONE = 0.25f;
+double P_XYMovement(AActor *mo, DVector2 scroll);
 
-
-static int axisTrackpad = -1;
-static int axisJoystick = -1;
-static int axisTrigger = -1;
-static bool identifiedAxes = false;
-
-DVector3 oculusquest_dpos(0,0,0);
-DAngle oculusquest_to_doom_angle;
 
 namespace s3d
 {
@@ -122,94 +112,31 @@ namespace s3d
         doomYawDegrees = yaw;
         outViewShift[0] = outViewShift[1] = outViewShift[2] = 0;
 
-        // Pitch and Roll are identical between vr and Doom worlds.
-        // But yaw can differ, depending on starting state, and controller movement.
-        float doomYawDegrees = yaw;
-        deltaYawDegrees = doomYawDegrees - hmdorientation[YAW];
-        while (deltaYawDegrees > 180)
-            deltaYawDegrees -= 360;
-        while (deltaYawDegrees < -180)
-            deltaYawDegrees += 360;
+        VSMatrix shiftMat;
+        shiftMat.loadIdentity();
 
-        DAngle vr_to_doom_angle = DAngle(-deltaYawDegrees);
+        shiftMat.rotate(GLRenderer->mAngles.Roll.Degrees, 0, 0, 1);
+        shiftMat.rotate(GLRenderer->mAngles.Pitch.Degrees, 1, 0, 0);
+        shiftMat.rotate(GLRenderer->mAngles.Yaw.Degrees, 0, 1, 0);
 
-        const Stereo3DMode * mode3d = &Stereo3DMode::getCurrentMode();
-        if (mode3d->IsMono())
-            return;
-        const OculusQuestMode  * vrMode = static_cast<const OculusQuestMode *>(mode3d);
+        double mult = eye == 0 ? -1.0 : 1.0;
 
-        ovrTracking2 tracking;
-        vrMode->getTracking(&tracking);
+        LSVec3 vec((vr_ipd * 0.5) * vr_vunits_per_meter * mult, 0, 0);
+        LSMatrix44 mat(shiftMat);
 
-        /*
-        // extract rotation component from hmd transform
-        LSMatrix44 vr_X_hmd(hmdPose);
-        LSMatrix44 hmdRot = vr_X_hmd.getWithoutTranslation(); // .transpose();
+        LSVec3 eyeOffset = mat * vec;
 
-        /// In these eye methods, just get local inter-eye stereoscopic shift, not full position shift ///
+        // In vr, the real world floor level is at y==0
+        // In Doom, the virtual player foot level is viewheight below the current viewpoint (on the Z axis)
+        // We want to align those two heights here
+        const player_t & player = players[consoleplayer];
+        double vh = player.viewheight; // Doom thinks this is where you are
+        double hh = (hmdPosition[2] - vr_floor_offset) * vr_vunits_per_meter; // HMD is actually here
+        eyeOffset[2] += hh - vh;
 
-        // compute local eye shift
-        LSMatrix44 eyeShift2;
-        eyeShift2.loadIdentity();
-        eyeShift2 = eyeShift2 * eyeToHeadTransform; // eye to head
-        eyeShift2 = eyeShift2 * hmdRot; // head to vr
-
-        LSVec3 eye_EyePos = LSVec3(0, 0, 0); // eye position in eye frame
-        LSVec3 hmd_EyePos = LSMatrix44(eyeToHeadTransform) * eye_EyePos;
-        LSVec3 hmd_HmdPos = LSVec3(0, 0, 0); // hmd position in hmd frame
-        LSVec3 vr_EyePos = vr_X_hmd * hmd_EyePos;
-        LSVec3 vr_HmdPos = vr_X_hmd * hmd_HmdPos;
-        LSVec3 hmd_OtherEyePos = LSMatrix44(otherEyeToHeadTransform) * eye_EyePos;
-        LSVec3 vr_OtherEyePos = vr_X_hmd * hmd_OtherEyePos;
-        LSVec3 vr_EyeOffset = vr_EyePos - vr_HmdPos;
-
-        VSMatrix doomInvr = VSMatrix();
-        doomInvr.loadIdentity();
-        // permute axes
-        float permute[] = { // Convert from vr to Doom axis convention, including mirror inversion
-                -1,  0,  0,  0, // X-right in vr -> X-left in Doom
-                0,  0,  1,  0, // Z-backward in vr -> Y-backward in Doom
-                0,  1,  0,  0, // Y-up in vr -> Z-up in Doom
-                0,  0,  0,  1};
-        doomInvr.multMatrix(permute);
-        doomInvr.scale(vr_vunits_per_meter, vr_vunits_per_meter, vr_vunits_per_meter); // Doom units are not meters
-        double pixelstretch = level.info ? level.info->pixelstretch : 1.2;
-        doomInvr.scale(pixelstretch, pixelstretch, 1.0); // Doom universe is scaled by 1990s pixel aspect ratio
-        doomInvr.rotate(deltaYawDegrees, 0, 0, 1);
-
-        LSVec3 doom_EyeOffset = LSMatrix44(doomInvr) * vr_EyeOffset;
-
-        if (doTrackHmdVerticalPosition) {
-            // In vr, the real world floor level is at y==0
-            // In Doom, the virtual player foot level is viewheight below the current viewpoint (on the Z axis)
-            // We want to align those two heights here
-            const player_t & player = players[consoleplayer];
-            double vh = player.viewheight; // Doom thinks this is where you are
-            double hh = (vr_X_hmd[1][3] - vr_floor_offset) * vr_vunits_per_meter; // HMD is actually here
-            doom_EyeOffset[2] += hh - vh;
-            // TODO: optionally allow player to jump and crouch by actually jumping and crouching
-        }
-
-        if (doTrackHmdHorizontalPosition) {
-            // shift viewpoint when hmd position shifts
-            static bool is_initial_origin_set = false;
-            if (! is_initial_origin_set) {
-                // initialize origin to first noted HMD location
-                // TODO: implement recentering based on a CCMD
-                vr_origin = vr_HmdPos;
-                is_initial_origin_set = true;
-            }
-            vr_dpos = vr_HmdPos - vr_origin;
-
-            LSVec3 doom_dpos = LSMatrix44(doomInvr) * vr_dpos;
-            doom_EyeOffset[0] += doom_dpos[0];
-            doom_EyeOffset[1] += doom_dpos[1];
-        }
-
-        outViewShift[0] = doom_EyeOffset[0];
-        outViewShift[1] = doom_EyeOffset[1];
-        outViewShift[2] = doom_EyeOffset[2];
-         */
+        outViewShift[0] = eyeOffset[0];
+        outViewShift[1] = eyeOffset[1];
+        outViewShift[2] = eyeOffset[2];
     }
 
 /* virtual */
@@ -387,39 +314,12 @@ namespace s3d
         gl_RenderState.EnableModelMatrix(false);
     }
 
-    void OculusQuestMode::AdjustCrossHair() const
-    {
-        cached2DDrawer = GLRenderer->m2DDrawer;
-        // Remove effect of screenblocks setting on crosshair position
-        cachedViewheight = viewheight;
-        cachedViewwindowy = viewwindowy;
-        viewheight = SCREENHEIGHT;
-        viewwindowy = 0;
-
-        if (crossHairDrawer != nullptr) {
-            // Hijack 2D drawing to our local crosshair drawer
-            crossHairDrawer->Clear();
-            GLRenderer->m2DDrawer = crossHairDrawer;
-        }
-    }
-
-    void OculusQuestMode::UnAdjustCrossHair() const
-    {
-        viewheight = cachedViewheight;
-        viewwindowy = cachedViewwindowy;
-        if (cached2DDrawer)
-            GLRenderer->m2DDrawer = cached2DDrawer;
-        cached2DDrawer = nullptr;
-    }
-
     bool OculusQuestMode::GetHandTransform(int hand, VSMatrix* mat) const
     {
-        /*
-        if (controllers[hand].active)
-        {
+/*        {
             mat->loadIdentity();
 
-            APlayerPawn* playermo = r_viewpoint.camera->player->mo;
+            AActor* playermo = r_viewpoint.camera->player->mo;
             DVector3 pos = playermo->InterpolatedPosition(r_viewpoint.TicFrac);
 
             mat->translate(pos.X, pos.Z, pos.Y);
@@ -436,8 +336,8 @@ namespace s3d
             mat->multMatrix(handToAbs.transpose());
 
             return true;
-        }
-         */
+        }*/
+
         return false;
     }
 
@@ -453,40 +353,6 @@ namespace s3d
         }
         return false;
     }
-
-/*    static DVector3 MapAttackDir(AActor* actor, DAngle yaw, DAngle pitch)
-    {
-        LSMatrix44 mat;
-        if (!s3d::Stereo3DMode::getCurrentMode().GetWeaponTransform(&mat))
-        {
-            double pc = pitch.Cos();
-
-            DVector3 direction = { pc * yaw.Cos(), pc * yaw.Sin(), -pitch.Sin() };
-            return direction;
-        }
-        double pc = pitch.Cos();
-
-        DVector3 refdirection = { pc * yaw.Cos(), pc * yaw.Sin(), -pitch.Sin() };
-
-        yaw -= actor->Angles.Yaw;
-
-        //ignore specified pitch (would need to compensate for auto aim and no (vanilla) Doom weapon varies this)
-        //pitch -= actor->Angles.Pitch;
-        pitch.Degrees = 0;
-
-        pc = pitch.Cos();
-
-        DVector3 local = { (float)(pc * yaw.Cos()), (float)(pc * yaw.Sin()), (float)(-pitch.Sin()), 0.0f };
-
-        DVector3 dir;
-        dir.X = local.x * -mat[2][0] + local.y * -mat[0][0] + local.z * -mat[1][0];
-        dir.Y = local.x * -mat[2][2] + local.y * -mat[0][2] + local.z * -mat[1][2];
-        dir.Z = local.x * -mat[2][1] + local.y * -mat[0][1] + local.z * -mat[1][1];
-        dir.MakeUnit();
-
-        return dir;
-    }
-*/
 
 
 /* virtual */
@@ -504,151 +370,8 @@ namespace s3d
         return int(m);
     }
 
+    extern "C" void VR_GetMove( float *joy_forward, float *joy_side, float *hmd_forward, float *hmd_side, float *up, float *yaw, float *pitch, float *roll );
 
-/*    void Joy_GenerateUIButtonEvents(int oldbuttons, int newbuttons, int numbuttons, const int *keys)
-    {
-        int changed = oldbuttons ^ newbuttons;
-        if (changed != 0)
-        {
-            event_t ev = { 0, 0, 0, 0, 0, 0, 0 };
-            int mask = 1;
-            for (int j = 0; j < numbuttons; mask <<= 1, ++j)
-            {
-                if (changed & mask)
-                {
-                    ev.data1 = keys[j];
-                    ev.type = EV_GUI_Event;
-                    ev.subtype = (newbuttons & mask) ? EV_GUI_KeyDown : EV_GUI_KeyUp;
-                    D_PostEvent(&ev);
-                }
-            }
-        }
-    }
-
-    static void HandleVRAxis(VRControllerState_t& lastState, VRControllerState_t& newState, int vrAxis, int axis, int negativedoomkey, int positivedoomkey, int base)
-    {
-        int keys[] = { negativedoomkey + base, positivedoomkey + base };
-        Joy_GenerateButtonEvents(GetVRAxisState(lastState, vrAxis, axis), GetVRAxisState(newState, vrAxis, axis), 2, keys);
-    }
-
-    static void HandleUIVRAxis(VRControllerState_t& lastState, VRControllerState_t& newState, int vrAxis, int axis, ESpecialGUIKeys negativedoomkey, ESpecialGUIKeys positivedoomkey)
-    {
-        int keys[] = { (int)negativedoomkey, (int)positivedoomkey };
-        Joy_GenerateUIButtonEvents(GetVRAxisState(lastState, vrAxis, axis), GetVRAxisState(newState, vrAxis, axis), 2, keys);
-    }
-
-    static void HandleUIVRAxes(VRControllerState_t& lastState, VRControllerState_t& newState, int vrAxis,
-                               ESpecialGUIKeys xnegativedoomkey, ESpecialGUIKeys xpositivedoomkey, ESpecialGUIKeys ynegativedoomkey, ESpecialGUIKeys ypositivedoomkey)
-    {
-        int oldButtons = abs(lastState.rAxis[vrAxis].x) > abs(lastState.rAxis[vrAxis].y)
-                         ? GetVRAxisState(lastState, vrAxis, 0)
-                         : GetVRAxisState(lastState, vrAxis, 1) << 2;
-        int newButtons = abs(newState.rAxis[vrAxis].x) > abs(newState.rAxis[vrAxis].y)
-                         ? GetVRAxisState(newState, vrAxis, 0)
-                         : GetVRAxisState(newState, vrAxis, 1) << 2;
-
-        int keys[] = { xnegativedoomkey, xpositivedoomkey, ynegativedoomkey, ypositivedoomkey };
-
-        Joy_GenerateUIButtonEvents(oldButtons, newButtons, 4, keys);
-    }
-
-    static void HandleVRButton(VRControllerState_t& lastState, VRControllerState_t& newState, long long vrindex, int doomkey, int base)
-    {
-        Joy_GenerateButtonEvents((lastState.ulButtonPressed & (1LL << vrindex)) ? 1 : 0, (newState.ulButtonPressed & (1LL << vrindex)) ? 1 : 0, 1, doomkey + base);
-    }
-
-    static void HandleUIVRButton(VRControllerState_t& lastState, VRControllerState_t& newState, long long vrindex, int doomkey)
-    {
-        Joy_GenerateUIButtonEvents((lastState.ulButtonPressed & (1LL << vrindex)) ? 1 : 0, (newState.ulButtonPressed & (1LL << vrindex)) ? 1 : 0, 1, &doomkey);
-    }
-
-    static void HandleControllerState(int device, int role, VRControllerState_t& newState)
-    {
-        VRControllerState_t& lastState = controllers[role].lastState;
-
-        //trigger (swaps with handedness)
-        int controller = oculusquest_rightHanded ? role : 1 - role;
-
-        if (CurrentMenu == nullptr) //the quit menu is cancelled by any normal keypress, so don't generate the fire while in menus
-        {
-            HandleVRAxis(lastState, newState, 1, 0, KEY_JOY4, KEY_JOY4, controller * (KEY_PAD_RTRIGGER - KEY_JOY4));
-        }
-        HandleUIVRAxis(lastState, newState, 1, 0, GK_RETURN, GK_RETURN);
-
-        //touchpad
-        if (axisTrackpad != -1)
-        {
-            HandleVRAxis(lastState, newState, axisTrackpad, 0, KEY_PAD_LTHUMB_LEFT, KEY_PAD_LTHUMB_RIGHT, role * (KEY_PAD_RTHUMB_LEFT - KEY_PAD_LTHUMB_LEFT));
-            HandleVRAxis(lastState, newState, axisTrackpad, 1, KEY_PAD_LTHUMB_DOWN, KEY_PAD_LTHUMB_UP, role * (KEY_PAD_RTHUMB_DOWN - KEY_PAD_LTHUMB_UP));
-            HandleUIVRAxes(lastState, newState, axisTrackpad, GK_LEFT, GK_RIGHT, GK_DOWN, GK_UP);
-        }
-
-        //WMR joysticks
-        if (axisJoystick != -1)
-        {
-            HandleVRAxis(lastState, newState, axisJoystick, 0, KEY_JOYAXIS1MINUS, KEY_JOYAXIS1PLUS, role * (KEY_JOYAXIS3PLUS - KEY_JOYAXIS1PLUS));
-            HandleVRAxis(lastState, newState, axisJoystick, 1, KEY_JOYAXIS2MINUS, KEY_JOYAXIS2PLUS, role * (KEY_JOYAXIS3PLUS - KEY_JOYAXIS1PLUS));
-            HandleUIVRAxes(lastState, newState, axisJoystick, GK_LEFT, GK_RIGHT, GK_DOWN, GK_UP);
-        }
-
-        HandleVRButton(lastState, newState, vr::k_EButton_Grip, KEY_PAD_LSHOULDER, role * (KEY_PAD_RSHOULDER - KEY_PAD_LSHOULDER));
-        HandleUIVRButton(lastState, newState, vr::k_EButton_Grip, GK_BACK);
-        HandleVRButton(lastState, newState, vr::k_EButton_ApplicationMenu, KEY_PAD_START, role * (KEY_PAD_BACK - KEY_PAD_START));
-
-        //Extra controls for rift
-        HandleVRButton(lastState, newState, vr::k_EButton_A, KEY_PAD_A, role * (KEY_PAD_B - KEY_PAD_A));
-        HandleVRButton(lastState, newState, vr::k_EButton_SteamVR_Touchpad, KEY_PAD_X, role * (KEY_PAD_Y - KEY_PAD_X));
-
-        lastState = newState;
-    }
-
-
-    VRControllerState_t& OculusQuest_GetState(int hand)
-    {
-        int controller = oculusquest_rightHanded ? hand : 1 - hand;
-        return controllers[controller].lastState;
-    }
-
-
-    int OculusQuest_GetTouchPadAxis()
-    {
-        return axisTrackpad;
-    }
-
-    int OculusQuest_GetJoystickAxis()
-    {
-        return axisJoystick;
-    }
-
-    bool OculusQuest_OnHandIsRight()
-    {
-        return oculusquest_rightHanded;
-    }
-
-
-    static inline int joyint(double val)
-    {
-        if (val >= 0)
-        {
-            return int(ceil(val));
-        }
-        else
-        {
-            return int(floor(val));
-        }
-    }
-
-    bool JustStoppedMoving(VRControllerState_t& lastState, VRControllerState_t& newState, int axis)
-    {
-        if (axis != -1)
-        {
-            bool wasMoving = (abs(lastState.rAxis[axis].x) > DEAD_ZONE || abs(lastState.rAxis[axis].y) > DEAD_ZONE);
-            bool isMoving = (abs(newState.rAxis[axis].x) > DEAD_ZONE || abs(newState.rAxis[axis].y) > DEAD_ZONE);
-            return !isMoving && wasMoving;
-        }
-        return false;
-    }
-*/
 /* virtual */
     void OculusQuestMode::SetUp() const
     {
@@ -659,8 +382,8 @@ namespace s3d
         if (doAdjustVrSettings) {
             movebob = 0;
             gl_billboard_faces_camera = true;
-            if (gl_multisample < 2)
-                gl_multisample = 4;
+//            if (gl_multisample < 2)
+//                gl_multisample = 4;
         }
 
         if (gamestate == GS_LEVEL && !isMenuActive()) {
@@ -681,37 +404,34 @@ namespace s3d
         //Set up stuff used in the tracking code
         vr_weapon_pitchadjust = vr_weaponRotate;
         vr_snapturn_angle = vr_snapTurn;
-        vr_walkdirection = !vr_moveFollowsOffHand; //FIX THIS!
+        vr_walkdirection = !vr_moveFollowsOffHand;
         doomYawDegrees = GLRenderer->mAngles.Yaw.Degrees;
         getTrackedRemotesOrientation(vr_control_scheme);
 
-/*        player_t* player = r_viewpoint.camera ? r_viewpoint.camera->player : nullptr;
+        player_t* player = r_viewpoint.camera ? r_viewpoint.camera->player : nullptr;
         {
-            LSMatrix44 mat;
             if (player)
             {
-                if (GetWeaponTransform(&mat))
                 {
                     player->mo->OverrideAttackPosDir = true;
 
-                    player->mo->AttackPos.X = mat[3][0];
-                    player->mo->AttackPos.Y = mat[3][2];
-                    player->mo->AttackPos.Z = mat[3][1];
+                    player->mo->AttackPos.X = player->mo->X() + weaponoffset[0];
+                    player->mo->AttackPos.Y = player->mo->Y() + weaponoffset[1];
+                    player->mo->AttackPos.Z = player->mo->Z() + weaponoffset[2];
 
-                    player->mo->AttackDir = MapAttackDir;
+                    player->mo->AttackDir = DVector3(weaponangles[0], weaponangles[1], weaponangles[2]);
                 }
-                if (GetHandTransform(oculusquest_rightHanded ? 0 : 1, &mat) && oculusquest_moveFollowsOffHand)
-                {
-                    player->mo->ThrustAngleOffset = DAngle(RAD2DEG(atan2f(-mat[2][2], -mat[2][0]))) - player->mo->Angles.Yaw;
-                }
-                else
-                {
-                    player->mo->ThrustAngleOffset = 0.0f;
-                }
+
+                //Positional Movement
+                float hmd_forward=0;
+                float hmd_side=0;
+                float dummy=0;
+                VR_GetMove(&dummy, &dummy, &hmd_forward, &hmd_side, &dummy, &dummy, &dummy, &dummy);
+
                 auto vel = player->mo->Vel;
-                player->mo->Vel = DVector3((DVector2(-oculusquest_dpos.x, oculusquest_dpos.z) * vr_vunits_per_meter).Rotated(oculusquest_to_doom_angle), 0);
+                player->mo->Vel = DVector3((DVector2(hmd_forward, hmd_side) * vr_vunits_per_meter), 0);
                 bool wasOnGround = player->mo->Z() <= player->mo->floorz;
-                float oldZ = player->mo->Z();
+                double oldZ = player->mo->Z();
                 P_XYMovement(player->mo, DVector2(0, 0));
 
                 //if we were on the ground before offsetting, make sure we still are (this fixes not being able to move on lifts)
@@ -724,63 +444,56 @@ namespace s3d
                     player->mo->SetZ(oldZ);
                 }
                 player->mo->Vel = vel;
-                oculusquest_origin += oculusquest_dpos;
             }
         }
-*/
-  /*      //To feel smooth, yaw changes need to accumulate over the (sub) tic (i.e. render frame, not per tic)
-        unsigned int time = I_FPSTime();
-        static unsigned int lastTime = time;
 
-        unsigned int delta = time - lastTime;
-        lastTime = time;
-
-        //G_AddViewAngle(joyint(-1280 * I_OculusQuestGetYaw() * delta * 30 / 1000));
-*/
-
-        //Always update roll (as the game tic cmd doesn't support roll
-        GLRenderer->mAngles.Roll = hmdorientation[ROLL];
-
-        //updateHmdPose();
+        updateHmdPose();
     }
 
 
     void OculusQuestMode::updateHmdPose() const
     {
-        double hmdYawDeltaDegrees = 0;
+        float dummy=0;
+        float yaw=0;
+        float pitch=0;
+        float roll=0;
+        VR_GetMove(&dummy, &dummy, &dummy, &dummy, &dummy, &yaw, &pitch, &roll);
+
+        //Yaw
         {
             static double previousHmdYaw = 0;
             static bool havePreviousYaw = false;
             if (!havePreviousYaw) {
-                previousHmdYaw = hmdorientation[YAW];
+                previousHmdYaw = yaw;
                 havePreviousYaw = true;
             }
-            hmdYawDeltaDegrees = hmdorientation[YAW] - previousHmdYaw;
+            double hmdYawDeltaDegrees = yaw - previousHmdYaw;
             G_AddViewAngle(mAngleFromRadians(DEG2RAD(-hmdYawDeltaDegrees)));
-            previousHmdYaw = hmdorientation[YAW];
+            previousHmdYaw = yaw;
         }
 
-        /* */
         // Pitch
         {
             double viewPitchInDoom = GLRenderer->mAngles.Pitch.Radians();
             double dPitch =
-                    - DEG2RAD(hmdorientation[PITCH])
+                    - DEG2RAD(pitch)
                     - viewPitchInDoom;
             G_AddViewPitch(mAngleFromRadians(dPitch));
         }
 
+        //Set all the render angles - including roll
         {
-            GLRenderer->mAngles.Pitch = hmdorientation[PITCH];
+            //Always update roll (as the game tic cmd doesn't support roll
+            GLRenderer->mAngles.Roll = roll;
+            GLRenderer->mAngles.Pitch = pitch;
 
-            double viewYaw = r_viewpoint.Angles.Yaw.Degrees - hmdYawDeltaDegrees;
+            double viewYaw = yaw;
             while (viewYaw <= -180.0)
                 viewYaw += 360.0;
             while (viewYaw > 180.0)
                 viewYaw -= 360.0;
-            r_viewpoint.Angles.Yaw = viewYaw;
+            r_viewpoint.Angles.Yaw.Degrees = viewYaw;
         }
-
     }
 
 /* virtual */
