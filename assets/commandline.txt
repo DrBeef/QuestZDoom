@@ -1,1 +1,1 @@
-qzdoom --supersampling 1.2 -iwad wads/DOOM.WAD
+qzdoom -iwad wads/DOOM.WAD

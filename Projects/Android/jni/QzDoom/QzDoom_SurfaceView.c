@@ -93,8 +93,8 @@ PFNEGLGETSYNCATTRIBKHRPROC		eglGetSyncAttribKHR;
 //Let's go to the maximum!
 int CPU_LEVEL			= 4;
 int GPU_LEVEL			= 4;
-int NUM_MULTI_SAMPLES	= 4;
-float SS_MULTIPLIER    = 1.25f;
+int NUM_MULTI_SAMPLES	= 1;
+float SS_MULTIPLIER    = 1.0f;
 
 jclass clazz;
 

@@ -136,7 +136,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             offhandangles[YAW] += (doomYawDegrees - hmdorientation[YAW]);
 
 			if (vr_walkdirection == 0) {
-				controllerYawHeading = -doomYawDegrees + offhandangles[YAW];
+				controllerYawHeading = offhandangles[YAW] - hmdorientation[YAW];
 			}
 			else
 			{
@@ -157,7 +157,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 
             vec2_t v;
             rotateAboutOrigin(-positionDeltaThisFrame[0] * vr_positional_factor,
-                              positionDeltaThisFrame[2] * vr_positional_factor, - hmdorientation[YAW], v);
+                              positionDeltaThisFrame[2] * vr_positional_factor, hmdorientation[YAW], v);
             positional_movementSideways = v[0];
             positional_movementForward = v[1];
 

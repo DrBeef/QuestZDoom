@@ -68,6 +68,7 @@ EXTERN_CVAR(Float, vr_snapTurn);
 EXTERN_CVAR(Float, vr_ipd);
 
 double P_XYMovement(AActor *mo, DVector2 scroll);
+extern "C" void VR_GetMove( float *joy_forward, float *joy_side, float *hmd_forward, float *hmd_side, float *up, float *yaw, float *pitch, float *roll );
 
 
 namespace s3d
@@ -112,12 +113,31 @@ namespace s3d
         doomYawDegrees = yaw;
         outViewShift[0] = outViewShift[1] = outViewShift[2] = 0;
 
+        // Pitch and Roll are identical between OpenVR and Doom worlds.
+        // But yaw can differ, depending on starting state, and controller movement.
+        float doomYawDegrees = yaw;
+        float vrYawDegrees = hmdorientation[YAW];
+        deltaYawDegrees = doomYawDegrees - vrYawDegrees;
+        while (deltaYawDegrees > 180)
+            deltaYawDegrees -= 360;
+        while (deltaYawDegrees < -180)
+            deltaYawDegrees += 360;
+
         VSMatrix shiftMat;
         shiftMat.loadIdentity();
 
         shiftMat.rotate(GLRenderer->mAngles.Roll.Degrees, 0, 0, 1);
         shiftMat.rotate(GLRenderer->mAngles.Pitch.Degrees, 1, 0, 0);
-        shiftMat.rotate(GLRenderer->mAngles.Yaw.Degrees, 0, 1, 0);
+        shiftMat.rotate(deltaYawDegrees, 0, 1, 0);
+        double pixelstretch = level.info ? level.info->pixelstretch : 1.2;
+        shiftMat.scale(pixelstretch, pixelstretch, 1.0);
+        // permute axes
+        float permute[] = { // Convert from OpenVR to Doom axis convention, including mirror inversion
+                -1,  0,  0,  0, // X-right in VR -> X-left in Doom
+                0,  0,  1,  0, // Z-backward in VR -> Y-backward in Doom
+                0,  1,  0,  0, // Y-up in VR -> Z-up in Doom
+                0,  0,  0,  1};
+        shiftMat.multMatrix(permute);
 
         double mult = eye == 0 ? -1.0 : 1.0;
 
@@ -131,7 +151,7 @@ namespace s3d
         // We want to align those two heights here
         const player_t & player = players[consoleplayer];
         double vh = player.viewheight; // Doom thinks this is where you are
-        double hh = (hmdPosition[2] - vr_floor_offset) * vr_vunits_per_meter; // HMD is actually here
+        double hh = (hmdPosition[1] - vr_floor_offset) * vr_vunits_per_meter; // HMD is actually here
         eyeOffset[2] += hh - vh;
 
         outViewShift[0] = eyeOffset[0];
@@ -369,8 +389,6 @@ namespace s3d
         double m = std::round(65535.0 * radians / (2.0 * M_PI));
         return int(m);
     }
-
-    extern "C" void VR_GetMove( float *joy_forward, float *joy_side, float *hmd_forward, float *hmd_side, float *up, float *yaw, float *pitch, float *roll );
 
 /* virtual */
     void OculusQuestMode::SetUp() const
