@@ -84,6 +84,7 @@ void C_ClearDelayedCommands();
 
 // Process a single console command. Does not handle wait.
 void C_DoCommand (const char *cmd, int keynum=0);
+extern "C" void C_DoCommandC (const char *cmd); // Added for C code to call
 
 FExecList *C_ParseExecFile(const char *file, FExecList *source);
 void C_SearchForPullins(FExecList *exec, const char *file, class FCommandLine &args);

@@ -110,38 +110,28 @@ namespace s3d
 /* virtual */
     void OculusQuestEyePose::GetViewShift(FLOATTYPE yaw, FLOATTYPE outViewShift[3]) const
     {
-        doomYawDegrees = yaw;
         outViewShift[0] = outViewShift[1] = outViewShift[2] = 0;
 
         // Pitch and Roll are identical between OpenVR and Doom worlds.
         // But yaw can differ, depending on starting state, and controller movement.
-        float doomYawDegrees = yaw;
-        float vrYawDegrees = hmdorientation[YAW];
-        deltaYawDegrees = doomYawDegrees - vrYawDegrees;
-        while (deltaYawDegrees > 180)
-            deltaYawDegrees -= 360;
-        while (deltaYawDegrees < -180)
-            deltaYawDegrees += 360;
+        float doomYawDegrees = VR_GetRawYaw() + hmdorientation[YAW];
+        while (doomYawDegrees > 180)
+            doomYawDegrees -= 360;
+        while (doomYawDegrees < -180)
+            doomYawDegrees += 360;
 
         VSMatrix shiftMat;
         shiftMat.loadIdentity();
 
-        shiftMat.rotate(GLRenderer->mAngles.Roll.Degrees, 0, 0, 1);
+        shiftMat.rotate(GLRenderer->mAngles.Roll.Degrees, 0, 1, 0);
         shiftMat.rotate(GLRenderer->mAngles.Pitch.Degrees, 1, 0, 0);
-        shiftMat.rotate(deltaYawDegrees, 0, 1, 0);
+        shiftMat.rotate(-doomYawDegrees, 0, 0, 1);
         double pixelstretch = level.info ? level.info->pixelstretch : 1.2;
-        shiftMat.scale(pixelstretch, pixelstretch, 1.0);
-        // permute axes
-        float permute[] = { // Convert from OpenVR to Doom axis convention, including mirror inversion
-                -1,  0,  0,  0, // X-right in VR -> X-left in Doom
-                0,  0,  1,  0, // Z-backward in VR -> Y-backward in Doom
-                0,  1,  0,  0, // Y-up in VR -> Z-up in Doom
-                0,  0,  0,  1};
-        shiftMat.multMatrix(permute);
+        shiftMat.scale(1.0, pixelstretch, 1.0);
 
-        double mult = eye == 0 ? -1.0 : 1.0;
+        double mult = eye == 0 ? 1.0 : -1.0;
 
-        LSVec3 vec((vr_ipd * 0.5) * vr_vunits_per_meter * mult, 0, 0);
+        LSVec3 vec(0, (vr_ipd * 0.5) * vr_vunits_per_meter * mult, 0);
         LSMatrix44 mat(shiftMat);
 
         LSVec3 eyeOffset = mat * vec;
@@ -423,7 +413,6 @@ namespace s3d
         vr_weapon_pitchadjust = vr_weaponRotate;
         vr_snapturn_angle = vr_snapTurn;
         vr_walkdirection = !vr_moveFollowsOffHand;
-        doomYawDegrees = GLRenderer->mAngles.Yaw.Degrees;
         getTrackedRemotesOrientation(vr_control_scheme);
 
         player_t* player = r_viewpoint.camera ? r_viewpoint.camera->player : nullptr;

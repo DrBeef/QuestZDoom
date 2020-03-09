@@ -57,7 +57,6 @@ bool weaponStabilised;
 float vr_weapon_pitchadjust;
 bool vr_walkdirection;
 float vr_snapturn_angle;
-float doomYawDegrees;
 vec3_t offhandangles;
 vec3_t offhandoffset;
 int ducked;
@@ -879,6 +878,11 @@ void getVROrigins(vec3_t _weaponoffset, vec3_t _weaponangles, vec3_t _hmdPositio
 
 
 void VR_DoomMain(int argc, char** argv);
+
+float VR_GetRawYaw()
+{
+    return snapTurn;
+}
 
 void VR_GetMove( float *joy_forward, float *joy_side, float *hmd_forward, float *hmd_side, float *up, float *yaw, float *pitch, float *roll )
 {

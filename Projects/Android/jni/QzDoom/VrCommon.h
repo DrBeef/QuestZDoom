@@ -49,7 +49,6 @@ extern bool weaponStabilised;
 extern float vr_weapon_pitchadjust;
 extern bool vr_walkdirection;
 extern float vr_snapturn_angle;
-extern float doomYawDegrees;
 
 
 extern vec3_t offhandangles;
@@ -76,6 +75,10 @@ void QuatToYawPitchRoll(ovrQuatf q, float pitchAdjust, vec3_t out);
 bool useScreenLayer();
 void handleTrackedControllerButton(ovrInputStateTrackedRemote * trackedRemoteState, ovrInputStateTrackedRemote * prevTrackedRemoteState, uint32_t button, int key);
 void Android_GetScreenRes(uint32_t *width, uint32_t *height);
+
+void C_DoCommandC (const char *cmd);
+
+float VR_GetRawYaw();
 
 void setUseScreenLayer(bool use);
 

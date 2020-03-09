@@ -310,6 +310,7 @@ void NoSDLGLFB::NewRefreshRate ()
 
 void NoSDLGLFB::SwapBuffers()
 {
+	//No swapping required
 }
 
 int NoSDLGLFB::GetClientWidth()

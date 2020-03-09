@@ -557,6 +557,11 @@ void ResetButtonStates ()
 	}
 }
 
+void C_DoCommandC (const char *cmd)
+{
+	C_DoCommand(cmd, 0);
+}
+
 void C_DoCommand (const char *cmd, int keynum)
 {
 	FConsoleCommand *com;

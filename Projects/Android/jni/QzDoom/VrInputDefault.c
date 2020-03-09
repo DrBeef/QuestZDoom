@@ -57,13 +57,6 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
     }
     else
     {
-        //Dominant Grip works like a shift key
-        if ((pDominantTrackedRemoteNew->Buttons & ovrButton_GripTrigger) !=
-            (pDominantTrackedRemoteOld->Buttons & ovrButton_GripTrigger)) {
-
-            dominantGripPushed = true;
-        }
-
         float distance = sqrtf(powf(pOffTracking->HeadPose.Pose.Position.x - pDominantTracking->HeadPose.Pose.Position.x, 2) +
                                powf(pOffTracking->HeadPose.Pose.Position.y - pDominantTracking->HeadPose.Pose.Position.y, 2) +
                                powf(pOffTracking->HeadPose.Pose.Position.z - pDominantTracking->HeadPose.Pose.Position.z, 2));
@@ -94,7 +87,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 
 			{
 				vec2_t v;
-//				rotateAboutOrigin(-weaponoffset[0], weaponoffset[2], (doomYawDegrees - hmdorientation[YAW]), v);
+				rotateAboutOrigin(-weaponoffset[0], weaponoffset[2], VR_GetRawYaw(), v);
 				weaponoffset[0] = v[0];
 				weaponoffset[2] = v[1];
 			}
@@ -102,8 +95,8 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             //Set gun angles - We need to calculate all those we might need (including adjustments) for the client to then take its pick
             const ovrQuatf quatRemote = pDominantTracking->HeadPose.Pose.Orientation;
             QuatToYawPitchRoll(quatRemote, vr_weapon_pitchadjust, weaponangles);
-            weaponangles[YAW] += (doomYawDegrees - hmdorientation[YAW]);
-            weaponangles[ROLL] *= -1.0f;
+            weaponangles[YAW] -= VR_GetRawYaw();
+            //weaponangles[ROLL] *= -1.0f;
 
 
             if (weaponStabilised)
@@ -114,12 +107,13 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                 float zxDist = length(x, z);
 
                 if (zxDist != 0.0f && z != 0.0f) {
-                    VectorSet(weaponangles, -degrees(atanf(y / zxDist)), (doomYawDegrees - hmdorientation[YAW]) - degrees(atan2f(x, -z)), weaponangles[ROLL]);
+                    VectorSet(weaponangles, -degrees(atanf(y / zxDist)), VR_GetRawYaw() - degrees(atan2f(x, -z)), weaponangles[ROLL]);
                 }
             }
         }
 
         float controllerYawHeading = 0.0f;
+
         //off-hand stuff
         {
             offhandoffset[0] = pOffTracking->HeadPose.Pose.Position.x - hmdPosition[0];
@@ -127,24 +121,23 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             offhandoffset[2] = pOffTracking->HeadPose.Pose.Position.z - hmdPosition[2];
 
 			vec2_t v;
-			rotateAboutOrigin(-offhandoffset[0], offhandoffset[2], (doomYawDegrees - hmdorientation[YAW]), v);
+			rotateAboutOrigin(-offhandoffset[0], offhandoffset[2], VR_GetRawYaw(), v);
 			offhandoffset[0] = v[0];
 			offhandoffset[2] = v[1];
 
-            QuatToYawPitchRoll(pOffTracking->HeadPose.Pose.Orientation, 15.0f, offhandangles);
-
-            offhandangles[YAW] += (doomYawDegrees - hmdorientation[YAW]);
+            QuatToYawPitchRoll(pOffTracking->HeadPose.Pose.Orientation, 0.0f, offhandangles);
+            offhandangles[YAW] -= VR_GetRawYaw();
 
 			if (vr_walkdirection == 0) {
-				controllerYawHeading = offhandangles[YAW] - hmdorientation[YAW];
+				controllerYawHeading = offhandangles[YAW];
 			}
 			else
 			{
-				controllerYawHeading = 0.0f;//-cl.viewangles[YAW];
+				controllerYawHeading = 0.0f;
 			}
         }
 
-        //Right-hand specific stuff
+        //Dominant-hand specific stuff
         {
             ALOGV("        Right-Controller-Position: %f, %f, %f",
                   pDominantTracking->HeadPose.Pose.Position.x,
@@ -157,63 +150,16 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 
             vec2_t v;
             rotateAboutOrigin(-positionDeltaThisFrame[0] * vr_positional_factor,
-                              positionDeltaThisFrame[2] * vr_positional_factor, hmdorientation[YAW], v);
+                              positionDeltaThisFrame[2] * vr_positional_factor, -(VR_GetRawYaw() + hmdorientation[YAW]), v);
             positional_movementSideways = v[0];
             positional_movementForward = v[1];
 
             ALOGV("        positional_movementSideways: %f, positional_movementForward: %f",
                   positional_movementSideways,
                   positional_movementForward);
-
-            //Jump (B Button)
-            handleTrackedControllerButton(pDominantTrackedRemoteNew,
-                                          pDominantTrackedRemoteOld, domButton2, KEY_SPACE);
-
-            //We need to record if we have started firing primary so that releasing trigger will stop firing, if user has pushed grip
-            //in meantime, then it wouldn't stop the gun firing and it would get stuck
-            static bool firingPrimary = false;
-
-			{
-				//Fire Primary
-				if ((pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger) !=
-					(pDominantTrackedRemoteOld->Buttons & ovrButton_Trigger)) {
-
-					firingPrimary = (pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger);
-
-				}
-			}
-
-            //Duck with A
-            if ((pDominantTrackedRemoteNew->Buttons & domButton1) !=
-                (pDominantTrackedRemoteOld->Buttons & domButton1) &&
-                ducked != DUCK_CROUCHED) {
-
-                ducked = (pDominantTrackedRemoteNew->Buttons & domButton1) ? DUCK_BUTTON : DUCK_NOTDUCKED;
-
-                //Trigger Duck
-            }
-
-			//Weapon/Inventory Chooser
-			static bool itemSwitched = false;
-			if (between(-0.2f, pDominantTrackedRemoteNew->Joystick.x, 0.2f) &&
-				(between(0.8f, pDominantTrackedRemoteNew->Joystick.y, 1.0f) ||
-				 between(-1.0f, pDominantTrackedRemoteNew->Joystick.y, -0.8f)))
-			{
-				if (!itemSwitched) {
-					if (between(0.8f, pDominantTrackedRemoteNew->Joystick.y, 1.0f))
-					{
-					}
-					else
-					{
-					}
-					itemSwitched = true;
-				}
-			} else {
-				itemSwitched = false;
-			}
         }
 
-        //Left-hand specific stuff
+        //Off-hand specific stuff
         {
             ALOGV("        Left-Controller-Position: %f, %f, %f",
                   pOffTracking->HeadPose.Pose.Position.x,
@@ -245,32 +191,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                   remote_movementSideways,
                   remote_movementForward);
 
-
-            //show help computer while X/A pressed
-            if ((pOffTrackedRemoteNew->Buttons & offButton1) !=
-                 (pOffTrackedRemoteOld->Buttons & offButton1)) {
-
-                //Help Computer
-            }
-
-
-            //Use (Action)
-            if ((pOffTrackedRemoteNew->Buttons & ovrButton_Joystick) !=
-                (pOffTrackedRemoteOld->Buttons & ovrButton_Joystick)
-                && (pOffTrackedRemoteNew->Buttons & ovrButton_Joystick)) {
-
-
-            }
-
-            //We need to record if we have started firing primary so that releasing trigger will stop definitely firing, if user has pushed grip
-            //in meantime, then it wouldn't stop the gun firing and it would get stuck
-            static bool firingPrimary = false;
-
-			//Run
-//			handleTrackedControllerButton(pOffTrackedRemoteNew,
-//										  pOffTrackedRemoteOld,
-//										  ovrButton_Trigger, K_SHIFT);
-
+            // Turning logic
             static int increaseSnap = true;
 			if (pDominantTrackedRemoteNew->Joystick.x > 0.6f)
 			{
@@ -311,6 +232,111 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 			{
 				decreaseSnap = true;
 			}
+        }
+
+        //Now handle all the buttons
+        {
+            //Dominant Grip works like a shift key
+            bool dominantGripPushedOld = (pDominantTrackedRemoteNew->Buttons & ovrButton_GripTrigger) != 0;
+            bool dominantGripPushedNew = (pDominantTrackedRemoteOld->Buttons & ovrButton_GripTrigger) != 0;
+
+
+            //Weapon Chooser
+            static bool itemSwitched = false;
+            if (between(-0.2f, pDominantTrackedRemoteNew->Joystick.x, 0.2f) &&
+                (between(0.8f, pDominantTrackedRemoteNew->Joystick.y, 1.0f) ||
+                 between(-1.0f, pDominantTrackedRemoteNew->Joystick.y, -0.8f)))
+            {
+                if (!itemSwitched) {
+                    if (between(0.8f, pDominantTrackedRemoteNew->Joystick.y, 1.0f))
+                    {
+                        C_DoCommandC("nextweap");
+                    }
+                    else
+                    {
+                        C_DoCommandC("prevweap");
+                    }
+
+                    itemSwitched = true;
+                }
+            } else {
+                itemSwitched = false;
+            }
+
+            //Dominant Hand - Primary keys (no grip pushed)
+            Joy_GenerateButtonEvents(((pDominantTrackedRemoteOld->Buttons & ovrButton_Trigger) != 0) && !dominantGripPushedOld ? 1 : 0,
+                                     ((pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger) != 0) && !dominantGripPushedNew ? 1 : 0,
+                                     1, KEY_PAD_RTRIGGER);
+
+            Joy_GenerateButtonEvents(((pDominantTrackedRemoteOld->Buttons & domButton1) != 0) && !dominantGripPushedOld ? 1 : 0,
+                                     ((pDominantTrackedRemoteNew->Buttons & domButton1) != 0) && !dominantGripPushedNew ? 1 : 0,
+                                     1, KEY_PAD_A);
+
+            Joy_GenerateButtonEvents(((pDominantTrackedRemoteOld->Buttons & domButton2) != 0) && !dominantGripPushedOld ? 1 : 0,
+                                     ((pDominantTrackedRemoteNew->Buttons & domButton2) != 0) && !dominantGripPushedNew ? 1 : 0,
+                                     1, KEY_PAD_B);
+
+            Joy_GenerateButtonEvents(((pDominantTrackedRemoteOld->Buttons & ovrButton_Joystick) != 0) && !dominantGripPushedOld ? 1 : 0,
+                                     ((pDominantTrackedRemoteNew->Buttons & ovrButton_Joystick) != 0) && !dominantGripPushedNew ? 1 : 0,
+                                     1, KEY_MWHEELDOWN);
+
+
+
+            //Dominant Hand - Secondary keys (grip pushed)
+            Joy_GenerateButtonEvents(((pDominantTrackedRemoteOld->Buttons & ovrButton_Trigger) != 0) && dominantGripPushedOld ? 1 : 0,
+                                     ((pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger) != 0) && dominantGripPushedNew ? 1 : 0,
+                                     1, KEY_PAD_RSHOULDER);
+
+            Joy_GenerateButtonEvents(((pDominantTrackedRemoteOld->Buttons & domButton1) != 0) && dominantGripPushedOld ? 1 : 0,
+                                     ((pDominantTrackedRemoteNew->Buttons & domButton1) != 0) && dominantGripPushedNew ? 1 : 0,
+                                     1, KEY_RSHIFT);
+
+            Joy_GenerateButtonEvents(((pDominantTrackedRemoteOld->Buttons & domButton2) != 0) && dominantGripPushedOld ? 1 : 0,
+                                     ((pDominantTrackedRemoteNew->Buttons & domButton2) != 0) && dominantGripPushedNew ? 1 : 0,
+                                     1, KEY_RCTRL);
+
+            Joy_GenerateButtonEvents(((pDominantTrackedRemoteOld->Buttons & ovrButton_Joystick) != 0) && dominantGripPushedOld ? 1 : 0,
+                                     ((pDominantTrackedRemoteNew->Buttons & ovrButton_Joystick) != 0) && dominantGripPushedNew ? 1 : 0,
+                                     1, KEY_ENTER);
+
+
+
+
+            //Off Hand - Primary keys (no grip pushed)
+            Joy_GenerateButtonEvents(((pOffTrackedRemoteOld->Buttons & ovrButton_Trigger) != 0) && !dominantGripPushedOld ? 1 : 0,
+                                     ((pOffTrackedRemoteNew->Buttons & ovrButton_Trigger) != 0) && !dominantGripPushedNew ? 1 : 0,
+                                     1, KEY_PAD_LTRIGGER);
+
+            Joy_GenerateButtonEvents(((pOffTrackedRemoteOld->Buttons & offButton1) != 0) && !dominantGripPushedOld ? 1 : 0,
+                                     ((pOffTrackedRemoteNew->Buttons & offButton1) != 0) && !dominantGripPushedNew ? 1 : 0,
+                                     1, KEY_PAD_X);
+
+            Joy_GenerateButtonEvents(((pOffTrackedRemoteOld->Buttons & offButton2) != 0) && !dominantGripPushedOld ? 1 : 0,
+                                     ((pOffTrackedRemoteNew->Buttons & offButton2) != 0) && !dominantGripPushedNew ? 1 : 0,
+                                     1, KEY_PAD_Y);
+
+            Joy_GenerateButtonEvents(((pOffTrackedRemoteOld->Buttons & ovrButton_Joystick) != 0) && !dominantGripPushedOld ? 1 : 0,
+                                     ((pOffTrackedRemoteNew->Buttons & ovrButton_Joystick) != 0) && !dominantGripPushedNew ? 1 : 0,
+                                     1, KEY_SPACE);
+
+
+
+            //Off Hand - Secondary keys (grip pushed)
+            Joy_GenerateButtonEvents(((pOffTrackedRemoteOld->Buttons & ovrButton_Trigger) != 0) && dominantGripPushedOld ? 1 : 0,
+                                     ((pOffTrackedRemoteNew->Buttons & ovrButton_Trigger) != 0) && dominantGripPushedNew ? 1 : 0,
+                                     1, KEY_PAD_LSHOULDER);
+
+            Joy_GenerateButtonEvents(((pOffTrackedRemoteOld->Buttons & offButton1) != 0) && dominantGripPushedOld ? 1 : 0,
+                                     ((pOffTrackedRemoteNew->Buttons & offButton1) != 0) && dominantGripPushedNew ? 1 : 0,
+                                     1, KEY_LSHIFT);
+
+            Joy_GenerateButtonEvents(((pOffTrackedRemoteOld->Buttons & offButton2) != 0) && dominantGripPushedOld ? 1 : 0,
+                                     ((pOffTrackedRemoteNew->Buttons & offButton2) != 0) && dominantGripPushedNew ? 1 : 0,
+                                     1, KEY_LCTRL);
+
+            Joy_GenerateButtonEvents(((pOffTrackedRemoteOld->Buttons & ovrButton_Joystick) != 0) && dominantGripPushedOld ? 1 : 0,
+                                     ((pOffTrackedRemoteNew->Buttons & ovrButton_Joystick) != 0) && dominantGripPushedNew ? 1 : 0,
+                                     1, KEY_DEL);
         }
     }
 

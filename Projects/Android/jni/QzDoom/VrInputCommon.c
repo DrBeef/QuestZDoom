@@ -22,7 +22,6 @@ void handleTrackedControllerButton(ovrInputStateTrackedRemote * trackedRemoteSta
     Joy_GenerateButtonEvents(prevTrackedRemoteState->Buttons & button ? 1 : 0, trackedRemoteState->Buttons & button ? 1 : 0, 1, key);
 }
 
-
 static void Matrix4x4_Transform (const matrix4x4 *in, const float v[3], float out[3])
 {
     out[0] = v[0] * (*in)[0][0] + v[1] * (*in)[0][1] + v[2] * (*in)[0][2] + (*in)[0][3];

@@ -222,14 +222,11 @@ extern int camtexcount;
 
 void OpenGLFrameBuffer::Swap()
 {
-	glFinish();
-
-/*	bool swapbefore = gl_finishbeforeswap && camtexcount == 0;
+	bool swapbefore = gl_finishbeforeswap && camtexcount == 0;
 	Finish.Reset();
 	Finish.Clock();
-#ifndef __MOBILE__
+
 	if (swapbefore) glFinish();
-#endif
 
 #ifdef USE_GL_HW_BUFFERS
     GLRenderer->GPUDropSync();
@@ -237,18 +234,14 @@ void OpenGLFrameBuffer::Swap()
 
 	SwapBuffers();
 
-#ifndef __MOBILE__
 	if (!swapbefore) glFinish();
-#endif
 
-#ifdef __MOBILE__
     gl_RenderState.SetVertexBuffer(NULL);
-#endif
+
 	Finish.Unclock();
 	camtexcount = 0;
 	FHardwareTexture::UnbindAll();
 	mDebug->Update();
- */
 }
 
 //==========================================================================
