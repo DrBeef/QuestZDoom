@@ -738,7 +738,7 @@ void G_BuildTiccmd (ticcmd_t *cmd)
 	float dummy=0;
 
 	VR_GetMove(&joyforward, &joyside, &dummy, &dummy, &dummy, &dummy, &dummy, &dummy);
-	side += joyint(sidemove[speed] * joyside);
+	side += joyint(sidemove[speed] * -joyside);
 	forward += joyint(joyforward * forwardmove[speed]);
 
 	cmd->ucmd.pitch = LocalViewPitch >> 16;

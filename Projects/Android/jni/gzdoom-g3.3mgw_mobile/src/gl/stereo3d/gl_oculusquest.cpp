@@ -436,7 +436,7 @@ namespace s3d
                 VR_GetMove(&dummy, &dummy, &hmd_forward, &hmd_side, &dummy, &dummy, &dummy, &dummy);
 
                 auto vel = player->mo->Vel;
-                player->mo->Vel = DVector3((DVector2(hmd_forward, hmd_side) * vr_vunits_per_meter), 0);
+                player->mo->Vel = DVector3((DVector2(hmd_forward, -hmd_side) * vr_vunits_per_meter), 0);
                 bool wasOnGround = player->mo->Z() <= player->mo->floorz;
                 double oldZ = player->mo->Z();
                 P_XYMovement(player->mo, DVector2(0, 0));
