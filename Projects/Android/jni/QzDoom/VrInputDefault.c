@@ -96,7 +96,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             const ovrQuatf quatRemote = pDominantTracking->HeadPose.Pose.Orientation;
             QuatToYawPitchRoll(quatRemote, vr_weapon_pitchadjust, weaponangles);
             weaponangles[YAW] -= VR_GetRawYaw();
-            //weaponangles[ROLL] *= -1.0f;
+            weaponangles[ROLL] = 0.0f; // remove roll for weapons
 
 
             if (weaponStabilised)
@@ -107,7 +107,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                 float zxDist = length(x, z);
 
                 if (zxDist != 0.0f && z != 0.0f) {
-                    VectorSet(weaponangles, -degrees(atanf(y / zxDist)), VR_GetRawYaw() - degrees(atan2f(x, -z)), weaponangles[ROLL]);
+                    VectorSet(weaponangles, -degrees(atanf(y / zxDist)), VR_GetRawYaw() - degrees(atan2f(x, -z)), 0.0f);
                 }
             }
         }
@@ -126,31 +126,27 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 			offhandoffset[2] = v[1];
 
             QuatToYawPitchRoll(pOffTracking->HeadPose.Pose.Orientation, 0.0f, offhandangles);
-            offhandangles[YAW] -= VR_GetRawYaw();
 
 			if (vr_walkdirection == 0) {
-				controllerYawHeading = offhandangles[YAW];
+				controllerYawHeading = offhandangles[YAW] - hmdorientation[YAW];
 			}
 			else
 			{
 				controllerYawHeading = 0.0f;
 			}
+
+            offhandangles[YAW] -= VR_GetRawYaw();
         }
 
-        //Dominant-hand specific stuff
+        //Positional movement
         {
             ALOGV("        Right-Controller-Position: %f, %f, %f",
                   pDominantTracking->HeadPose.Pose.Position.x,
 				  pDominantTracking->HeadPose.Pose.Position.y,
 				  pDominantTracking->HeadPose.Pose.Position.z);
 
-            //This section corrects for the fact that the controller actually controls direction of movement, but we want to move relative to the direction the
-            //player is facing for positional tracking
-            float vr_positional_factor = 1.0f;//4.0f;
-
             vec2_t v;
-            rotateAboutOrigin(-positionDeltaThisFrame[0] * vr_positional_factor,
-                              positionDeltaThisFrame[2] * vr_positional_factor, -(VR_GetRawYaw() + hmdorientation[YAW]), v);
+            rotateAboutOrigin(-positionDeltaThisFrame[0], positionDeltaThisFrame[2], -(VR_GetRawYaw() + hmdorientation[YAW]), v);
             positional_movementSideways = v[0];
             positional_movementForward = v[1];
 
@@ -174,12 +170,16 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 			}
 
 			//Apply a filter and quadratic scaler so small movements are easier to make
+			//and we don't get movement jitter when the joystick doesn't quite center properly
 			float dist = length(pOffTrackedRemoteNew->Joystick.x, pOffTrackedRemoteNew->Joystick.y);
 			float nlf = nonLinearFilter(dist);
             float x = nlf * pOffTrackedRemoteNew->Joystick.x;
             float y = nlf * pOffTrackedRemoteNew->Joystick.y;
 
+            //Apply a simple deadzone
             player_moving = (fabs(x) + fabs(y)) > 0.05f;
+            x = player_moving ? x : 0;
+            y = player_moving ? y : 0;
 
 			//Adjust to be off-hand controller oriented
             vec2_t v;

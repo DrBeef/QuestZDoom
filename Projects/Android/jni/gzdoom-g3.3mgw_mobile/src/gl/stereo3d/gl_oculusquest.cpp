@@ -66,6 +66,7 @@ EXTERN_CVAR(Bool, vr_moveFollowsOffHand)
 EXTERN_CVAR(Float, vr_weaponRotate);
 EXTERN_CVAR(Float, vr_snapTurn);
 EXTERN_CVAR(Float, vr_ipd);
+EXTERN_CVAR(Float, vr_weaponScale);
 
 double P_XYMovement(AActor *mo, DVector2 scroll);
 extern "C" void VR_GetMove( float *joy_forward, float *joy_side, float *hmd_forward, float *hmd_side, float *up, float *yaw, float *pitch, float *roll );
@@ -312,7 +313,7 @@ namespace s3d
     {
         GetWeaponTransform(&gl_RenderState.mModelMatrix);
 
-        float scale = 0.00125f * 1.0;//oculusquest_weaponScale;
+        float scale = 0.00125f * vr_weaponScale;
         gl_RenderState.mModelMatrix.scale(scale, -scale, scale);
         gl_RenderState.mModelMatrix.translate(-viewwidth / 2, -viewheight * 3 / 4, 0.0f);
 
@@ -326,7 +327,7 @@ namespace s3d
 
     bool OculusQuestMode::GetHandTransform(int hand, VSMatrix* mat) const
     {
-/*        {
+        {
             mat->loadIdentity();
 
             AActor* playermo = r_viewpoint.camera->player->mo;
@@ -338,15 +339,26 @@ namespace s3d
 
             mat->rotate(-deltaYawDegrees - 180, 0, 1, 0);
 
-            mat->translate(-oculusquest_origin.x, -vr_floor_offset, -oculusquest_origin.z);
+            if ((vr_control_scheme < 10 && hand == 1)
+                || (vr_control_scheme > 10 && hand == 0)) {
+                DVector3 weap(weaponoffset[0], weaponoffset[1], weaponoffset[2]);
+                weap *= vr_vunits_per_meter;
+                mat->translate(weap.X - hmdPosition[0], weap.Y - vr_floor_offset,
+                               weap.Z - hmdPosition[2]);
+            }
+            else
+            {
+                DVector3 weap(offhandoffset[0], offhandoffset[1], offhandoffset[2]);
+                weap *= vr_vunits_per_meter;
+                mat->translate(weap.X - hmdPosition[0], weap.Y - vr_floor_offset,
+                               weap.Z - hmdPosition[2]);
+            }
 
-            LSMatrix44 handToAbs;
-            vSMatrixFromHmdMatrix34(handToAbs, controllers[hand].pose.mDeviceToAbsoluteTracking);
+            //Perform roration here?
 
-            mat->multMatrix(handToAbs.transpose());
 
             return true;
-        }*/
+        }
 
         return false;
     }
@@ -386,12 +398,9 @@ namespace s3d
         super::SetUp();
 
         // Set VR-appropriate settings
-        const bool doAdjustVrSettings = true;
-        if (doAdjustVrSettings) {
+        {
             movebob = 0;
             gl_billboard_faces_camera = true;
-//            if (gl_multisample < 2)
-//                gl_multisample = 4;
         }
 
         if (gamestate == GS_LEVEL && !isMenuActive()) {
@@ -419,6 +428,7 @@ namespace s3d
         {
             if (player)
             {
+                //Weapon firing tracking - Thanks Fishbiter!
                 {
                     player->mo->OverrideAttackPosDir = true;
 
@@ -435,8 +445,9 @@ namespace s3d
                 float dummy=0;
                 VR_GetMove(&dummy, &dummy, &hmd_forward, &hmd_side, &dummy, &dummy, &dummy, &dummy);
 
+                //Positional movement - Thanks fishbiter!!
                 auto vel = player->mo->Vel;
-                player->mo->Vel = DVector3((DVector2(hmd_forward, -hmd_side) * vr_vunits_per_meter), 0);
+                player->mo->Vel = DVector3((DVector2(hmd_side, hmd_forward) * vr_vunits_per_meter), 0);
                 bool wasOnGround = player->mo->Z() <= player->mo->floorz;
                 double oldZ = player->mo->Z();
                 P_XYMovement(player->mo, DVector2(0, 0));

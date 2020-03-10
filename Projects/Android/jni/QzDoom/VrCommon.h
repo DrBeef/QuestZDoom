@@ -54,11 +54,6 @@ extern float vr_snapturn_angle;
 extern vec3_t offhandangles;
 extern vec3_t offhandoffset;
 
-#define DUCK_NOTDUCKED 0
-#define DUCK_BUTTON 1
-#define DUCK_CROUCHED 2
-extern int ducked;
-
 extern bool player_moving;
 
 void shutdownVR();

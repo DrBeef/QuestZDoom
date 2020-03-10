@@ -59,7 +59,6 @@ bool vr_walkdirection;
 float vr_snapturn_angle;
 vec3_t offhandangles;
 vec3_t offhandoffset;
-int ducked;
 bool player_moving;
 
 
@@ -1280,32 +1279,13 @@ void VR_Init()
 	remote_movementUp = 0.0f;
 	positional_movementSideways = 0.0f;
 	positional_movementForward = 0.0f;
-	snapTurn = 0.0f;
-	ducked = DUCK_NOTDUCKED;
+	snapTurn = 90.0f; // start partly turned
 
 	//init randomiser
 	srand(time(NULL));
 
 	//Initialise our cvar holders
-	vr_weapon_pitchadjust = -20.0;
-
-/*	vr_snapturn_angle = Cvar_Get( "vr_snapturn_angle", "45", CVAR_ARCHIVE);
-	vr_positional_factor = Cvar_Get( "vr_positional_factor", "2000", CVAR_ARCHIVE);
-    vr_walkdirection = Cvar_Get( "vr_walkdirection", "0", CVAR_ARCHIVE);
-	vr_weapon_pitchadjust = Cvar_Get( "vr_weapon_pitchadjust", "-20.0", CVAR_ARCHIVE);
-	vr_control_scheme = Cvar_Get( "vr_control_scheme", "0", CVAR_ARCHIVE);
-    vr_height_adjust = Cvar_Get( "vr_height_adjust", "0.0", CVAR_ARCHIVE);
-	vr_weaponscale = Cvar_Get( "vr_weaponscale", "0.56", CVAR_ARCHIVE);
-    vr_weapon_stabilised = Cvar_Get( "vr_weapon_stabilised", "0.0", CVAR_LATCH);
-	vr_lasersight = Cvar_Get( "vr_lasersight", "0", CVAR_LATCH);
-
-    //The Engine (which is a derivative of Quake) uses a very specific unit size:
-    //Wolfenstein 3D, DOOM and QUAKE use the same coordinate/unit system:
-    //8 foot (96 inch) height wall == 64 units, 1.5 inches per pixel unit
-    //1.0 pixel unit / 1.5 inch == 0.666666 pixel units per inch
-    //This make a world scale of: 26.2467
-	vr_worldscale = Cvar_Get( "vr_worldscale", "26.2467", CVAR_ARCHIVE);
- */
+	vr_weapon_pitchadjust = -30.0;
 }
 
 static ovrAppThread * gAppThread = NULL;

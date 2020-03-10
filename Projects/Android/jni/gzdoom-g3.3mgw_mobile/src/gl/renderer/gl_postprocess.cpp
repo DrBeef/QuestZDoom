@@ -807,8 +807,8 @@ void FGLRenderer::Flush()
 			glViewport(mScreenViewport.left, mScreenViewport.top, mScreenViewport.width, mScreenViewport.height);
 			glScissor(mScreenViewport.left, mScreenViewport.top, mScreenViewport.width, mScreenViewport.height);
 
-			//Only adjust HUD if we are 3D (otherwise we are rendering to a cylinder compositor layer)
-			//if (!is2D)	stereo3dMode.getEyePose(eye_ix)->AdjustHud();
+			//Only adjust HUD if we are 3D and not showing menu (otherwise we are rendering to a cylinder compositor layer)
+			if (!is2D && !isMenuActive())	stereo3dMode.getEyePose(eye_ix)->AdjustHud();
 
 			m2DDrawer->Draw();
 			FGLDebug::PopGroup();
