@@ -46,6 +46,8 @@ bool qzdoom_initialised;
 long long global_time;
 float playerHeight;
 float playerYaw;
+bool resetDoomYaw;
+float doomYaw;
 float vrFOV;
 vec3_t worldPosition;
 vec3_t hmdPosition;
@@ -91,7 +93,7 @@ PFNEGLGETSYNCATTRIBKHRPROC		eglGetSyncAttribKHR;
 //Let's go to the maximum!
 int CPU_LEVEL			= 4;
 int GPU_LEVEL			= 4;
-int NUM_MULTI_SAMPLES	= 1;
+int NUM_MULTI_SAMPLES	= 2;
 float SS_MULTIPLIER    = 1.0f;
 
 jclass clazz;
@@ -148,6 +150,7 @@ LAMBDA1VR Stuff
 
 //This is now controlled by the engine
 static bool useVirtualScreen = true;
+bool forceVirtualScreen = false;
 
 void setUseScreenLayer(bool use)
 {
@@ -156,7 +159,7 @@ void setUseScreenLayer(bool use)
 
 bool useScreenLayer()
 {
-	return useVirtualScreen;
+	return useVirtualScreen || forceVirtualScreen;
 }
 
 static void UnEscapeQuotes( char *arg )
@@ -504,17 +507,6 @@ static void ovrFramebuffer_Clear( ovrFramebuffer * frameBuffer )
 
 static bool ovrFramebuffer_Create( ovrFramebuffer * frameBuffer, const GLenum colorFormat, const int width, const int height, const int multisamples )
 {
-    //LOAD_GLES2(glBindTexture);
-    //LOAD_GLES2(glTexParameteri);
-    //LOAD_GLES2(glGenRenderbuffers);
-    //LOAD_GLES2(glBindRenderbuffer);
-    //LOAD_GLES2(glRenderbufferStorage);
-    //LOAD_GLES2(glGenFramebuffers);
-    //LOAD_GLES2(glBindFramebuffer);
-    //LOAD_GLES2(glFramebufferRenderbuffer);
-    //LOAD_GLES2(glFramebufferTexture2D);
-    //LOAD_GLES2(glCheckFramebufferStatus);
-
     frameBuffer->Width = width;
 	frameBuffer->Height = height;
 	frameBuffer->Multisamples = multisamples;
@@ -529,31 +521,31 @@ static bool ovrFramebuffer_Create( ovrFramebuffer * frameBuffer, const GLenum co
 		// Create the color buffer texture.
 		const GLuint colorTexture = vrapi_GetTextureSwapChainHandle( frameBuffer->ColorTextureSwapChain, i );
 		GLenum colorTextureTarget = GL_TEXTURE_2D;
-		GL( /*gles_*/glBindTexture( colorTextureTarget, colorTexture ) );
+		GL( glBindTexture( colorTextureTarget, colorTexture ) );
         // Just clamp to edge. However, this requires manually clearing the border
         // around the layer to clear the edge texels.
-        GL( /*gles_*/glTexParameteri( colorTextureTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE ) );
-        GL( /*gles_*/glTexParameteri( colorTextureTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE ) );
+        GL( glTexParameteri( colorTextureTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE ) );
+        GL( glTexParameteri( colorTextureTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE ) );
 
-		GL( /*gles_*/glTexParameteri( colorTextureTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR ) );
-		GL( /*gles_*/glTexParameteri( colorTextureTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR ) );
-		GL( /*gles_*/glBindTexture( colorTextureTarget, 0 ) );
+		GL( glTexParameteri( colorTextureTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR ) );
+		GL( glTexParameteri( colorTextureTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR ) );
+		GL( glBindTexture( colorTextureTarget, 0 ) );
 
 		{
 			{
 				// Create depth buffer.
-				GL( /*gles_*/glGenRenderbuffers( 1, &frameBuffer->DepthBuffers[i] ) );
-				GL( /*gles_*/glBindRenderbuffer( GL_RENDERBUFFER, frameBuffer->DepthBuffers[i] ) );
-				GL( /*gles_*/glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, frameBuffer->Width, frameBuffer->Height ) );
-				GL( /*gles_*/glBindRenderbuffer( GL_RENDERBUFFER, 0 ) );
+				GL( glGenRenderbuffers( 1, &frameBuffer->DepthBuffers[i] ) );
+				GL( glBindRenderbuffer( GL_RENDERBUFFER, frameBuffer->DepthBuffers[i] ) );
+				GL( glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, frameBuffer->Width, frameBuffer->Height ) );
+				GL( glBindRenderbuffer( GL_RENDERBUFFER, 0 ) );
 
 				// Create the frame buffer.
-				GL( /*gles_*/glGenFramebuffers( 1, &frameBuffer->FrameBuffers[i] ) );
-				GL( /*gles_*/glBindFramebuffer( GL_DRAW_FRAMEBUFFER, frameBuffer->FrameBuffers[i] ) );
-				GL( /*gles_*/glFramebufferRenderbuffer( GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, frameBuffer->DepthBuffers[i] ) );
-				GL( /*gles_*/glFramebufferTexture2D( GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorTexture, 0 ) );
-				GL( GLenum renderFramebufferStatus = /*gles_*/glCheckFramebufferStatus( GL_DRAW_FRAMEBUFFER ) );
-				GL( /*gles_*/glBindFramebuffer( GL_DRAW_FRAMEBUFFER, 0 ) );
+				GL( glGenFramebuffers( 1, &frameBuffer->FrameBuffers[i] ) );
+				GL( glBindFramebuffer( GL_DRAW_FRAMEBUFFER, frameBuffer->FrameBuffers[i] ) );
+				GL( glFramebufferRenderbuffer( GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, frameBuffer->DepthBuffers[i] ) );
+				GL( glFramebufferTexture2D( GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorTexture, 0 ) );
+				GL( GLenum renderFramebufferStatus = glCheckFramebufferStatus( GL_DRAW_FRAMEBUFFER ) );
+				GL( glBindFramebuffer( GL_DRAW_FRAMEBUFFER, 0 ) );
 				if ( renderFramebufferStatus != GL_FRAMEBUFFER_COMPLETE )
 				{
 					ALOGE( "Incomplete frame buffer object: %s", GlFrameBufferStatusString( renderFramebufferStatus ) );
@@ -568,11 +560,8 @@ static bool ovrFramebuffer_Create( ovrFramebuffer * frameBuffer, const GLenum co
 
 void ovrFramebuffer_Destroy( ovrFramebuffer * frameBuffer )
 {
-    //LOAD_GLES2(glDeleteFramebuffers);
-    //LOAD_GLES2(glDeleteRenderbuffers);
-
-	GL( /*gles_*/glDeleteFramebuffers( frameBuffer->TextureSwapChainLength, frameBuffer->FrameBuffers ) );
-	GL( /*gles_*/glDeleteRenderbuffers( frameBuffer->TextureSwapChainLength, frameBuffer->DepthBuffers ) );
+	GL( glDeleteFramebuffers( frameBuffer->TextureSwapChainLength, frameBuffer->FrameBuffers ) );
+	GL( glDeleteRenderbuffers( frameBuffer->TextureSwapChainLength, frameBuffer->DepthBuffers ) );
 
 	vrapi_DestroyTextureSwapChain( frameBuffer->ColorTextureSwapChain );
 
@@ -584,14 +573,17 @@ void ovrFramebuffer_Destroy( ovrFramebuffer * frameBuffer )
 
 void ovrFramebuffer_SetCurrent( ovrFramebuffer * frameBuffer )
 {
-    //LOAD_GLES2(glBindFramebuffer);
-	GL( /*gles_*/glBindFramebuffer( GL_DRAW_FRAMEBUFFER, frameBuffer->FrameBuffers[frameBuffer->ProcessingTextureSwapChainIndex] ) );
+    while (glGetError() != GL_NO_ERROR)
+    {
+
+    }
+
+	GL( glBindFramebuffer( GL_FRAMEBUFFER, frameBuffer->FrameBuffers[frameBuffer->ProcessingTextureSwapChainIndex] ) );
 }
 
 void ovrFramebuffer_SetNone()
 {
-    //LOAD_GLES2(glBindFramebuffer);
-	GL( /*gles_*/glBindFramebuffer( GL_DRAW_FRAMEBUFFER, 0 ) );
+	GL( glBindFramebuffer( GL_DRAW_FRAMEBUFFER, 0 ) );
 }
 
 void ovrFramebuffer_Resolve( ovrFramebuffer * frameBuffer )
@@ -614,36 +606,29 @@ void ovrFramebuffer_Advance( ovrFramebuffer * frameBuffer )
 
 void ovrFramebuffer_ClearEdgeTexels( ovrFramebuffer * frameBuffer )
 {
-	//LOAD_GLES2(glEnable);
-	//LOAD_GLES2(glDisable);
-	//LOAD_GLES2(glViewport);
-	//LOAD_GLES2(glScissor);
-	//LOAD_GLES2(glClearColor);
-	//LOAD_GLES2(glClear);
-
-	GL( /*gles_*/glEnable( GL_SCISSOR_TEST ) );
-	GL( /*gles_*/glViewport( 0, 0, frameBuffer->Width, frameBuffer->Height ) );
+	GL( glEnable( GL_SCISSOR_TEST ) );
+	GL( glViewport( 0, 0, frameBuffer->Width, frameBuffer->Height ) );
 
 	// Explicitly clear the border texels to black because OpenGL-ES does not support GL_CLAMP_TO_BORDER.
 	// Clear to fully opaque black.
-	GL( /*gles_*/glClearColor( 0.0f, 0.0f, 0.0f, 1.0f ) );
+	GL( glClearColor( 0.0f, 0.0f, 0.0f, 1.0f ) );
 
 	// bottom
-	GL( /*gles_*/glScissor( 0, 0, frameBuffer->Width, 1 ) );
-	GL( /*gles_*/glClear( GL_COLOR_BUFFER_BIT ) );
+	GL( glScissor( 0, 0, frameBuffer->Width, 1 ) );
+	GL( glClear( GL_COLOR_BUFFER_BIT ) );
 	// top
-	GL( /*gles_*/glScissor( 0, frameBuffer->Height - 1, frameBuffer->Width, 1 ) );
-	GL( /*gles_*/glClear( GL_COLOR_BUFFER_BIT ) );
+	GL( glScissor( 0, frameBuffer->Height - 1, frameBuffer->Width, 1 ) );
+	GL( glClear( GL_COLOR_BUFFER_BIT ) );
 	// left
-	GL( /*gles_*/glScissor( 0, 0, 1, frameBuffer->Height ) );
-	GL( /*gles_*/glClear( GL_COLOR_BUFFER_BIT ) );
+	GL( glScissor( 0, 0, 1, frameBuffer->Height ) );
+	GL( glClear( GL_COLOR_BUFFER_BIT ) );
 	// right
-	GL( /*gles_*/glScissor( frameBuffer->Width - 1, 0, 1, frameBuffer->Height ) );
-	GL( /*gles_*/glClear( GL_COLOR_BUFFER_BIT ) );
+	GL( glScissor( frameBuffer->Width - 1, 0, 1, frameBuffer->Height ) );
+	GL( glClear( GL_COLOR_BUFFER_BIT ) );
 
 
-	GL( /*gles_*/glScissor( 0, 0, 0, 0 ) );
-	GL( /*gles_*/glDisable( GL_SCISSOR_TEST ) );
+	GL( glScissor( 0, 0, 0, 0 ) );
+	GL( glDisable( GL_SCISSOR_TEST ) );
 }
 
 
@@ -1274,6 +1259,7 @@ void VR_Init()
 {
 	//Initialise all our variables
 	playerYaw = 0.0f;
+    resetDoomYaw = true;
 	remote_movementSideways = 0.0f;
 	remote_movementForward = 0.0f;
 	remote_movementUp = 0.0f;
@@ -1655,6 +1641,8 @@ void submitFrame(ovrTracking2 *tracking)
         // Hand over the eye images to the time warp.
         vrapi_SubmitFrame2(gAppState.Ovr, &frameDesc);
     }
+
+    incrementFrameIndex();
 }
 
 

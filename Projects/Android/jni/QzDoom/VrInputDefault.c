@@ -21,6 +21,7 @@ int getGameState();
 int isMenuActive();
 void Joy_GenerateButtonEvents(int oldbuttons, int newbuttons, int numbuttons, int base);
 
+extern bool forceVirtualScreen;
 
 void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew, ovrInputStateTrackedRemote *pDominantTrackedRemoteOld, ovrTracking* pDominantTracking,
                           ovrInputStateTrackedRemote *pOffTrackedRemoteNew, ovrInputStateTrackedRemote *pOffTrackedRemoteOld, ovrTracking* pOffTracking,
@@ -30,12 +31,12 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 
     static bool dominantGripPushed = false;
 
-    //Show screen view (if in multiplayer toggle scoreboard)
+    //Show screen view - for testing
     if (((pOffTrackedRemoteNew->Buttons & offButton2) !=
          (pOffTrackedRemoteOld->Buttons & offButton2)) &&
 			(pOffTrackedRemoteNew->Buttons & offButton2)) {
 
-
+        forceVirtualScreen = !forceVirtualScreen;
     }
 
 	//Menu button
@@ -146,9 +147,9 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 				  pDominantTracking->HeadPose.Pose.Position.z);
 
             vec2_t v;
-            rotateAboutOrigin(-positionDeltaThisFrame[0], positionDeltaThisFrame[2], -(VR_GetRawYaw() + hmdorientation[YAW]), v);
-            positional_movementSideways = v[0];
-            positional_movementForward = v[1];
+            rotateAboutOrigin(positionDeltaThisFrame[0], positionDeltaThisFrame[2], -(doomYaw - hmdorientation[YAW]), v);
+            positional_movementSideways = v[1];
+            positional_movementForward = v[0];
 
             ALOGV("        positional_movementSideways: %f, positional_movementForward: %f",
                   positional_movementSideways,
@@ -197,7 +198,8 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 			{
 				if (increaseSnap)
 				{
-					snapTurn -= vr_snapturn_angle;
+                    resetDoomYaw = true;
+                    snapTurn -= vr_snapturn_angle;
                     if (vr_snapturn_angle > 10.0f) {
                         increaseSnap = false;
                     }
@@ -216,6 +218,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 			{
 				if (decreaseSnap)
 				{
+                    resetDoomYaw = true;
 					snapTurn += vr_snapturn_angle;
 
 					//If snap turn configured for less than 10 degrees
@@ -242,35 +245,43 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 
 
             //Weapon Chooser
-            static bool itemSwitched = false;
+            static int itemSwitched = 0;
             if (between(-0.2f, pDominantTrackedRemoteNew->Joystick.x, 0.2f) &&
                 (between(0.8f, pDominantTrackedRemoteNew->Joystick.y, 1.0f) ||
                  between(-1.0f, pDominantTrackedRemoteNew->Joystick.y, -0.8f)))
             {
-                if (!itemSwitched) {
+                if (itemSwitched == 0) {
                     if (between(0.8f, pDominantTrackedRemoteNew->Joystick.y, 1.0f))
                     {
-                        C_DoCommandC("nextweap");
+                        C_DoCommandC("+nextweap");
+                        itemSwitched = 1;
                     }
                     else
                     {
-                        C_DoCommandC("prevweap");
+                        C_DoCommandC("+prevweap");
+                        itemSwitched = 2;
                     }
-
-                    itemSwitched = true;
                 }
             } else {
-                itemSwitched = false;
+                if (itemSwitched == 1)
+                {
+                    C_DoCommandC("-nextweap");
+                }
+                else if (itemSwitched == 2)
+                {
+                    C_DoCommandC("-prevweap");
+                }
+                itemSwitched = 0;
             }
 
             //Dominant Hand - Primary keys (no grip pushed)
             Joy_GenerateButtonEvents(((pDominantTrackedRemoteOld->Buttons & ovrButton_Trigger) != 0) && !dominantGripPushedOld ? 1 : 0,
                                      ((pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger) != 0) && !dominantGripPushedNew ? 1 : 0,
-                                     1, KEY_PAD_RTRIGGER);
+                                     1, KEY_RCTRL);
 
             Joy_GenerateButtonEvents(((pDominantTrackedRemoteOld->Buttons & domButton1) != 0) && !dominantGripPushedOld ? 1 : 0,
                                      ((pDominantTrackedRemoteNew->Buttons & domButton1) != 0) && !dominantGripPushedNew ? 1 : 0,
-                                     1, KEY_PAD_A);
+                                     1, KEY_SPACE);
 
             Joy_GenerateButtonEvents(((pDominantTrackedRemoteOld->Buttons & domButton2) != 0) && !dominantGripPushedOld ? 1 : 0,
                                      ((pDominantTrackedRemoteNew->Buttons & domButton2) != 0) && !dominantGripPushedNew ? 1 : 0,
@@ -305,7 +316,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             //Off Hand - Primary keys (no grip pushed)
             Joy_GenerateButtonEvents(((pOffTrackedRemoteOld->Buttons & ovrButton_Trigger) != 0) && !dominantGripPushedOld ? 1 : 0,
                                      ((pOffTrackedRemoteNew->Buttons & ovrButton_Trigger) != 0) && !dominantGripPushedNew ? 1 : 0,
-                                     1, KEY_PAD_LTRIGGER);
+                                     1, KEY_LSHIFT);
 
             Joy_GenerateButtonEvents(((pOffTrackedRemoteOld->Buttons & offButton1) != 0) && !dominantGripPushedOld ? 1 : 0,
                                      ((pOffTrackedRemoteNew->Buttons & offButton1) != 0) && !dominantGripPushedNew ? 1 : 0,

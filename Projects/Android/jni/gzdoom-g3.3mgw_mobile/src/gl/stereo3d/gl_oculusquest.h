@@ -66,6 +66,8 @@ protected:
 		bool doFixPitch,
 		float pitchOffset
 	) const;
+
+	mutable VSMatrix projection;
 };
 
 class OculusQuestMode : public Stereo3DMode

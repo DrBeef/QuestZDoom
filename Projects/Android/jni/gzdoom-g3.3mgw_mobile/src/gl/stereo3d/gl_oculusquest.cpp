@@ -30,6 +30,7 @@
 #include <string>
 #include <map>
 #include <cmath>
+#include <VrApi_Ext.h>
 #include "gl/system/gl_system.h"
 #include "doomtype.h" // Printf
 #include "d_player.h"
@@ -90,13 +91,13 @@ namespace s3d
         dispose();
     }
 
-    /*
-    static void vSMatrixFromHmdMatrix34(VSMatrix& m1, const HmdMatrix34_t& m2)
+
+    static void vSMatrixFromOvrMatrix(VSMatrix& m1, const ovrMatrix4f& m2)
     {
         float tmp[16];
         for (int i = 0; i < 3; ++i) {
             for (int j = 0; j < 4; ++j) {
-                tmp[4 * i + j] = m2.m[i][j];
+                tmp[4 * i + j] = m2.M[i][j];
             }
         }
         int i = 3;
@@ -105,7 +106,7 @@ namespace s3d
         }
         tmp[15] = 1;
         m1.loadMatrix(&tmp[0]);
-    }*/
+    }
 
 
 /* virtual */
@@ -115,27 +116,23 @@ namespace s3d
 
         // Pitch and Roll are identical between OpenVR and Doom worlds.
         // But yaw can differ, depending on starting state, and controller movement.
-        float doomYawDegrees = VR_GetRawYaw() + hmdorientation[YAW];
+        float doomYawDegrees = r_viewpoint.Angles.Yaw.Degrees;
         while (doomYawDegrees > 180)
             doomYawDegrees -= 360;
         while (doomYawDegrees < -180)
             doomYawDegrees += 360;
 
-        VSMatrix shiftMat;
-        shiftMat.loadIdentity();
+        vec3_t angles;
+        VectorSet(angles, -GLRenderer->mAngles.Pitch.Degrees,  doomYawDegrees, GLRenderer->mAngles.Roll.Degrees);
 
-        shiftMat.rotate(GLRenderer->mAngles.Roll.Degrees, 0, 1, 0);
-        shiftMat.rotate(GLRenderer->mAngles.Pitch.Degrees, 1, 0, 0);
-        shiftMat.rotate(-doomYawDegrees, 0, 0, 1);
-        double pixelstretch = level.info ? level.info->pixelstretch : 1.2;
-        shiftMat.scale(1.0, pixelstretch, 1.0);
+        vec3_t v_forward, v_right, v_up;
+        AngleVectors(angles, v_forward, v_right, v_up);
 
-        double mult = eye == 0 ? 1.0 : -1.0;
+        float stereo_separation = (vr_ipd * 0.5) * vr_vunits_per_meter * (eye == 0 ? -1.0 : 1.0);
+        vec3_t tmp;
+        VectorScale(v_right, stereo_separation, tmp);
 
-        LSVec3 vec(0, (vr_ipd * 0.5) * vr_vunits_per_meter * mult, 0);
-        LSMatrix44 mat(shiftMat);
-
-        LSVec3 eyeOffset = mat * vec;
+        LSVec3 eyeOffset(tmp[0], tmp[1], tmp[2]);
 
         // In vr, the real world floor level is at y==0
         // In Doom, the virtual player foot level is viewheight below the current viewpoint (on the Z axis)
@@ -153,7 +150,8 @@ namespace s3d
 /* virtual */
     VSMatrix OculusQuestEyePose::GetProjection(FLOATTYPE fov, FLOATTYPE aspectRatio, FLOATTYPE fovRatio) const
     {
-        return EyePose::GetProjection(fov, aspectRatio, fovRatio);
+        projection = EyePose::GetProjection(fov, aspectRatio, fovRatio);
+        return projection;
     }
 
     void OculusQuestEyePose::initialize()
@@ -192,7 +190,8 @@ namespace s3d
                 vr_vunits_per_meter,
                 -vr_vunits_per_meter);
         double pixelstretch = level.info ? level.info->pixelstretch : 1.2;
-        new_projection.scale(pixelstretch, pixelstretch, 1.0); // Doom universe is scaled by 1990s pixel aspect ratio
+        new_projection.scale(1.0, pixelstretch, 1.0); // Doom universe is scaled by 1990s pixel aspect ratio
+
 
         const OculusQuestEyePose * activeEye = this;
 
@@ -210,9 +209,11 @@ namespace s3d
                 float vrPitchDegrees = RAD2DEG(-eulerAnglesFromMatrix(activeEye->currentPose->mDeviceToAbsoluteTracking).v[1]);
                 new_projection.rotate(-vrPitchDegrees, 1, 0, 0);
             }
-            if (pitchOffset != 0)
-                new_projection.rotate(-pitchOffset, 1, 0, 0);
         }*/
+
+
+        if (pitchOffset != 0)
+            new_projection.rotate(-pitchOffset, 1, 0, 0);
 
         // hmd coordinates (meters) from ndc coordinates
         // const float weapon_distance_meters = 0.55f;
@@ -228,9 +229,13 @@ namespace s3d
         new_projection.translate(-1.0, 1.0, 0);
         new_projection.scale(2.0 / SCREENWIDTH, -2.0 / SCREENHEIGHT, -1.0);
 
-//        VSMatrix proj(activeEye->projectionMatrix);
-  //      proj.multMatrix(new_projection);
-    //    new_projection = proj;
+        ovrTracking2 tracking;
+        const OculusQuestMode * mode3d = static_cast<const OculusQuestMode*>(&Stereo3DMode::getCurrentMode());
+        mode3d->getTracking(&tracking);
+
+        VSMatrix proj = projection;
+        projection.multMatrix(new_projection);
+        new_projection = proj;
 
         return new_projection;
     }
@@ -313,7 +318,7 @@ namespace s3d
     {
         GetWeaponTransform(&gl_RenderState.mModelMatrix);
 
-        float scale = 0.00125f * vr_weaponScale;
+        float scale = 0.000625f * vr_weaponScale;
         gl_RenderState.mModelMatrix.scale(scale, -scale, scale);
         gl_RenderState.mModelMatrix.translate(-viewwidth / 2, -viewheight * 3 / 4, 0.0f);
 
@@ -337,25 +342,26 @@ namespace s3d
 
             mat->scale(vr_vunits_per_meter, vr_vunits_per_meter, -vr_vunits_per_meter);
 
-            mat->rotate(-deltaYawDegrees - 180, 0, 1, 0);
+            float doomYawDegrees = r_viewpoint.Angles.Yaw.Degrees;
+            while (doomYawDegrees > 180)
+                doomYawDegrees -= 360;
+            while (doomYawDegrees < -180)
+                doomYawDegrees += 360;
 
             if ((vr_control_scheme < 10 && hand == 1)
                 || (vr_control_scheme > 10 && hand == 0)) {
-                DVector3 weap(weaponoffset[0], weaponoffset[1], weaponoffset[2]);
-                weap *= vr_vunits_per_meter;
-                mat->translate(weap.X - hmdPosition[0], weap.Y - vr_floor_offset,
-                               weap.Z - hmdPosition[2]);
+                mat->translate(-weaponoffset[0], hmdPosition[1] + weaponoffset[1] - vr_floor_offset, weaponoffset[2]);
+                mat->rotate(-weaponangles[ROLL], 1, 0, 0);
+                mat->rotate(-weaponangles[PITCH], 0, 1, 0);
+                mat->rotate(-doomYawDegrees-weaponangles[YAW], 0, 0, 1);
             }
             else
             {
-                DVector3 weap(offhandoffset[0], offhandoffset[1], offhandoffset[2]);
-                weap *= vr_vunits_per_meter;
-                mat->translate(weap.X - hmdPosition[0], weap.Y - vr_floor_offset,
-                               weap.Z - hmdPosition[2]);
+                //mat->rotate(-offhandangles[ROLL], 1, 0, 0);
+                //mat->rotate(-offhandangles[PITCH], 0, 1, 0);
+                //mat->rotate(-offhandangles[YAW], 0, 0, 1);
+                mat->translate(offhandoffset[0], hmdPosition[1] + offhandoffset[1] - vr_floor_offset, -offhandoffset[2]);
             }
-
-            //Perform roration here?
-
 
             return true;
         }
@@ -400,7 +406,6 @@ namespace s3d
         // Set VR-appropriate settings
         {
             movebob = 0;
-            gl_billboard_faces_camera = true;
         }
 
         if (gamestate == GS_LEVEL && !isMenuActive()) {
@@ -423,6 +428,19 @@ namespace s3d
         vr_snapturn_angle = vr_snapTurn;
         vr_walkdirection = !vr_moveFollowsOffHand;
         getTrackedRemotesOrientation(vr_control_scheme);
+
+        //Some crazy stuff to ascertain the actual yaw that doom is using at the right times!
+        if (gamestate != GS_LEVEL || isMenuActive() || (gamestate == GS_LEVEL && resetDoomYaw))
+        {
+            doomYaw = r_viewpoint.Angles.Yaw.Degrees;
+            if (gamestate == GS_LEVEL && resetDoomYaw) {
+                resetDoomYaw = false;
+            }
+            if (gamestate != GS_LEVEL || isMenuActive())
+            {
+                resetDoomYaw = true;
+            }
+        }
 
         player_t* player = r_viewpoint.camera ? r_viewpoint.camera->player : nullptr;
         {
@@ -478,6 +496,7 @@ namespace s3d
         VR_GetMove(&dummy, &dummy, &dummy, &dummy, &dummy, &yaw, &pitch, &roll);
 
         //Yaw
+        double hmdYawDeltaDegrees;
         {
             static double previousHmdYaw = 0;
             static bool havePreviousYaw = false;
@@ -485,7 +504,7 @@ namespace s3d
                 previousHmdYaw = yaw;
                 havePreviousYaw = true;
             }
-            double hmdYawDeltaDegrees = yaw - previousHmdYaw;
+            hmdYawDeltaDegrees = yaw - previousHmdYaw;
             G_AddViewAngle(mAngleFromRadians(DEG2RAD(-hmdYawDeltaDegrees)));
             previousHmdYaw = yaw;
         }
@@ -499,13 +518,18 @@ namespace s3d
             G_AddViewPitch(mAngleFromRadians(dPitch));
         }
 
+        if (gamestate == GS_LEVEL && !isMenuActive())
+        {
+            doomYaw += hmdYawDeltaDegrees;
+        }
+
         //Set all the render angles - including roll
         {
             //Always update roll (as the game tic cmd doesn't support roll
             GLRenderer->mAngles.Roll = roll;
             GLRenderer->mAngles.Pitch = pitch;
 
-            double viewYaw = yaw;
+            double viewYaw = doomYaw;
             while (viewYaw <= -180.0)
                 viewYaw += 360.0;
             while (viewYaw > 180.0)

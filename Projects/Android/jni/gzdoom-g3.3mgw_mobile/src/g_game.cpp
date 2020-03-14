@@ -241,7 +241,7 @@ int				lookspeed[2] = {450, 512};
 
 #define SLOWTURNTICS	6 
 
-CVAR (Bool,		cl_run,			true,	CVAR_GLOBALCONFIG|CVAR_ARCHIVE)		// Always run?
+CVAR (Bool,		cl_run,			false,	CVAR_GLOBALCONFIG|CVAR_ARCHIVE)		// Always run?
 CVAR (Bool,		invertmouse,	false,	CVAR_GLOBALCONFIG|CVAR_ARCHIVE)		// Invert mouse look down/up?
 CVAR (Bool,		freelook,		true,	CVAR_GLOBALCONFIG|CVAR_ARCHIVE)		// Always mlook?
 CVAR (Bool,		lookstrafe,		false,	CVAR_GLOBALCONFIG|CVAR_ARCHIVE)		// Always strafe with mouse?
@@ -738,7 +738,7 @@ void G_BuildTiccmd (ticcmd_t *cmd)
 	float dummy=0;
 
 	VR_GetMove(&joyforward, &joyside, &dummy, &dummy, &dummy, &dummy, &dummy, &dummy);
-	side += joyint(sidemove[speed] * -joyside);
+	side += joyint(joyside * sidemove[speed]);
 	forward += joyint(joyforward * forwardmove[speed]);
 
 	cmd->ucmd.pitch = LocalViewPitch >> 16;

@@ -16,6 +16,11 @@ GNU General Public License for more details.
 #ifndef MATHLIB_H
 #define MATHLIB_H
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #include <math.h>
 #include <stdbool.h>
 
@@ -158,7 +163,7 @@ void SinCosFastVector2( float r1, float r2,
 float VectorNormalizeLength2( const vec3_t v, vec3_t out );
 void VectorVectors( const vec3_t forward, vec3_t right, vec3_t up );
 void VectorAngles( const float *forward, float *angles );
-//void AngleVectors( const vec3_t angles, vec3_t forward, vec3_t right, vec3_t up );
+void AngleVectors( const vec3_t angles, vec3_t forward, vec3_t right, vec3_t up );
 void VectorsAngles( const vec3_t forward, const vec3_t right, const vec3_t up, vec3_t angles );
 void RotatePointAroundVector( vec3_t dst, const vec3_t dir, const vec3_t point, float degrees );
 
@@ -221,5 +226,9 @@ bool Matrix4x4_Invert_Full( matrix4x4 out, cmatrix4x4 in1 );
 extern vec3_t		vec3_origin;
 extern const matrix3x4	matrix3x4_identity;
 extern const matrix4x4	matrix4x4_identity;
+
+#ifdef __cplusplus
+} // extern "C"
+#endif
 
 #endif//MATHLIB_H

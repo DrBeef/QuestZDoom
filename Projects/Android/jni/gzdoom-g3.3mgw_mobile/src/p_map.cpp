@@ -4496,7 +4496,13 @@ AActor *P_LineAttack(AActor *t1, DAngle angle, double distance,
 
 	DVector3 tempos;
 
-	if (flags & LAF_ABSPOSITION)
+
+	if (t1->player != NULL && t1->player->mo->OverrideAttackPosDir)
+	{
+		tempos = t1->player->mo->AttackPos;
+		direction = t1->player->mo->AttackDir;
+	}
+	else if (flags & LAF_ABSPOSITION)
 	{
 		tempos = DVector3(offsetforward, offsetside, sz);
 	}
