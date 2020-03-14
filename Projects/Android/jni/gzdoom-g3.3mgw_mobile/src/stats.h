@@ -38,21 +38,9 @@
 
 #if !defined _WIN32 && !defined __APPLE__
 
-#ifdef NO_CLOCK_GETTIME
-class cycle_t
-{
-public:
-	cycle_t &operator= (const cycle_t &o) { return *this; }
-	void Reset() {}
-	void Clock() {}
-	void Unclock() {}
-	double Time() { return 0; }
-	double TimeMS() { return 0; }
-};
-
-#else
-
 #include <time.h>
+
+extern bool disable_clock_gettime;
 
 class cycle_t
 {
@@ -64,18 +52,21 @@ public:
 	
 	void Clock()
 	{
-		timespec ts;
-		
-		clock_gettime(CLOCK_MONOTONIC, &ts);
-		Sec -= ts.tv_sec + ts.tv_nsec * 1e-9;
+		if (!disable_clock_gettime) {
+			timespec ts;
+
+			clock_gettime(CLOCK_MONOTONIC, &ts);
+			Sec -= ts.tv_sec + ts.tv_nsec * 1e-9;
+		}
 	}
 	
-	void Unclock()
-	{
-		timespec ts;
-		
-		clock_gettime(CLOCK_MONOTONIC, &ts);
-		Sec += ts.tv_sec + ts.tv_nsec * 1e-9;
+	void Unclock() {
+		if (!disable_clock_gettime) {
+			timespec ts;
+
+			clock_gettime(CLOCK_MONOTONIC, &ts);
+			Sec += ts.tv_sec + ts.tv_nsec * 1e-9;
+		}
 	}
 	
 	double Time()
@@ -91,8 +82,6 @@ public:
 private:
 	double Sec;
 };
-
-#endif
 
 #else
 

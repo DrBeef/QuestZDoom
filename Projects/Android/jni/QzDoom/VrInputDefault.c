@@ -22,21 +22,27 @@ int isMenuActive();
 void Joy_GenerateButtonEvents(int oldbuttons, int newbuttons, int numbuttons, int base);
 
 extern bool forceVirtualScreen;
+extern bool disable_clock_gettime;
 
 void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew, ovrInputStateTrackedRemote *pDominantTrackedRemoteOld, ovrTracking* pDominantTracking,
                           ovrInputStateTrackedRemote *pOffTrackedRemoteNew, ovrInputStateTrackedRemote *pOffTrackedRemoteOld, ovrTracking* pOffTracking,
                           int domButton1, int domButton2, int offButton1, int offButton2 )
 
 {
-
-    static bool dominantGripPushed = false;
-
     //Show screen view - for testing
     if (((pOffTrackedRemoteNew->Buttons & offButton2) !=
          (pOffTrackedRemoteOld->Buttons & offButton2)) &&
 			(pOffTrackedRemoteNew->Buttons & offButton2)) {
 
         forceVirtualScreen = !forceVirtualScreen;
+    }
+
+    //Toggle the get time function for testing
+    if (((pOffTrackedRemoteNew->Buttons & offButton1) !=
+         (pOffTrackedRemoteOld->Buttons & offButton1)) &&
+			(pOffTrackedRemoteNew->Buttons & offButton1)) {
+
+        disable_clock_gettime = !disable_clock_gettime;
     }
 
 	//Menu button
@@ -240,9 +246,8 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
         //Now handle all the buttons
         {
             //Dominant Grip works like a shift key
-            bool dominantGripPushedOld = (pDominantTrackedRemoteNew->Buttons & ovrButton_GripTrigger) != 0;
-            bool dominantGripPushedNew = (pDominantTrackedRemoteOld->Buttons & ovrButton_GripTrigger) != 0;
-
+            bool dominantGripPushedOld = (pDominantTrackedRemoteOld->Buttons & ovrButton_GripTrigger) != 0;
+            bool dominantGripPushedNew = (pDominantTrackedRemoteNew->Buttons & ovrButton_GripTrigger) != 0;
 
             //Weapon Chooser
             static int itemSwitched = 0;
@@ -253,23 +258,33 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                 if (itemSwitched == 0) {
                     if (between(0.8f, pDominantTrackedRemoteNew->Joystick.y, 1.0f))
                     {
-                        C_DoCommandC("+nextweap");
+                        Joy_GenerateButtonEvents(0, 1, 1, KEY_MWHEELDOWN);
                         itemSwitched = 1;
                     }
                     else
                     {
-                        C_DoCommandC("+prevweap");
+                        Joy_GenerateButtonEvents(0, 1, 1, KEY_MWHEELUP);
                         itemSwitched = 2;
                     }
+                }
+                else if (itemSwitched == 1)
+                {
+                    Joy_GenerateButtonEvents(1, 0, 1, KEY_MWHEELDOWN);
+                    itemSwitched = 0;
+                }
+                else if (itemSwitched == 2)
+                {
+                    Joy_GenerateButtonEvents(1, 0, 1, KEY_MWHEELUP);
+                    itemSwitched = 0;
                 }
             } else {
                 if (itemSwitched == 1)
                 {
-                    C_DoCommandC("-nextweap");
+                    Joy_GenerateButtonEvents(1, 0, 1, KEY_MWHEELDOWN);
                 }
                 else if (itemSwitched == 2)
                 {
-                    C_DoCommandC("-prevweap");
+                    Joy_GenerateButtonEvents(1, 0, 1, KEY_MWHEELUP);
                 }
                 itemSwitched = 0;
             }

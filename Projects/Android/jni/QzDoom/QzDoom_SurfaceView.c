@@ -63,6 +63,8 @@ vec3_t offhandangles;
 vec3_t offhandoffset;
 bool player_moving;
 
+bool disable_clock_gettime;
+
 
 #if !defined( EGL_OPENGL_ES3_BIT_KHR )
 #define EGL_OPENGL_ES3_BIT_KHR		0x0040
@@ -833,7 +835,7 @@ bool isMultiplayer()
 
 /*
 ========================
-Android_Vibrate
+VR_Vibrate
 ========================
 */
 
@@ -841,7 +843,7 @@ Android_Vibrate
 float vibration_channel_duration[2] = {0.0f, 0.0f};
 float vibration_channel_intensity[2] = {0.0f, 0.0f};
 
-void Android_Vibrate( float duration, int channel, float intensity )
+void VR_Vibrate( float duration, int channel, float intensity )
 {
 	if (vibration_channel_duration[channel] > 0.0f)
 		return;
@@ -1242,7 +1244,7 @@ int m_height;
 
 //qboolean R_SetMode( void );
 
-void Android_GetScreenRes(uint32_t *width, uint32_t *height)
+void VR_GetScreenRes(uint32_t *width, uint32_t *height)
 {
     *width = m_width;
     *height = m_height;
@@ -1266,6 +1268,8 @@ void VR_Init()
 	positional_movementSideways = 0.0f;
 	positional_movementForward = 0.0f;
 	snapTurn = 90.0f; // start partly turned
+
+    disable_clock_gettime = false;
 
 	//init randomiser
 	srand(time(NULL));

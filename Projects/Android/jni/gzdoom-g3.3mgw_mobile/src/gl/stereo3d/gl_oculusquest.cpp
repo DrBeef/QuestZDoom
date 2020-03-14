@@ -287,7 +287,7 @@ namespace s3d
         eye_ptrs.Push(&rightEyeView);
 
         //Get this from my code
-        Android_GetScreenRes(&sceneWidth, &sceneHeight);
+        VR_GetScreenRes(&sceneWidth, &sceneHeight);
 
         leftEyeView.initialize();
         rightEyeView.initialize();
@@ -410,7 +410,7 @@ namespace s3d
 
         if (gamestate == GS_LEVEL && !isMenuActive()) {
             cachedScreenBlocks = screenblocks;
-            screenblocks = 12; // always be full-screen during 3D scene render
+            screenblocks = 12;
             setUseScreenLayer(false);
         }
         else {

@@ -1529,7 +1529,7 @@ void V_Init (bool restart)
 			if (height == 0)
 			{
 				uint32_t uWidth, uHeight;
-				Android_GetScreenRes(&uWidth, &uHeight);
+                VR_GetScreenRes(&uWidth, &uHeight);
 				width = uWidth;
 				height = uHeight;
 			}
