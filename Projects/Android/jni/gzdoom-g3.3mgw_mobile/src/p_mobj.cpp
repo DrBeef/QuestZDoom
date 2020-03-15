@@ -6750,7 +6750,7 @@ AActor *P_SpawnPlayerMissile (AActor *source, double x, double y, double z,
 		pos = source->player->mo->AttackPos;
 		DVector3 dir = source->player->mo->AttackDir(source, angle, pitch);
 		an = dir.Angle();
-		pitch = -dir.Pitch();
+		pitch = dir.Pitch();
 	}
 	AActor *MissileActor = Spawn (type, pos, ALLOW_REPLACE);
 

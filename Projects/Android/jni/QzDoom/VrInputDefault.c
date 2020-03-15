@@ -110,7 +110,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                 float zxDist = length(x, z);
 
                 if (zxDist != 0.0f && z != 0.0f) {
-                    VectorSet(weaponangles, -degrees(atanf(y / zxDist)), (-(doomYaw - hmdorientation[YAW])) - degrees(atan2f(x, -z)), 0.0f);
+                    VectorSet(weaponangles, -degrees(atanf(y / zxDist)), -degrees(atan2f(x, -z)), 0.0f);
                 }
             }
         }
