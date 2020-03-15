@@ -60,9 +60,9 @@ mwheelup weapprev
 // Originally just for Heretic, Hexen, and Strife.
 // I can't see why they shouldn't be for Doom or Chex either.
 pgup +moveup
-ins +movedown
+pgdn +movedown
 home land
-pgdn +lookup
+ins +lookup
 del +lookdown
 end centerview
 
@@ -74,7 +74,7 @@ joy4 +use
 
 // Xbox 360 / PS2 controllers
 pad_a +use
-pad_y +jump
+pad_b +jump
 rtrigger +attack
 ltrigger +altattack
 lshoulder weapprev

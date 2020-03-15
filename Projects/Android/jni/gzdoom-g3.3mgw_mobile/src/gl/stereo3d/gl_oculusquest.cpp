@@ -357,7 +357,6 @@ namespace s3d
         long oculusquest_rightHanded = vr_control_scheme < 10;
         if (GetHandTransform(oculusquest_rightHanded ? 1 : 0, out))
         {
-            //out->rotate(vr_weaponRotate, 1, 0, 0); - not needed, done in the C
             if (!oculusquest_rightHanded)
                 out->scale(-1.0f, 1.0f, 1.0f);
             return true;
@@ -382,6 +381,7 @@ namespace s3d
     }
 
 
+    //Fishbiter's Function.. Thank-you!!
     static DVector3 MapAttackDir(AActor* actor, DAngle yaw, DAngle pitch)
     {
         LSMatrix44 mat;

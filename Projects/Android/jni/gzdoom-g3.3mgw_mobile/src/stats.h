@@ -40,8 +40,6 @@
 
 #include <time.h>
 
-extern bool disable_clock_gettime;
-
 class cycle_t
 {
 public:
@@ -52,21 +50,21 @@ public:
 	
 	void Clock()
 	{
-		if (!disable_clock_gettime) {
+#if 0
 			timespec ts;
 
 			clock_gettime(CLOCK_MONOTONIC, &ts);
 			Sec -= ts.tv_sec + ts.tv_nsec * 1e-9;
-		}
+#endif
 	}
 	
 	void Unclock() {
-		if (!disable_clock_gettime) {
+#if 0
 			timespec ts;
 
 			clock_gettime(CLOCK_MONOTONIC, &ts);
 			Sec += ts.tv_sec + ts.tv_nsec * 1e-9;
-		}
+#endif
 	}
 	
 	double Time()

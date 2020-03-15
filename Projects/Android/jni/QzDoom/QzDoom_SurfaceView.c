@@ -63,8 +63,6 @@ vec3_t offhandangles;
 vec3_t offhandoffset;
 bool player_moving;
 
-bool disable_clock_gettime;
-
 
 #if !defined( EGL_OPENGL_ES3_BIT_KHR )
 #define EGL_OPENGL_ES3_BIT_KHR		0x0040
@@ -153,6 +151,7 @@ LAMBDA1VR Stuff
 //This is now controlled by the engine
 static bool useVirtualScreen = true;
 bool forceVirtualScreen = false;
+extern bool		automapactive;
 
 void setUseScreenLayer(bool use)
 {
@@ -161,7 +160,7 @@ void setUseScreenLayer(bool use)
 
 bool useScreenLayer()
 {
-	return useVirtualScreen || forceVirtualScreen;
+	return useVirtualScreen || forceVirtualScreen || automapactive;
 }
 
 static void UnEscapeQuotes( char *arg )
@@ -1268,8 +1267,6 @@ void VR_Init()
 	positional_movementSideways = 0.0f;
 	positional_movementForward = 0.0f;
 	snapTurn = 90.0f; // start partly turned
-
-    disable_clock_gettime = false;
 
 	//init randomiser
 	srand(time(NULL));

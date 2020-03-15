@@ -43,6 +43,7 @@
 #include "r_data/models/models_ue1.h"
 #include "r_data/models/models_obj.h"
 #include "i_time.h"
+#include "gl/stereo3d/gl_stereo3d.h"
 
 #ifdef _MSC_VER
 #pragma warning(disable:4244) // warning C4244: conversion from 'double' to 'float', possible loss of data
@@ -192,6 +193,18 @@ void FModelRenderer::RenderHUDModel(DPSprite *psp, float ofsX, float ofsY)
 	// The model position and orientation has to be drawn independently from the position of the player,
 	// but we need to position it correctly in the world for light to work properly.
 	VSMatrix objectToWorldMatrix = GetViewToWorldMatrix();
+	if (s3d::Stereo3DMode::getCurrentMode().GetHandTransform(1, &objectToWorldMatrix))
+	{
+		float scale = 0.01f;
+		objectToWorldMatrix.scale(scale, scale, scale);
+		objectToWorldMatrix.translate(0, 5, 30);
+	}
+	else
+	{
+		DVector3 pos = playermo->Pos();
+		objectToWorldMatrix.translate(pos.X, pos.Z + 40, pos.Y);
+		objectToWorldMatrix.rotate(-playermo->Angles.Yaw.Degrees - 90, 0, 1, 0);
+	}
 
 	// Scaling model (y scale for a sprite means height, i.e. z in the world!).
 	objectToWorldMatrix.scale(smf->xscale, smf->zscale, smf->yscale);

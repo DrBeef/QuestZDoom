@@ -303,7 +303,7 @@ unsigned int *FModelVertexBuffer::LockIndexBuffer(unsigned int size)
 	                ibo_mem = (char*)realloc(ibo_mem,ibo_size);
 	            }
 	        }
-	
+
 	        return (unsigned int*)ibo_mem;
     	}
     	else
@@ -316,7 +316,7 @@ unsigned int *FModelVertexBuffer::LockIndexBuffer(unsigned int size)
 		else
 			return (unsigned int*)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);
 #ifdef __MOBILE__
-		}			
+		}
 #endif
 	}
 	else
