@@ -91,39 +91,13 @@ namespace s3d
         dispose();
     }
 
-
-    static void vSMatrixFromOvrMatrix(VSMatrix& m1, const ovrMatrix4f& m2)
-    {
-        float tmp[16];
-        for (int i = 0; i < 3; ++i) {
-            for (int j = 0; j < 4; ++j) {
-                tmp[4 * i + j] = m2.M[i][j];
-            }
-        }
-        int i = 3;
-        for (int j = 0; j < 4; ++j) {
-            tmp[4 * i + j] = 0;
-        }
-        tmp[15] = 1;
-        m1.loadMatrix(&tmp[0]);
-    }
-
-
 /* virtual */
     void OculusQuestEyePose::GetViewShift(FLOATTYPE yaw, FLOATTYPE outViewShift[3]) const
     {
         outViewShift[0] = outViewShift[1] = outViewShift[2] = 0;
 
-        // Pitch and Roll are identical between OpenVR and Doom worlds.
-        // But yaw can differ, depending on starting state, and controller movement.
-        float doomYawDegrees = r_viewpoint.Angles.Yaw.Degrees;
-        while (doomYawDegrees > 180)
-            doomYawDegrees -= 360;
-        while (doomYawDegrees < -180)
-            doomYawDegrees += 360;
-
         vec3_t angles;
-        VectorSet(angles, -GLRenderer->mAngles.Pitch.Degrees,  doomYawDegrees, GLRenderer->mAngles.Roll.Degrees);
+        VectorSet(angles, -GLRenderer->mAngles.Pitch.Degrees,  doomYaw, GLRenderer->mAngles.Roll.Degrees);
 
         vec3_t v_forward, v_right, v_up;
         AngleVectors(angles, v_forward, v_right, v_up);
@@ -242,7 +216,6 @@ namespace s3d
 
     void OculusQuestEyePose::AdjustHud() const
     {
-        // Draw crosshair on a separate quad, before updating HUD matrix
         const Stereo3DMode * mode3d = &Stereo3DMode::getCurrentMode();
         if (mode3d->IsMono())
             return;
@@ -320,7 +293,7 @@ namespace s3d
 
         float scale = 0.000625f * vr_weaponScale;
         gl_RenderState.mModelMatrix.scale(scale, -scale, scale);
-        gl_RenderState.mModelMatrix.translate(-viewwidth / 2, -viewheight * 3 / 4, 0.0f);
+        gl_RenderState.mModelMatrix.translate(-viewwidth / 2, -viewheight * 3 / 4, 0.0f); // What dis?!
 
         gl_RenderState.EnableModelMatrix(true);
     }
@@ -330,40 +303,50 @@ namespace s3d
         gl_RenderState.EnableModelMatrix(false);
     }
 
+    static void vSMatrixFromOvrMatrix(VSMatrix& m1, const ovrMatrix4f& m2)
+    {
+        float tmp[16];
+        for (int i = 0; i < 4; ++i) {
+            for (int j = 0; j < 4; ++j) {
+                //Do the transpose step at the same time
+                tmp[4 * j + 1] = m2.M[i][j];
+            }
+        }
+
+        m1.loadMatrix(&tmp[0]);
+    }
+
     bool OculusQuestMode::GetHandTransform(int hand, VSMatrix* mat) const
     {
+        AActor* playermo = r_viewpoint.camera->player->mo;
+        DVector3 pos = playermo->InterpolatedPosition(r_viewpoint.TicFrac);
+
         {
             mat->loadIdentity();
-
-            AActor* playermo = r_viewpoint.camera->player->mo;
-            DVector3 pos = playermo->InterpolatedPosition(r_viewpoint.TicFrac);
 
             mat->translate(pos.X, pos.Z, pos.Y);
 
             mat->scale(vr_vunits_per_meter, vr_vunits_per_meter, -vr_vunits_per_meter);
 
-            float doomYawDegrees = r_viewpoint.Angles.Yaw.Degrees;
-            while (doomYawDegrees > 180)
-                doomYawDegrees -= 360;
-            while (doomYawDegrees < -180)
-                doomYawDegrees += 360;
-
             if ((vr_control_scheme < 10 && hand == 1)
                 || (vr_control_scheme > 10 && hand == 0)) {
                 mat->translate(-weaponoffset[0], hmdPosition[1] + weaponoffset[1] - vr_floor_offset, weaponoffset[2]);
-                mat->rotate(-weaponangles[ROLL], 1, 0, 0);
-                mat->rotate(-weaponangles[PITCH], 0, 1, 0);
-                mat->rotate(-doomYawDegrees-weaponangles[YAW], 0, 0, 1);
+
+                mat->rotate(-90 + (doomYaw - hmdorientation[YAW]) + weaponangles[YAW], 0, 1, 0);
+                mat->rotate(-weaponangles[PITCH], 1, 0, 0);
+                mat->rotate(-weaponangles[ROLL], 0, 0, 1);
             }
             else
             {
-                //mat->rotate(-offhandangles[ROLL], 1, 0, 0);
-                //mat->rotate(-offhandangles[PITCH], 0, 1, 0);
-                //mat->rotate(-offhandangles[YAW], 0, 0, 1);
+                mat->rotate(-90 + (doomYaw - hmdorientation[YAW]) + offhandangles[YAW], 0, 1, 0);
+                mat->rotate(-offhandangles[PITCH], 1, 0, 0);
+                mat->rotate(-offhandangles[ROLL], 0, 0, 1);
+
                 mat->translate(offhandoffset[0], hmdPosition[1] + offhandoffset[1] - vr_floor_offset, -offhandoffset[2]);
             }
 
             return true;
+
         }
 
         return false;
@@ -398,7 +381,40 @@ namespace s3d
         return int(m);
     }
 
-/* virtual */
+
+    static DVector3 MapAttackDir(AActor* actor, DAngle yaw, DAngle pitch)
+    {
+        LSMatrix44 mat;
+        if (!s3d::Stereo3DMode::getCurrentMode().GetWeaponTransform(&mat))
+        {
+            double pc = pitch.Cos();
+
+            DVector3 direction = { pc * yaw.Cos(), pc * yaw.Sin(), -pitch.Sin() };
+            return direction;
+        }
+        double pc = pitch.Cos();
+
+        yaw -= actor->Angles.Yaw;
+
+        //ignore specified pitch (would need to compensate for auto aim and no (vanilla) Doom weapon varies this)
+        //pitch -= actor->Angles.Pitch;
+        pitch.Degrees = 0;
+
+        pc = pitch.Cos();
+
+        LSVec3 local = { (float)(pc * yaw.Cos()), (float)(pc * yaw.Sin()), (float)(-pitch.Sin()), 0.0f };
+
+        DVector3 dir;
+        dir.X = local.x * -mat[2][0] + local.y * -mat[0][0] + local.z * -mat[1][0];
+        dir.Y = local.x * -mat[2][2] + local.y * -mat[0][2] + local.z * -mat[1][2];
+        dir.Z = local.x * -mat[2][1] + local.y * -mat[0][1] + local.z * -mat[1][1];
+        dir.MakeUnit();
+
+        return dir;
+    }
+
+
+    /* virtual */
     void OculusQuestMode::SetUp() const
     {
         super::SetUp();
@@ -432,7 +448,7 @@ namespace s3d
         //Some crazy stuff to ascertain the actual yaw that doom is using at the right times!
         if (gamestate != GS_LEVEL || isMenuActive() || (gamestate == GS_LEVEL && resetDoomYaw))
         {
-            doomYaw = r_viewpoint.Angles.Yaw.Degrees;
+            doomYaw = (float)r_viewpoint.Angles.Yaw.Degrees;
             if (gamestate == GS_LEVEL && resetDoomYaw) {
                 resetDoomYaw = false;
             }
@@ -446,15 +462,20 @@ namespace s3d
         {
             if (player)
             {
-                //Weapon firing tracking - Thanks Fishbiter!
+                //Weapon firing tracking - Thanks Fishbiter for the inspiration of how/where to use this!
                 {
                     player->mo->OverrideAttackPosDir = true;
 
-                    player->mo->AttackPos.X = player->mo->X() + weaponoffset[0];
-                    player->mo->AttackPos.Y = player->mo->Y() + weaponoffset[1];
-                    player->mo->AttackPos.Z = player->mo->Z() + weaponoffset[2];
+                    player->mo->AttackPos.X = player->mo->X() - (weaponoffset[0] * vr_vunits_per_meter);
+                    player->mo->AttackPos.Y = player->mo->Y() + (weaponoffset[2] * vr_vunits_per_meter);
+                    player->mo->AttackPos.Z = player->mo->Z() + ((hmdPosition[1] + weaponoffset[1] + vr_floor_offset) * vr_vunits_per_meter);
 
-                    player->mo->AttackDir = DVector3(weaponangles[0], weaponangles[1], weaponangles[2]);
+                    vec3_t angles;
+                    VectorSet(angles, -GLRenderer->mAngles.Pitch.Degrees,  (doomYaw - hmdorientation[YAW]) + weaponangles[YAW], 0);
+
+                    vec3_t v_forward, v_right, v_up;
+                    AngleVectors(angles, v_forward, v_right, v_up);
+                    player->mo->AttackDir = MapAttackDir;//DVector3(v_forward[0], v_forward[1], v_forward[2]);
                 }
 
                 //Positional Movement

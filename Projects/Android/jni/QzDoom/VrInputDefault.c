@@ -45,8 +45,8 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
         disable_clock_gettime = !disable_clock_gettime;
     }
 
-	//Menu button
-	handleTrackedControllerButton(&leftTrackedRemoteState_new, &leftTrackedRemoteState_old, ovrButton_Enter, KEY_ESCAPE);
+    //Menu button - invoke menu
+    handleTrackedControllerButton(&leftTrackedRemoteState_new, &leftTrackedRemoteState_old, ovrButton_Enter, KEY_ESCAPE);
 
     if (getGameState() != 0 || isMenuActive()) //gamestate != GS_LEVEL
     {
@@ -61,6 +61,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
         handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, domButton1, KEY_PAD_A);
         handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, ovrButton_Trigger, KEY_PAD_A);
         handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, domButton2, KEY_PAD_B);
+        handleTrackedControllerButton(&leftTrackedRemoteState_new, &leftTrackedRemoteState_old, ovrButton_Enter, KEY_PAD_B);
     }
     else
     {
@@ -94,16 +95,17 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 
 			{
 				vec2_t v;
-				rotateAboutOrigin(-weaponoffset[0], weaponoffset[2], VR_GetRawYaw(), v);
-				weaponoffset[0] = v[0];
-				weaponoffset[2] = v[1];
+				rotateAboutOrigin(weaponoffset[0], weaponoffset[2], -(doomYaw - hmdorientation[YAW]), v);
+				weaponoffset[0] = v[1];
+				weaponoffset[2] = v[0];
 			}
 
-            //Set gun angles - We need to calculate all those we might need (including adjustments) for the client to then take its pick
+            //Set gun angles
             const ovrQuatf quatRemote = pDominantTracking->HeadPose.Pose.Orientation;
-            QuatToYawPitchRoll(quatRemote, vr_weapon_pitchadjust, weaponangles);
-            weaponangles[YAW] -= VR_GetRawYaw();
-            weaponangles[ROLL] = 0.0f; // remove roll for weapons
+            vec3_t rotation = {0};
+            rotation[PITCH] = vr_weapon_pitchadjust;
+            //rotation[YAW] = (doomYaw - hmdorientation[YAW]);
+            QuatToYawPitchRoll(quatRemote, rotation, weaponangles);
 
 
             if (weaponStabilised)
@@ -114,7 +116,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                 float zxDist = length(x, z);
 
                 if (zxDist != 0.0f && z != 0.0f) {
-                    VectorSet(weaponangles, -degrees(atanf(y / zxDist)), VR_GetRawYaw() - degrees(atan2f(x, -z)), 0.0f);
+                    VectorSet(weaponangles, -degrees(atanf(y / zxDist)), (-(doomYaw - hmdorientation[YAW])) - degrees(atan2f(x, -z)), 0.0f);
                 }
             }
         }
@@ -128,11 +130,12 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             offhandoffset[2] = pOffTracking->HeadPose.Pose.Position.z - hmdPosition[2];
 
 			vec2_t v;
-			rotateAboutOrigin(-offhandoffset[0], offhandoffset[2], VR_GetRawYaw(), v);
-			offhandoffset[0] = v[0];
-			offhandoffset[2] = v[1];
+			rotateAboutOrigin(offhandoffset[0], offhandoffset[2], -(doomYaw - hmdorientation[YAW]), v);
+			offhandoffset[0] = v[1];
+			offhandoffset[2] = v[0];
 
-            QuatToYawPitchRoll(pOffTracking->HeadPose.Pose.Orientation, 0.0f, offhandangles);
+            vec3_t rotation = {0};
+            QuatToYawPitchRoll(pOffTracking->HeadPose.Pose.Orientation, rotation, offhandangles);
 
 			if (vr_walkdirection == 0) {
 				controllerYawHeading = offhandangles[YAW] - hmdorientation[YAW];
@@ -141,8 +144,6 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 			{
 				controllerYawHeading = 0.0f;
 			}
-
-            offhandangles[YAW] -= VR_GetRawYaw();
         }
 
         //Positional movement

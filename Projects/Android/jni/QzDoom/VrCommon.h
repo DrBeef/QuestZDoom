@@ -68,7 +68,7 @@ float length(float x, float y);
 float nonLinearFilter(float in);
 bool between(float min, float val, float max);
 void rotateAboutOrigin(float v1, float v2, float rotation, vec2_t out);
-void QuatToYawPitchRoll(ovrQuatf q, float pitchAdjust, vec3_t out);
+void QuatToYawPitchRoll(ovrQuatf q, vec3_t rotation, vec3_t out);
 bool useScreenLayer();
 void handleTrackedControllerButton(ovrInputStateTrackedRemote * trackedRemoteState, ovrInputStateTrackedRemote * prevTrackedRemoteState, uint32_t button, int key);
 void VR_GetScreenRes(uint32_t *width, uint32_t *height);

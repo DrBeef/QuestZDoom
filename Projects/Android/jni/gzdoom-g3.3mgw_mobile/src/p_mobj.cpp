@@ -6748,7 +6748,7 @@ AActor *P_SpawnPlayerMissile (AActor *source, double x, double y, double z,
 	if (source->player != NULL && source->player->mo->OverrideAttackPosDir)
 	{
 		pos = source->player->mo->AttackPos;
-		DVector3 dir = source->player->mo->AttackDir;
+		DVector3 dir = source->player->mo->AttackDir(source, angle, pitch);
 		an = dir.Angle();
 		pitch = -dir.Pitch();
 	}
