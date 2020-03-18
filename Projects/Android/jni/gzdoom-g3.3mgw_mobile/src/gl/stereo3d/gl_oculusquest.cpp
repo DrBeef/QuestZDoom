@@ -149,14 +149,13 @@ namespace s3d
         return true;
     }
 
-    VSMatrix OculusQuestEyePose::getQuadInWorld(
-            float distance, // meters
-            float width, // meters
-            bool doFixPitch,
-            float pitchOffset) const
+    VSMatrix OculusQuestEyePose::getQuadInWorld() const
     {
         VSMatrix new_projection;
         new_projection.loadIdentity();
+
+        float stereo_separation = (vr_ipd * 0.5) * vr_vunits_per_meter * (eye == 1 ? -1.0 : 1.0);
+        new_projection.translate(stereo_separation, 0, 0);
 
         // doom_units from meters
         new_projection.scale(
@@ -164,51 +163,36 @@ namespace s3d
                 vr_vunits_per_meter,
                 -vr_vunits_per_meter);
         double pixelstretch = level.info ? level.info->pixelstretch : 1.2;
-        new_projection.scale(1.0, pixelstretch, 1.0); // Doom universe is scaled by 1990s pixel aspect ratio
+        new_projection.scale(pixelstretch, pixelstretch, 1.0); // Doom universe is scaled by 1990s pixel aspect ratio
 
-
-        const OculusQuestEyePose * activeEye = this;
-
-        // eye coordinates from hmd coordinates
-        //VSMatrix e2h(activeEye->eyeToHeadTransform);
-        //e2h.transpose();
-        //new_projection.multMatrix(e2h);
 
         // Follow HMD orientation, EXCEPT for roll angle (keep weapon upright)
-        /*if (activeEye->currentPose) {
-            float vrRollDegrees = RAD2DEG(-eulerAnglesFromMatrix(activeEye->currentPose->mDeviceToAbsoluteTracking).v[2]);
-            new_projection.rotate(-vrRollDegrees, 0, 0, 1);
+        {
+            new_projection.rotate(-hmdorientation[ROLL], 0, 0, 1);
 
-            if (doFixPitch) {
-                float vrPitchDegrees = RAD2DEG(-eulerAnglesFromMatrix(activeEye->currentPose->mDeviceToAbsoluteTracking).v[1]);
-                new_projection.rotate(-vrPitchDegrees, 1, 0, 0);
+            {
+                new_projection.rotate(-hmdorientation[PITCH], 1, 0, 0);
             }
-        }*/
 
-
-        if (pitchOffset != 0)
-            new_projection.rotate(-pitchOffset, 1, 0, 0);
+            new_projection.rotate(30, 1, 0, 0);
+        }
 
         // hmd coordinates (meters) from ndc coordinates
         // const float weapon_distance_meters = 0.55f;
         // const float weapon_width_meters = 0.3f;
         const float aspect = SCREENWIDTH / float(SCREENHEIGHT);
-        new_projection.translate(0.0, 0.0, distance);
+        new_projection.translate(0.0, 0.0, 1.0);
         new_projection.scale(
-                -width,
-                width / aspect,
-                -width);
+                -0.5,
+                0.5,
+                -0.5);
 
         // ndc coordinates from pixel coordinates
         new_projection.translate(-1.0, 1.0, 0);
         new_projection.scale(2.0 / SCREENWIDTH, -2.0 / SCREENHEIGHT, -1.0);
 
-        ovrTracking2 tracking;
-        const OculusQuestMode * mode3d = static_cast<const OculusQuestMode*>(&Stereo3DMode::getCurrentMode());
-        mode3d->getTracking(&tracking);
-
         VSMatrix proj = projection;
-        projection.multMatrix(new_projection);
+        proj.multMatrix(new_projection);
         new_projection = proj;
 
         return new_projection;
@@ -221,14 +205,7 @@ namespace s3d
             return;
 
         // Update HUD matrix to render on a separate quad
-        const float menu_distance_meters = 1.0f;
-        const float menu_width_meters = 0.4f * menu_distance_meters;
-        const float pitch_offset = -8.0;
-        gl_RenderState.mProjectionMatrix = getQuadInWorld(
-                menu_distance_meters,
-                menu_width_meters,
-                true,
-                pitch_offset);
+        gl_RenderState.mProjectionMatrix = getQuadInWorld();
         gl_RenderState.ApplyMatrices();
     }
 
@@ -342,7 +319,7 @@ namespace s3d
                 mat->rotate(-offhandangles[PITCH], 1, 0, 0);
                 mat->rotate(-offhandangles[ROLL], 0, 0, 1);
 
-                mat->translate(offhandoffset[0], hmdPosition[1] + offhandoffset[1] - vr_floor_offset, -offhandoffset[2]);
+                mat->translate(-offhandoffset[0], hmdPosition[1] + offhandoffset[1] - vr_floor_offset, offhandoffset[2]);
             }
 
             return true;
@@ -475,7 +452,7 @@ namespace s3d
 
                     vec3_t v_forward, v_right, v_up;
                     AngleVectors(angles, v_forward, v_right, v_up);
-                    player->mo->AttackDir = MapAttackDir;//DVector3(v_forward[0], v_forward[1], v_forward[2]);
+                    player->mo->AttackDir = MapAttackDir;
                 }
 
                 //Positional Movement

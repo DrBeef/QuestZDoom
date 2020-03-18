@@ -51,6 +51,7 @@
 
 CVAR(Bool, gl_interpolate_model_frames, true, CVAR_ARCHIVE)
 EXTERN_CVAR(Bool, r_drawvoxels)
+EXTERN_CVAR(Int, vr_control_scheme)
 
 extern TDeletingArray<FVoxel *> Voxels;
 extern TDeletingArray<FVoxelDef *> VoxelDefs;
@@ -190,10 +191,12 @@ void FModelRenderer::RenderHUDModel(DPSprite *psp, float ofsX, float ofsY)
 	if (smf == nullptr)
 		return;
 
-	// The model position and orientation has to be drawn independently from the position of the player,
+    long oculusquest_rightHanded = vr_control_scheme < 10;
+
+    // The model position and orientation has to be drawn independently from the position of the player,
 	// but we need to position it correctly in the world for light to work properly.
 	VSMatrix objectToWorldMatrix = GetViewToWorldMatrix();
-	if (s3d::Stereo3DMode::getCurrentMode().GetHandTransform(1, &objectToWorldMatrix))
+	if (s3d::Stereo3DMode::getCurrentMode().GetHandTransform(oculusquest_rightHanded ? 1 : 0, &objectToWorldMatrix))
 	{
 		float scale = 0.01f;
 		objectToWorldMatrix.scale(scale, scale, scale);

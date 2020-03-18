@@ -60,12 +60,7 @@ protected:
 	mutable uint32_t framebuffer;
 	int eye;
 
-	VSMatrix getQuadInWorld(
-		float distance, 
-		float width, 
-		bool doFixPitch,
-		float pitchOffset
-	) const;
+	VSMatrix getQuadInWorld() const;
 
 	mutable VSMatrix projection;
 };
