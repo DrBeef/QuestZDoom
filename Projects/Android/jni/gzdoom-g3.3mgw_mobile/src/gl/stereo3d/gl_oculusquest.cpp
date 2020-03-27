@@ -88,7 +88,6 @@ namespace s3d
 /* virtual */
     OculusQuestEyePose::~OculusQuestEyePose()
     {
-        dispose();
     }
 
 /* virtual */
@@ -128,14 +127,6 @@ namespace s3d
         return projection;
     }
 
-    void OculusQuestEyePose::initialize()
-    {
-    }
-
-    void OculusQuestEyePose::dispose()
-    {
-    }
-
     bool OculusQuestEyePose::submitFrame() const
     {
         prepareEyeBuffer( eye );
@@ -149,7 +140,7 @@ namespace s3d
         return true;
     }
 
-    VSMatrix OculusQuestEyePose::getQuadInWorld() const
+    VSMatrix OculusQuestEyePose::getHUDProjection() const
     {
         VSMatrix new_projection;
         new_projection.loadIdentity();
@@ -174,7 +165,7 @@ namespace s3d
                 new_projection.rotate(-hmdorientation[PITCH], 1, 0, 0);
             }
 
-            new_projection.rotate(30, 1, 0, 0);
+            new_projection.rotate(35, 1, 0, 0);
         }
 
         // hmd coordinates (meters) from ndc coordinates
@@ -205,7 +196,7 @@ namespace s3d
             return;
 
         // Update HUD matrix to render on a separate quad
-        gl_RenderState.mProjectionMatrix = getQuadInWorld();
+        gl_RenderState.mProjectionMatrix = getHUDProjection();
         gl_RenderState.ApplyMatrices();
     }
 
@@ -230,19 +221,12 @@ namespace s3d
             : leftEyeView(0)
             , rightEyeView(1)
             , sceneWidth(0), sceneHeight(0)
-            , crossHairDrawer(new F2DDrawer)
-            , cached2DDrawer(nullptr)
     {
         eye_ptrs.Push(&leftEyeView);
         eye_ptrs.Push(&rightEyeView);
 
         //Get this from my code
         VR_GetScreenRes(&sceneWidth, &sceneHeight);
-
-        leftEyeView.initialize();
-        rightEyeView.initialize();
-
-        crossHairDrawer->Clear();
     }
 
     void OculusQuestMode::getTracking(ovrTracking2 *_tracking) const
@@ -548,14 +532,6 @@ namespace s3d
 /* virtual */
     OculusQuestMode::~OculusQuestMode()
     {
-        {
-            leftEyeView.dispose();
-            rightEyeView.dispose();
-        }
-        if (crossHairDrawer != nullptr) {
-            delete crossHairDrawer;
-            crossHairDrawer = nullptr;
-        }
     }
 
 } /* namespace s3d */

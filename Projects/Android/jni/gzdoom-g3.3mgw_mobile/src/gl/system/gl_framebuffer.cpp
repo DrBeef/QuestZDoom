@@ -226,15 +226,13 @@ void OpenGLFrameBuffer::Swap()
 	Finish.Reset();
 	Finish.Clock();
 
-	if (swapbefore) glFinish();
-
 #ifdef USE_GL_HW_BUFFERS
     GLRenderer->GPUDropSync();
-#endif
-
+#else
+	if (swapbefore) glFinish();
 	SwapBuffers();
-
 	if (!swapbefore) glFinish();
+#endif
 
     gl_RenderState.SetVertexBuffer(NULL);
 

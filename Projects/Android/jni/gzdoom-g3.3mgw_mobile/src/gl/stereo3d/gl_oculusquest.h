@@ -52,15 +52,13 @@ public:
 	virtual void AdjustHud() const override;
 	virtual void AdjustBlend() const override;
 
-	void initialize();
-	void dispose();
 	bool submitFrame() const;
 
 protected:
 	mutable uint32_t framebuffer;
 	int eye;
 
-	VSMatrix getQuadInWorld() const;
+	VSMatrix getHUDProjection() const;
 
 	mutable VSMatrix projection;
 };

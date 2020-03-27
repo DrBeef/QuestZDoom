@@ -165,7 +165,7 @@ DFrameBuffer *NoSDLGLVideo::CreateFrameBuffer (int width, int height, bool bgra,
 	
 	NoSDLBaseFB *fb;
 	const char *hwBuffers = Args->CheckValue("-hwbuffers");
-	int buffers = 1;
+	int buffers = 2;
 	if (hwBuffers)
 	{
 		buffers = atoi(hwBuffers);

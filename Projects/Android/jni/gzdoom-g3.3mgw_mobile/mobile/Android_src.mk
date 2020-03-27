@@ -8,7 +8,7 @@ LOCAL_MODULE    := qzdoom
 LOCAL_CFLAGS   :=  -D__MOBILE__ -DNO_PIX_BUFF -DOPNMIDI_DISABLE_GX_EMULATOR -DGZDOOM  -DLZDOOM -DUSE_GL_HW_BUFFERS -DNO_VBO -D__STDINT_LIMITS -DENGINE_NAME=\"lzdoom\"
 
 
-LOCAL_CPPFLAGS := -DHAVE_FLUIDSYNTH -DHAVE_MPG123 -DHAVE_SNDFILE -std=c++14 -DHAVE_JWZGLES  -Wno-inconsistent-missing-override -Werror=format-security  -fexceptions -fpermissive -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp -D__forceinline=inline -DNO_GTK -DNO_SSE -fsigned-char
+LOCAL_CPPFLAGS := -DHAVE_FLUIDSYNTH -DHAVE_MPG123 -DHAVE_SNDFILE -std=c++14 -Wno-inconsistent-missing-override -Werror=format-security  -fexceptions -fpermissive -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp -D__forceinline=inline -DNO_GTK -DNO_SSE -fsigned-char
 
 LOCAL_CFLAGS  += -DNO_SEND_STATS
 
@@ -45,13 +45,11 @@ LOCAL_C_INCLUDES := \
  $(GZDOOM_TOP_PATH)/src/scripting/vm \
  $(GZDOOM_TOP_PATH)/src/posix \
  $(GZDOOM_TOP_PATH)/src/posix\nosdl \
- $(SDL_INCLUDE_PATHS) \
  $(SUPPORT_LIBS)/fluidsynth-lite/include \
  $(SUPPORT_LIBS)/openal/include/AL \
  $(SUPPORT_LIBS)/libsndfile-android/jni/ \
  $(SUPPORT_LIBS)/libmpg123 \
  $(SUPPORT_LIBS)/jpeg8d \
- $(SUPPORT_LIBS)/gl4es/include \
  $(GZDOOM_TOP_PATH)/mobile/src \
  $(GL4ES_PATH)
 
@@ -63,9 +61,6 @@ LOCAL_C_INCLUDES := \
 
 ANDROID_SRC_FILES = \
     ../mobile/src/i_specialpaths_android.cpp
-#    ../../../Clibs_OpenTouch/idtech1/gzdoom_game_interface.cpp \
-#    ../../../Clibs_OpenTouch/idtech1/touch_interface.cpp \
-#    ../../../Clibs_OpenTouch/idtech1/android_jni.cpp \
 
 PLAT_POSIX_SOURCES = \
 	posix/i_cd.cpp \
