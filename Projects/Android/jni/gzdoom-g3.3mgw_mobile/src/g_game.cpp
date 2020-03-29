@@ -136,6 +136,7 @@ CVAR (String, save_dir, "", CVAR_ARCHIVE|CVAR_GLOBALCONFIG);
 CVAR (Bool, cl_waitforsave, true, CVAR_ARCHIVE | CVAR_GLOBALCONFIG);
 CVAR (Bool, enablescriptscreenshot, false, CVAR_ARCHIVE | CVAR_GLOBALCONFIG);
 EXTERN_CVAR (Float, con_midtime);
+EXTERN_CVAR(Bool, vr_teleport);
 
 //==========================================================================
 //
@@ -737,9 +738,11 @@ void G_BuildTiccmd (ticcmd_t *cmd)
 	float joyside=0;
 	float dummy=0;
 
-	VR_GetMove(&joyforward, &joyside, &dummy, &dummy, &dummy, &dummy, &dummy, &dummy);
-	side += joyint(joyside * sidemove[speed]);
-	forward += joyint(joyforward * forwardmove[speed]);
+	if (!vr_teleport) {
+		VR_GetMove(&joyforward, &joyside, &dummy, &dummy, &dummy, &dummy, &dummy, &dummy);
+		side += joyint(joyside * sidemove[speed]);
+		forward += joyint(joyforward * forwardmove[speed]);
+	}
 
 	cmd->ucmd.pitch = LocalViewPitch >> 16;
 

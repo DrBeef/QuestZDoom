@@ -171,7 +171,7 @@ DFrameBuffer *NoSDLGLVideo::CreateFrameBuffer (int width, int height, bool bgra,
 		buffers = atoi(hwBuffers);
 	}
 	Printf("HW buffers = %d\n", buffers);
-	fb = new OpenGLFrameBuffer(0, width, height, 32, 60, fullscreen, buffers);
+	fb = new OpenGLFrameBuffer(0, width, height, 32, 72, true, buffers);
 
 	retry = 0;
 	return fb;

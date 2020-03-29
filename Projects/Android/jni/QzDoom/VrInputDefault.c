@@ -22,23 +22,11 @@ int getGameState();
 int isMenuActive();
 void Joy_GenerateButtonEvents(int oldbuttons, int newbuttons, int numbuttons, int base);
 
-extern bool forceVirtualScreen;
-
 void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew, ovrInputStateTrackedRemote *pDominantTrackedRemoteOld, ovrTracking* pDominantTracking,
                           ovrInputStateTrackedRemote *pOffTrackedRemoteNew, ovrInputStateTrackedRemote *pOffTrackedRemoteOld, ovrTracking* pOffTracking,
                           int domButton1, int domButton2, int offButton1, int offButton2 )
 
 {
-#ifdef _DEBUG
-    //Show screen view - for testing
-    if (((pOffTrackedRemoteNew->Buttons & offButton2) !=
-         (pOffTrackedRemoteOld->Buttons & offButton2)) &&
-			(pOffTrackedRemoteNew->Buttons & offButton2)) {
-
-        forceVirtualScreen = !forceVirtualScreen;
-    }
-#endif
-
     //Menu button - invoke menu
     handleTrackedControllerButton(&leftTrackedRemoteState_new, &leftTrackedRemoteState_old, ovrButton_Enter, KEY_ESCAPE);
 
@@ -164,12 +152,17 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 				  pOffTracking->HeadPose.Pose.Position.y,
 				  pOffTracking->HeadPose.Pose.Position.z);
 
-			//Laser-sight
-			if ((pDominantTrackedRemoteNew->Buttons & ovrButton_Joystick) !=
-				(pDominantTrackedRemoteOld->Buttons & ovrButton_Joystick)
-				&& (pDominantTrackedRemoteNew->Buttons & ovrButton_Joystick)) {
-
-			}
+			//Teleport - only does anything if vr_teleport cvar is true
+			static bool ready_teleport = false;
+			if (pOffTrackedRemoteOld->Joystick.y > 0.7f && !ready_teleport)
+            {
+                ready_teleport = true;
+            }
+			else if (pOffTrackedRemoteOld->Joystick.y < 0.7f & ready_teleport)
+            {
+                ready_teleport = false;
+                trigger_teleport = true;
+            }
 
 			//Apply a filter and quadratic scaler so small movements are easier to make
 			//and we don't get movement jitter when the joystick doesn't quite center properly

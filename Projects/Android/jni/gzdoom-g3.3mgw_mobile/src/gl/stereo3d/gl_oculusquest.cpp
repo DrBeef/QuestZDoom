@@ -31,6 +31,8 @@
 #include <map>
 #include <cmath>
 #include <VrApi_Ext.h>
+#include "p_trace.h"
+#include "p_linetracedata.h"
 #include "gl/system/gl_system.h"
 #include "doomtype.h" // Printf
 #include "d_player.h"
@@ -68,10 +70,13 @@ EXTERN_CVAR(Float, vr_weaponRotate);
 EXTERN_CVAR(Float, vr_snapTurn);
 EXTERN_CVAR(Float, vr_ipd);
 EXTERN_CVAR(Float, vr_weaponScale);
+EXTERN_CVAR(Bool, vr_teleport);
 
 double P_XYMovement(AActor *mo, DVector2 scroll);
 extern "C" void VR_GetMove( float *joy_forward, float *joy_side, float *hmd_forward, float *hmd_side, float *up, float *yaw, float *pitch, float *roll );
+void I_Quit();
 
+extern int game_running;
 
 namespace s3d
 {
@@ -112,7 +117,8 @@ namespace s3d
         // We want to align those two heights here
         const player_t & player = players[consoleplayer];
         double vh = player.viewheight; // Doom thinks this is where you are
-        double hh = (hmdPosition[1] - vr_floor_offset) * vr_vunits_per_meter; // HMD is actually here
+        double pixelstretch = level.info ? level.info->pixelstretch : 1.2;
+        double hh = ((hmdPosition[1] - vr_floor_offset) * vr_vunits_per_meter) / pixelstretch; // HMD is actually here
         eyeOffset[2] += hh - vh;
 
         outViewShift[0] = eyeOffset[0];
@@ -289,9 +295,10 @@ namespace s3d
 
             mat->scale(vr_vunits_per_meter, vr_vunits_per_meter, -vr_vunits_per_meter);
 
+            double pixelstretch = level.info ? level.info->pixelstretch : 1.2;
             if ((vr_control_scheme < 10 && hand == 1)
                 || (vr_control_scheme > 10 && hand == 0)) {
-                mat->translate(-weaponoffset[0], hmdPosition[1] + weaponoffset[1] - vr_floor_offset, weaponoffset[2]);
+                mat->translate(-weaponoffset[0], (hmdPosition[1] + weaponoffset[1] - vr_floor_offset) / pixelstretch, weaponoffset[2]);
 
                 mat->rotate(-90 + (doomYaw - hmdorientation[YAW]) + weaponangles[YAW], 0, 1, 0);
                 mat->rotate(-weaponangles[PITCH], 1, 0, 0);
@@ -299,11 +306,11 @@ namespace s3d
             }
             else
             {
+                mat->translate(-offhandoffset[0], (hmdPosition[1] + offhandoffset[1] - vr_floor_offset) / pixelstretch, offhandoffset[2]);
+
                 mat->rotate(-90 + (doomYaw - hmdorientation[YAW]) + offhandangles[YAW], 0, 1, 0);
                 mat->rotate(-offhandangles[PITCH], 1, 0, 0);
                 mat->rotate(-offhandangles[ROLL], 0, 0, 1);
-
-                mat->translate(-offhandoffset[0], hmdPosition[1] + offhandoffset[1] - vr_floor_offset, offhandoffset[2]);
             }
 
             return true;
@@ -380,6 +387,18 @@ namespace s3d
     {
         super::SetUp();
 
+        QzDoom_FrameSetup();
+
+        if (shutdown)
+        {
+            game_running = false;
+            I_Quit();
+
+            return;
+        }
+
+        processMessageQueue();
+
         // Set VR-appropriate settings
         {
             movebob = 0;
@@ -423,20 +442,47 @@ namespace s3d
         {
             if (player)
             {
+                double pixelstretch = level.info ? level.info->pixelstretch : 1.2;
+
                 //Weapon firing tracking - Thanks Fishbiter for the inspiration of how/where to use this!
                 {
                     player->mo->OverrideAttackPosDir = true;
 
                     player->mo->AttackPos.X = player->mo->X() - (weaponoffset[0] * vr_vunits_per_meter);
-                    player->mo->AttackPos.Y = player->mo->Y() + (weaponoffset[2] * vr_vunits_per_meter);
-                    player->mo->AttackPos.Z = player->mo->Z() + ((hmdPosition[1] + weaponoffset[1] + vr_floor_offset) * vr_vunits_per_meter);
+                    player->mo->AttackPos.Y = player->mo->Y() - (weaponoffset[2] * vr_vunits_per_meter);
+                    player->mo->AttackPos.Z = player->mo->Z() + (((hmdPosition[1] + weaponoffset[1] + vr_floor_offset) * vr_vunits_per_meter) / pixelstretch);
 
-                    vec3_t angles;
-                    VectorSet(angles, -GLRenderer->mAngles.Pitch.Degrees,  (doomYaw - hmdorientation[YAW]) + weaponangles[YAW], 0);
-
-                    vec3_t v_forward, v_right, v_up;
-                    AngleVectors(angles, v_forward, v_right, v_up);
                     player->mo->AttackDir = MapAttackDir;
+                }
+
+                if (vr_teleport) {
+                    // Teleport?
+                    DAngle yaw((doomYaw - hmdorientation[YAW]) + offhandangles[YAW]);
+                    DAngle pitch(offhandangles[PITCH]);
+                    FLineTraceData trace;
+                    if (trigger_teleport &&
+                        P_LineTrace(player->mo, yaw, 8192, pitch, TRF_ABSOFFSET,
+                                    ((hmdPosition[1] + weaponoffset[1] + vr_floor_offset) * vr_vunits_per_meter) / pixelstretch,
+                                    -(weaponoffset[2] * vr_vunits_per_meter),
+                                    -(weaponoffset[0] * vr_vunits_per_meter), &trace) &&
+                        trace.HitType == TRACE_HitFloor) {
+                        auto vel = player->mo->Vel;
+                        player->mo->Vel = DVector3(trace.HitLocation.X - player->mo->X(),
+                                                   trace.HitLocation.Y - player->mo->Y(), 0);
+                        bool wasOnGround = player->mo->Z() <= player->mo->floorz;
+                        double oldZ = player->mo->Z();
+                        P_XYMovement(player->mo, DVector2(0, 0));
+
+                        //if we were on the ground before offsetting, make sure we still are (this fixes not being able to move on lifts)
+                        if (player->mo->Z() >= oldZ && wasOnGround) {
+                            player->mo->SetZ(player->mo->floorz);
+                        } else {
+                            player->mo->SetZ(oldZ);
+                        }
+                        player->mo->Vel = vel;
+                    }
+
+                    trigger_teleport = false;
                 }
 
                 //Positional Movement

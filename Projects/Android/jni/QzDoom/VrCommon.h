@@ -58,6 +58,9 @@ extern vec3_t offhandoffset;
 
 extern bool player_moving;
 
+extern bool trigger_teleport;
+
+extern bool shutdown;
 void shutdownVR();
 
 float radians(float deg);
@@ -73,7 +76,8 @@ bool useScreenLayer();
 void handleTrackedControllerButton(ovrInputStateTrackedRemote * trackedRemoteState, ovrInputStateTrackedRemote * prevTrackedRemoteState, uint32_t button, int key);
 void VR_GetScreenRes(uint32_t *width, uint32_t *height);
 void VR_Vibrate( float duration, int channel, float intensity );
-
+bool processMessageQueue();
+void QzDoom_FrameSetup();
 
 void C_DoCommandC (const char *cmd);
 

@@ -62,6 +62,8 @@ float vr_snapturn_angle;
 vec3_t offhandangles;
 vec3_t offhandoffset;
 bool player_moving;
+bool shutdown;
+bool trigger_teleport;
 
 
 #if !defined( EGL_OPENGL_ES3_BIT_KHR )
@@ -150,7 +152,6 @@ LAMBDA1VR Stuff
 
 //This is now controlled by the engine
 static bool useVirtualScreen = true;
-bool forceVirtualScreen = false;
 extern bool		automapactive;
 
 void setUseScreenLayer(bool use)
@@ -160,7 +161,7 @@ void setUseScreenLayer(bool use)
 
 bool useScreenLayer()
 {
-	return useVirtualScreen || forceVirtualScreen || automapactive;
+	return useVirtualScreen || automapactive;
 }
 
 static void UnEscapeQuotes( char *arg )
@@ -1273,6 +1274,9 @@ void VR_Init()
 
 	//Initialise our cvar holders
 	vr_weapon_pitchadjust = -30.0;
+
+	shutdown = false;
+    trigger_teleport = false;
 }
 
 static ovrAppThread * gAppThread = NULL;
@@ -1371,6 +1375,7 @@ bool processMessageQueue() {
 			{
 				gAppState.NativeWindow = NULL;
 				destroyed = true;
+				shutdown = true;
 				break;
 			}
 			case MESSAGE_ON_SURFACE_CREATED:	{ gAppState.NativeWindow = (ANativeWindow *)ovrMessage_GetPointerParm( &message, 0 ); break; }
@@ -1427,9 +1432,6 @@ void * AppThreadFunction(void * parm ) {
 		processMessageQueue();
 	}
 
-	//Use floor based tracking space
-	vrapi_SetTrackingSpace(gAppState.Ovr, VRAPI_TRACKING_SPACE_LOCAL_FLOOR);
-
 	ovrRenderer_Create(m_width, m_height, &gAppState.Renderer, &java);
 
 	if ( gAppState.Ovr == NULL )
@@ -1456,6 +1458,13 @@ void * AppThreadFunction(void * parm ) {
 	shutdownVR();
 
 	return NULL;
+}
+
+//All the stuff we want to do each frame
+void QzDoom_FrameSetup()
+{
+	//Use floor based tracking space
+	vrapi_SetTrackingSpace(gAppState.Ovr, VRAPI_TRACKING_SPACE_LOCAL_FLOOR);
 }
 
 void processHaptics() {//Handle haptics

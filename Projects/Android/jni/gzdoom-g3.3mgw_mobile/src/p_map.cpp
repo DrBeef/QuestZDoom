@@ -4390,6 +4390,9 @@ static ETraceStatus CheckForActor(FTraceResults &res, void *userdata)
 // if damage == 0, it is just a test trace that will leave linetarget set
 //
 //==========================================================================
+EXTERN_CVAR(Int, vr_control_scheme)
+extern "C" void VR_Vibrate( float duration, int channel, float intensity );
+extern bool weaponStabilised;
 
 AActor *P_LineAttack(AActor *t1, DAngle angle, double distance,
 	DAngle pitch, int damage, FName damageType, PClassActor *pufftype, int flags, FTranslatedLineTarget*victim, int *actualdamage, 
@@ -4428,6 +4431,14 @@ AActor *P_LineAttack(AActor *t1, DAngle angle, double distance,
 		// this is coming from a weapon attack function which needs to transfer information to the obituary code,
 		// We need to preserve this info from the damage type because the actual damage type can get overridden by the puff
 		pflag = DMG_PLAYERATTACK;
+
+		//Haptics
+		long rightHanded = vr_control_scheme < 10;
+		VR_Vibrate( 150, rightHanded ? 1 : 0, 0.8 );
+		if (weaponStabilised)
+		{
+			VR_Vibrate( 150, rightHanded ? 0 : 1, 0.6 );
+		}
 	}
 
 	// [MC] If overriding, set it to the base of the actor.

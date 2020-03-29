@@ -6677,6 +6677,9 @@ DEFINE_ACTION_FUNCTION(AActor, SpawnSubMissile)
 = Tries to aim at a nearby monster
 ================
 */
+EXTERN_CVAR(Int, vr_control_scheme)
+extern "C" void VR_Vibrate( float duration, int channel, float intensity );
+extern bool weaponStabilised;
 
 AActor *P_SpawnPlayerMissile (AActor *source, double x, double y, double z,
 							  PClassActor *type, DAngle angle, FTranslatedLineTarget *pLineTarget, AActor **pMissileActor,
@@ -6767,6 +6770,16 @@ AActor *P_SpawnPlayerMissile (AActor *source, double x, double y, double z,
 	{
 		MissileActor->Vel3DFromAngle(pitch, MissileActor->Speed);
 	}
+
+
+	//Haptics
+	long rightHanded = vr_control_scheme < 10;
+	VR_Vibrate( 150, rightHanded ? 1 : 0, 0.8 );
+	if (weaponStabilised)
+	{
+		VR_Vibrate( 150, rightHanded ? 0 : 1, 0.6 );
+	}
+
 
 	if (MissileActor->flags4 & MF4_SPECTRAL)
 	{

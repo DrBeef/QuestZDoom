@@ -64,6 +64,8 @@ CVAR(Int, vr_control_scheme, 0, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 
 CVAR(Bool, vr_moveFollowsOffHand, true, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 
+CVAR(Bool, vr_teleport, false, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
+
 CVAR(Float, vr_weaponRotate, -30, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 
 CVAR(Float, vr_weaponScale, 1.0f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
