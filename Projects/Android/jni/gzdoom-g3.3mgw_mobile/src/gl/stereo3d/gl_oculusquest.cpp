@@ -30,7 +30,6 @@
 #include <string>
 #include <map>
 #include <cmath>
-#include <VrApi_Ext.h>
 #include "p_trace.h"
 #include "p_linetracedata.h"
 #include "gl/system/gl_system.h"
@@ -41,15 +40,11 @@
 #include "r_utility.h" // viewpitch
 #include "gl/renderer/gl_renderer.h"
 #include "gl/renderer/gl_renderbuffers.h"
-#include "gl/renderer/gl_2ddrawer.h" // crosshair
-#include "gl/models/gl_models.h"
 #include "g_levellocals.h" // pixelstretch
-#include "g_statusbar/sbar.h"
 #include "math/cmath.h"
 #include "c_cvars.h"
 #include "cmdlib.h"
 #include "w_wad.h"
-#include "m_joy.h"
 #include "d_gui.h"
 #include "d_event.h"
 
@@ -135,13 +130,13 @@ namespace s3d
 
     bool OculusQuestEyePose::submitFrame() const
     {
-        prepareEyeBuffer( eye );
+        QzDoom_prepareEyeBuffer(eye);
 
         GLRenderer->mBuffers->BindEyeTexture(eye, 0);
         GL_IRECT box = {0, 0, GLRenderer->mSceneViewport.width, GLRenderer->mSceneViewport.height};
         GLRenderer->DrawPresentTexture(box, true);
 
-        finishEyeBuffer( eye );
+        QzDoom_finishEyeBuffer(eye);
 
         return true;
     }
@@ -232,7 +227,7 @@ namespace s3d
         eye_ptrs.Push(&rightEyeView);
 
         //Get this from my code
-        VR_GetScreenRes(&sceneWidth, &sceneHeight);
+        QzDoom_GetScreenRes(&sceneWidth, &sceneHeight);
     }
 
     void OculusQuestMode::getTracking(ovrTracking2 *_tracking) const
@@ -339,7 +334,7 @@ namespace s3d
         leftEyeView.submitFrame();
         rightEyeView.submitFrame();
 
-        submitFrame(&tracking);
+        QzDoom_submitFrame(&tracking);
     }
 
     static int mAngleFromRadians(double radians)
@@ -397,7 +392,7 @@ namespace s3d
             return;
         }
 
-        processMessageQueue();
+        QzDoom_processMessageQueue();
 
         // Set VR-appropriate settings
         {
@@ -407,23 +402,23 @@ namespace s3d
         if (gamestate == GS_LEVEL && !isMenuActive()) {
             cachedScreenBlocks = screenblocks;
             screenblocks = 12;
-            setUseScreenLayer(false);
+            QzDoom_setUseScreenLayer(false);
         }
         else {
             //Ensure we are drawing on virtual screen
-            setUseScreenLayer(true);
+            QzDoom_setUseScreenLayer(true);
         }
 
-        processHaptics();
+        QzDoom_processHaptics();
 
         //Get controller state here
-        getHMDOrientation(&tracking);
+        QzDoom_getHMDOrientation(&tracking);
 
         //Set up stuff used in the tracking code
         vr_weapon_pitchadjust = vr_weaponRotate;
         vr_snapturn_angle = vr_snapTurn;
         vr_walkdirection = !vr_moveFollowsOffHand;
-        getTrackedRemotesOrientation(vr_control_scheme);
+        QzDoom_getTrackedRemotesOrientation(vr_control_scheme);
 
         //Some crazy stuff to ascertain the actual yaw that doom is using at the right times!
         if (gamestate != GS_LEVEL || isMenuActive() || (gamestate == GS_LEVEL && resetDoomYaw))

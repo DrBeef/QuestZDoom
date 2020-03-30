@@ -154,12 +154,12 @@ LAMBDA1VR Stuff
 static bool useVirtualScreen = true;
 extern bool		automapactive;
 
-void setUseScreenLayer(bool use)
+void QzDoom_setUseScreenLayer(bool use)
 {
 	useVirtualScreen = use;
 }
 
-bool useScreenLayer()
+bool QzDoom_useScreenLayer()
 {
 	return useVirtualScreen || automapactive;
 }
@@ -813,15 +813,15 @@ void setHMDPosition( float x, float y, float z, float yaw )
 
 	VectorSet(hmdPosition, x, y, z);
 
-    if (s_useScreen != useScreenLayer())
+    if (s_useScreen != QzDoom_useScreenLayer())
     {
-		s_useScreen = useScreenLayer();
+		s_useScreen = QzDoom_useScreenLayer();
 
 		//Record player height on transition
         playerHeight = y;
     }
 
-	if (!useScreenLayer())
+	if (!QzDoom_useScreenLayer())
     {
     	playerYaw = yaw;
 	}
@@ -835,7 +835,7 @@ bool isMultiplayer()
 
 /*
 ========================
-VR_Vibrate
+QzDoom_Vibrate
 ========================
 */
 
@@ -843,7 +843,7 @@ VR_Vibrate
 float vibration_channel_duration[2] = {0.0f, 0.0f};
 float vibration_channel_intensity[2] = {0.0f, 0.0f};
 
-void VR_Vibrate( float duration, int channel, float intensity )
+void QzDoom_Vibrate(float duration, int channel, float intensity )
 {
 	if (vibration_channel_duration[channel] > 0.0f)
 		return;
@@ -1244,7 +1244,7 @@ int m_height;
 
 //qboolean R_SetMode( void );
 
-void VR_GetScreenRes(uint32_t *width, uint32_t *height)
+void QzDoom_GetScreenRes(uint32_t *width, uint32_t *height)
 {
     *width = m_width;
     *height = m_height;
@@ -1284,9 +1284,9 @@ static ovrApp gAppState;
 static ovrJava java;
 static bool destroyed = false;
 
-void prepareEyeBuffer(int eye )
+void QzDoom_prepareEyeBuffer(int eye )
 {
-	ovrRenderer *renderer = useScreenLayer() ? &gAppState.Scene.CylinderRenderer : &gAppState.Renderer;
+	ovrRenderer *renderer = QzDoom_useScreenLayer() ? &gAppState.Scene.CylinderRenderer : &gAppState.Renderer;
 
 	ovrFramebuffer *frameBuffer = &(renderer->FrameBuffer[eye]);
 	ovrFramebuffer_SetCurrent(frameBuffer);
@@ -1305,9 +1305,9 @@ void prepareEyeBuffer(int eye )
 	GL(glDisable(GL_SCISSOR_TEST));
 }
 
-void finishEyeBuffer(int eye )
+void QzDoom_finishEyeBuffer(int eye )
 {
-	ovrRenderer *renderer = useScreenLayer() ? &gAppState.Scene.CylinderRenderer : &gAppState.Renderer;
+	ovrRenderer *renderer = QzDoom_useScreenLayer() ? &gAppState.Scene.CylinderRenderer : &gAppState.Renderer;
 
 	ovrFramebuffer *frameBuffer = &(renderer->FrameBuffer[eye]);
 
@@ -1319,7 +1319,7 @@ void finishEyeBuffer(int eye )
 	ovrFramebuffer_SetNone();
 }
 
-bool processMessageQueue() {
+bool QzDoom_processMessageQueue() {
 	for ( ; ; )
 	{
 		ovrMessage message;
@@ -1429,7 +1429,7 @@ void * AppThreadFunction(void * parm ) {
 
 	//First handle any messages in the queue
 	while ( gAppState.Ovr == NULL ) {
-		processMessageQueue();
+        QzDoom_processMessageQueue();
 	}
 
 	ovrRenderer_Create(m_width, m_height, &gAppState.Renderer, &java);
@@ -1446,7 +1446,7 @@ void * AppThreadFunction(void * parm ) {
 
 	//Run loading loop until we are ready to start QzDoom
 	while (!destroyed && !qzdoom_initialised) {
-		processMessageQueue();
+        QzDoom_processMessageQueue();
 		incrementFrameIndex();
 		showLoadingIcon();
 	}
@@ -1467,7 +1467,7 @@ void QzDoom_FrameSetup()
 	vrapi_SetTrackingSpace(gAppState.Ovr, VRAPI_TRACKING_SPACE_LOCAL_FLOOR);
 }
 
-void processHaptics() {//Handle haptics
+void QzDoom_processHaptics() {//Handle haptics
 	static float lastFrameTime = 0.0f;
 	float timestamp = (float)(GetTimeInMilliSeconds());
 	float frametime = timestamp - lastFrameTime;
@@ -1521,7 +1521,7 @@ void showLoadingIcon()
 	vrapi_SubmitFrame2( gAppState.Ovr, &frameDesc );
 }
 
-void getHMDOrientation(ovrTracking2 *tracking) {//Get orientation
+void QzDoom_getHMDOrientation(ovrTracking2 *tracking) {//Get orientation
 
 	// Get the HMD pose, predicted for the middle of the time period during which
 	// the new eye images will be displayed. The number of frames predicted ahead
@@ -1560,7 +1560,7 @@ void incrementFrameIndex()
 														  gAppState.FrameIndex);
 }
 
-void getTrackedRemotesOrientation(int vr_control_scheme) {//Get info for tracked remotes
+void QzDoom_getTrackedRemotesOrientation(int vr_control_scheme) {//Get info for tracked remotes
     acquireTrackedRemotesData(gAppState.Ovr, gAppState.DisplayTime);
 
     //Call additional control schemes here
@@ -1579,11 +1579,11 @@ void getTrackedRemotesOrientation(int vr_control_scheme) {//Get info for tracked
     }
 }
 
-void submitFrame(ovrTracking2 *tracking)
+void QzDoom_submitFrame(ovrTracking2 *tracking)
 {
     ovrSubmitFrameDescription2 frameDesc = {0};
     
-    if (!useScreenLayer()) {
+    if (!QzDoom_useScreenLayer()) {
 
         ovrLayerProjection2 layer = vrapi_DefaultLayerProjection2();
         layer.HeadPose = (*tracking).HeadPose;
