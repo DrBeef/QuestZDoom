@@ -6678,7 +6678,7 @@ DEFINE_ACTION_FUNCTION(AActor, SpawnSubMissile)
 ================
 */
 EXTERN_CVAR(Int, vr_control_scheme)
-extern "C" void VR_Vibrate( float duration, int channel, float intensity );
+extern "C" void QzDoom_Vibrate(float duration, int channel, float intensity );
 extern bool weaponStabilised;
 
 AActor *P_SpawnPlayerMissile (AActor *source, double x, double y, double z,
@@ -6774,10 +6774,10 @@ AActor *P_SpawnPlayerMissile (AActor *source, double x, double y, double z,
 
 	//Haptics
 	long rightHanded = vr_control_scheme < 10;
-	VR_Vibrate( 150, rightHanded ? 1 : 0, 0.8 );
+    QzDoom_Vibrate(150, rightHanded ? 1 : 0, 0.8);
 	if (weaponStabilised)
 	{
-		VR_Vibrate( 150, rightHanded ? 0 : 1, 0.6 );
+        QzDoom_Vibrate(150, rightHanded ? 0 : 1, 0.6);
 	}
 
 

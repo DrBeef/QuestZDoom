@@ -232,7 +232,7 @@ void NoSDLFB::SetVSync (bool vsync)
 void NoSDLFB::ScaleCoordsFromWindow(int16_t &x, int16_t &y)
 {
 	uint32_t w, h;
-    VR_GetScreenRes(&w, &h);
+    QzDoom_GetScreenRes(&w, &h);
 
 
 	// Detect if we're doing scaling in the Window and adjust the mouse

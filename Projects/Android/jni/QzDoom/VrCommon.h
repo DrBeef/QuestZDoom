@@ -72,28 +72,24 @@ float nonLinearFilter(float in);
 bool between(float min, float val, float max);
 void rotateAboutOrigin(float v1, float v2, float rotation, vec2_t out);
 void QuatToYawPitchRoll(ovrQuatf q, vec3_t rotation, vec3_t out);
-bool useScreenLayer();
 void handleTrackedControllerButton(ovrInputStateTrackedRemote * trackedRemoteState, ovrInputStateTrackedRemote * prevTrackedRemoteState, uint32_t button, int key);
-void VR_GetScreenRes(uint32_t *width, uint32_t *height);
-void VR_Vibrate( float duration, int channel, float intensity );
-bool processMessageQueue();
+
+//Called from engine code
+bool QzDoom_useScreenLayer();
+void QzDoom_GetScreenRes(uint32_t *width, uint32_t *height);
+void QzDoom_Vibrate(float duration, int channel, float intensity );
+bool QzDoom_processMessageQueue();
 void QzDoom_FrameSetup();
-
-void C_DoCommandC (const char *cmd);
-
-float VR_GetRawYaw();
-
-void setUseScreenLayer(bool use);
-
-void processHaptics();
-void getHMDOrientation(ovrTracking2 *tracking);
-void getTrackedRemotesOrientation(int vr_control_scheme);
+void QzDoom_setUseScreenLayer(bool use);
+void QzDoom_processHaptics();
+void QzDoom_getHMDOrientation(ovrTracking2 *tracking);
+void QzDoom_getTrackedRemotesOrientation(int vr_control_scheme);
 
 void incrementFrameIndex();
 
-void prepareEyeBuffer(int eye );
-void finishEyeBuffer(int eye );
-void submitFrame(ovrTracking2 *tracking);
+void QzDoom_prepareEyeBuffer(int eye );
+void QzDoom_finishEyeBuffer(int eye );
+void QzDoom_submitFrame(ovrTracking2 *tracking);
 
 #ifdef __cplusplus
 } // extern "C"

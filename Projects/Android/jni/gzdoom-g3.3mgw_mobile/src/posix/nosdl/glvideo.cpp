@@ -316,7 +316,7 @@ void NoSDLGLFB::SwapBuffers()
 int NoSDLGLFB::GetClientWidth()
 {
 	uint32_t w, h;
-    VR_GetScreenRes(&w, &h);
+    QzDoom_GetScreenRes(&w, &h);
 	int width = w;
 	return width;
 }
@@ -324,7 +324,7 @@ int NoSDLGLFB::GetClientWidth()
 int NoSDLGLFB::GetClientHeight()
 {
 	uint32_t w, h;
-    VR_GetScreenRes(&w, &h);
+    QzDoom_GetScreenRes(&w, &h);
 	int height = h;
 	return height;
 }
@@ -332,7 +332,7 @@ int NoSDLGLFB::GetClientHeight()
 void NoSDLGLFB::ScaleCoordsFromWindow(int16_t &x, int16_t &y)
 {
 	uint32_t w, h;
-    VR_GetScreenRes(&w, &h);
+    QzDoom_GetScreenRes(&w, &h);
 
 	// Detect if we're doing scaling in the Window and adjust the mouse
 	// coordinates accordingly. This could be more efficent, but I

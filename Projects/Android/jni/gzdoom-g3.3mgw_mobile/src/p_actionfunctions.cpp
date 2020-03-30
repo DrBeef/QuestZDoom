@@ -1292,6 +1292,13 @@ DEFINE_ACTION_FUNCTION(AActor, A_Recoil)
 	PARAM_SELF_PROLOGUE(AActor);
 	PARAM_FLOAT(xyvel);
 
+	//We don't want to adjust the player's camera - that could make them sick
+	player_t* player = r_viewpoint.camera ? r_viewpoint.camera->player : nullptr;
+	if (player != nullptr && self != nullptr && player->mo == self)
+	{
+		return 0;
+	}
+
 	self->Thrust(self->Angles.Yaw + 180., xyvel);
 	return 0;
 }
@@ -2819,6 +2826,14 @@ DEFINE_ACTION_FUNCTION(AActor, A_SetAngle)
 	PARAM_INT(ptr);
 
 	AActor *ref = COPY_AAPTR(self, ptr);
+
+	//We don't want to adjust the player's camera - that could make them sick
+	player_t* player = r_viewpoint.camera ? r_viewpoint.camera->player : nullptr;
+	if (player != nullptr && ref != nullptr && player->mo == ref)
+	{
+		return 0;
+	}
+
 	if (ref != NULL)
 	{
 		ref->SetAngle(angle, !!(flags & SPF_INTERPOLATE));
@@ -2843,6 +2858,13 @@ DEFINE_ACTION_FUNCTION(AActor, A_SetPitch)
 
 	AActor *ref = COPY_AAPTR(self, ptr);
 
+	//We don't want to adjust the player's camera - that could make them sick
+	player_t* player = r_viewpoint.camera ? r_viewpoint.camera->player : nullptr;
+	if (player != nullptr && ref != nullptr && player->mo == ref)
+	{
+		return 0;
+	}
+
 	if (ref != NULL)
 	{
 		ref->SetPitch(pitch, !!(flags & SPF_INTERPOLATE), !!(flags & SPF_FORCECLAMP));
@@ -2865,6 +2887,13 @@ DEFINE_ACTION_FUNCTION(AActor, A_SetRoll)
 	PARAM_INT	(flags);
 	PARAM_INT	(ptr)	;
 	AActor *ref = COPY_AAPTR(self, ptr);
+
+	//We don't want to adjust the player's camera - that could make them sick
+	player_t* player = r_viewpoint.camera ? r_viewpoint.camera->player : nullptr;
+	if (player != nullptr && ref != nullptr && player->mo == ref)
+	{
+		return 0;
+	}
 
 	if (ref != NULL)
 	{
