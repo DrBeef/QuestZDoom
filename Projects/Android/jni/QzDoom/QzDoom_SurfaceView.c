@@ -161,7 +161,7 @@ void setUseScreenLayer(bool use)
 
 bool useScreenLayer()
 {
-	return useVirtualScreen || automapactive;
+	return useVirtualScreen;// || automapactive;
 }
 
 static void UnEscapeQuotes( char *arg )
