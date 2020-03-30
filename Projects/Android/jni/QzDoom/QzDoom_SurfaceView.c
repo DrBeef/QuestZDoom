@@ -507,6 +507,10 @@ static void ovrFramebuffer_Clear( ovrFramebuffer * frameBuffer )
 	frameBuffer->FrameBuffers = NULL;
 }
 
+typedef void (GL_APIENTRYP PFNGLRENDERBUFFERSTORAGEMULTISAMPLEEXTPROC) (GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height);
+typedef void (GL_APIENTRYP PFNGLFRAMEBUFFERTEXTURE2DMULTISAMPLEEXTPROC) (GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level, GLsizei samples);
+
+
 static bool ovrFramebuffer_Create( ovrFramebuffer * frameBuffer, const GLenum colorFormat, const int width, const int height, const int multisamples )
 {
     frameBuffer->Width = width;
@@ -517,6 +521,11 @@ static bool ovrFramebuffer_Create( ovrFramebuffer * frameBuffer, const GLenum co
 	frameBuffer->TextureSwapChainLength = vrapi_GetTextureSwapChainLength( frameBuffer->ColorTextureSwapChain );
 	frameBuffer->DepthBuffers = (GLuint *)malloc( frameBuffer->TextureSwapChainLength * sizeof( GLuint ) );
 	frameBuffer->FrameBuffers = (GLuint *)malloc( frameBuffer->TextureSwapChainLength * sizeof( GLuint ) );
+
+    PFNGLRENDERBUFFERSTORAGEMULTISAMPLEEXTPROC glRenderbufferStorageMultisampleEXT =
+            (PFNGLRENDERBUFFERSTORAGEMULTISAMPLEEXTPROC)eglGetProcAddress("glRenderbufferStorageMultisampleEXT");
+    PFNGLFRAMEBUFFERTEXTURE2DMULTISAMPLEEXTPROC glFramebufferTexture2DMultisampleEXT =
+            (PFNGLFRAMEBUFFERTEXTURE2DMULTISAMPLEEXTPROC)eglGetProcAddress("glFramebufferTexture2DMultisampleEXT");
 
 	for ( int i = 0; i < frameBuffer->TextureSwapChainLength; i++ )
 	{
@@ -533,28 +542,51 @@ static bool ovrFramebuffer_Create( ovrFramebuffer * frameBuffer, const GLenum co
 		GL( glTexParameteri( colorTextureTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR ) );
 		GL( glBindTexture( colorTextureTarget, 0 ) );
 
-		{
-			{
-				// Create depth buffer.
-				GL( glGenRenderbuffers( 1, &frameBuffer->DepthBuffers[i] ) );
-				GL( glBindRenderbuffer( GL_RENDERBUFFER, frameBuffer->DepthBuffers[i] ) );
-				GL( glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, frameBuffer->Width, frameBuffer->Height ) );
-				GL( glBindRenderbuffer( GL_RENDERBUFFER, 0 ) );
+        if (multisamples > 1 && glRenderbufferStorageMultisampleEXT != NULL && glFramebufferTexture2DMultisampleEXT != NULL)
+        {
 
-				// Create the frame buffer.
-				GL( glGenFramebuffers( 1, &frameBuffer->FrameBuffers[i] ) );
-				GL( glBindFramebuffer( GL_DRAW_FRAMEBUFFER, frameBuffer->FrameBuffers[i] ) );
-				GL( glFramebufferRenderbuffer( GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, frameBuffer->DepthBuffers[i] ) );
-				GL( glFramebufferTexture2D( GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorTexture, 0 ) );
-				GL( GLenum renderFramebufferStatus = glCheckFramebufferStatus( GL_DRAW_FRAMEBUFFER ) );
-				GL( glBindFramebuffer( GL_DRAW_FRAMEBUFFER, 0 ) );
-				if ( renderFramebufferStatus != GL_FRAMEBUFFER_COMPLETE )
-				{
-					ALOGE( "Incomplete frame buffer object: %s", GlFrameBufferStatusString( renderFramebufferStatus ) );
-					return false;
-				}
-			}
-		}
+            // Create multisampled depth buffer.
+            GL(glGenRenderbuffers(1, &frameBuffer->DepthBuffers[i]));
+            GL(glBindRenderbuffer(GL_RENDERBUFFER, frameBuffer->DepthBuffers[i]));
+            GL(glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER, multisamples, GL_DEPTH_COMPONENT24, width, height));
+            GL(glBindRenderbuffer(GL_RENDERBUFFER, 0));
+
+            // Create the frame buffer.
+            GL(glGenFramebuffers(1, &frameBuffer->FrameBuffers[i]));
+            GL(glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer->FrameBuffers[i]));
+            GL(glFramebufferTexture2DMultisampleEXT(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorTexture, 0, multisamples));
+            GL(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, frameBuffer->DepthBuffers[i]));
+            GL(GLenum renderFramebufferStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER));
+            GL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+            if (renderFramebufferStatus != GL_FRAMEBUFFER_COMPLETE)
+            {
+                ALOGE("OVRHelper::Incomplete frame buffer object: %s", GlFrameBufferStatusString(renderFramebufferStatus));
+                return false;
+            }
+        }
+        else
+        {
+            {
+                // Create depth buffer.
+                GL( glGenRenderbuffers( 1, &frameBuffer->DepthBuffers[i] ) );
+                GL( glBindRenderbuffer( GL_RENDERBUFFER, frameBuffer->DepthBuffers[i] ) );
+                GL( glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, frameBuffer->Width, frameBuffer->Height ) );
+                GL( glBindRenderbuffer( GL_RENDERBUFFER, 0 ) );
+
+                // Create the frame buffer.
+                GL( glGenFramebuffers( 1, &frameBuffer->FrameBuffers[i] ) );
+                GL( glBindFramebuffer( GL_DRAW_FRAMEBUFFER, frameBuffer->FrameBuffers[i] ) );
+                GL( glFramebufferRenderbuffer( GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, frameBuffer->DepthBuffers[i] ) );
+                GL( glFramebufferTexture2D( GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorTexture, 0 ) );
+                GL( GLenum renderFramebufferStatus = glCheckFramebufferStatus( GL_DRAW_FRAMEBUFFER ) );
+                GL( glBindFramebuffer( GL_DRAW_FRAMEBUFFER, 0 ) );
+                if ( renderFramebufferStatus != GL_FRAMEBUFFER_COMPLETE )
+                {
+                    ALOGE( "Incomplete frame buffer object: %s", GlFrameBufferStatusString( renderFramebufferStatus ) );
+                    return false;
+                }
+            }
+        }
 	}
 
 	return true;
