@@ -175,9 +175,9 @@ namespace s3d
         const float aspect = SCREENWIDTH / float(SCREENHEIGHT);
         new_projection.translate(0.0, 0.0, 1.0);
         new_projection.scale(
-                -0.5,
-                0.5,
-                -0.5);
+                -0.3,
+                0.3,
+                -0.3);
 
         // ndc coordinates from pixel coordinates
         new_projection.translate(-1.0, 1.0, 0);
