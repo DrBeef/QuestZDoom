@@ -1,10 +1,8 @@
 
-package com.drbeef.qzdoom;
+package com.drbeef.questzdoom;
 
 import android.app.Activity;
 import android.view.Surface;
-
-import java.nio.ByteBuffer;
 
 // Wrapper for native library
 

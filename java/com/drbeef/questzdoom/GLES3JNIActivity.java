@@ -1,5 +1,5 @@
 
-package com.drbeef.qzdoom;
+package com.drbeef.questzdoom;
 
 
 import java.io.BufferedReader;
@@ -10,7 +10,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.ByteBuffer;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -18,23 +17,16 @@ import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 
-import android.media.AudioFormat;
-import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.AudioTrack;
-import android.media.MediaRecorder;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
-import android.view.KeyEvent;
 
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-
-import static android.system.Os.setenv;
 
 @SuppressLint("SdCardPath") public class GLES3JNIActivity extends Activity implements SurfaceHolder.Callback
 {
@@ -44,7 +36,7 @@ import static android.system.Os.setenv;
 		System.loadLibrary( "qzdoom" );
 	}
 
-	private static final String TAG = "QzDoom";
+	private static final String TAG = "QuestZDoom";
 
 	private int permissionCount = 0;
 	private static final int READ_EXTERNAL_STORAGE_PERMISSION_ID = 1;
@@ -161,31 +153,31 @@ import static android.system.Os.setenv;
 
 	public void create()
 	{
-		copy_asset("/sdcard/QzDoom", "commandline.txt");
+		copy_asset("/sdcard/QuestZDoom", "commandline.txt");
 
 		//Create all required folders
-		new File("/sdcard/QzDoom/res").mkdirs();
-		new File("/sdcard/QzDoom/mods").mkdirs();
-		new File("/sdcard/QzDoom/audiopack/snd_fluidsynth").mkdirs();
+		new File("/sdcard/QuestZDoom/res").mkdirs();
+		new File("/sdcard/QuestZDoom/mods").mkdirs();
+		new File("/sdcard/QuestZDoom/audiopack/snd_fluidsynth").mkdirs();
 
-		copy_asset("/sdcard/QzDoom", "res/lzdoom.pk3");
-		copy_asset("/sdcard/QzDoom", "res/lz_game_support.pk3");
-		copy_asset("/sdcard/QzDoom", "res/lights.pk3");
-		copy_asset("/sdcard/QzDoom", "res/brightmaps.pk3");
-		copy_asset("/sdcard/QzDoom/audiopack", "snd_fluidsynth/fluidsynth.sf2");
+		copy_asset("/sdcard/QuestZDoom", "res/lzdoom.pk3");
+		copy_asset("/sdcard/QuestZDoom", "res/lz_game_support.pk3");
+		copy_asset("/sdcard/QuestZDoom", "res/lights.pk3");
+		copy_asset("/sdcard/QuestZDoom", "res/brightmaps.pk3");
+		copy_asset("/sdcard/QuestZDoom/audiopack", "snd_fluidsynth/fluidsynth.sf2");
 
 		//Doom Sharware WAD
-		copy_asset("/sdcard/QzDoom", "wads/DOOM1.WAD");
+		copy_asset("/sdcard/QuestZDoom", "wads/DOOM1.WAD");
 
 		//Read these from a file and pass through
 		commandLineParams = new String("doom");
 
 		//See if user is trying to use command line params
-		if(new File("/sdcard/QzDoom/commandline.txt").exists()) // should exist!
+		if(new File("/sdcard/QuestZDoom/commandline.txt").exists()) // should exist!
 		{
 			BufferedReader br;
 			try {
-				br = new BufferedReader(new FileReader("/sdcard/QzDoom/commandline.txt"));
+				br = new BufferedReader(new FileReader("/sdcard/QuestZDoom/commandline.txt"));
 				String s;
 				StringBuilder sb=new StringBuilder(0);
 				while ((s=br.readLine())!=null)
@@ -200,14 +192,6 @@ import static android.system.Os.setenv;
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}
-
-		try {
-			//setenv("YQUAKE2_GAMELIBDIR", getFilesDir().getParentFile().getPath() + "/lib", true);
-		}
-		catch (Exception e)
-		{
-
 		}
 
 		mNativeHandle = GLES3JNILib.onCreate( this, commandLineParams );

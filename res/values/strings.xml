@@ -5,6 +5,6 @@
 
 <resources>
     <!-- Simple strings. -->
-    <string name="qzdoom">QzDoom</string>
+    <string name="qzdoom">QuestZDoom</string>
 
 </resources>
