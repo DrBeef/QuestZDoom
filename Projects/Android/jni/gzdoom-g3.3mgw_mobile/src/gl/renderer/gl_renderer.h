@@ -212,7 +212,7 @@ public:
 
 	void FlushTextures();
 	unsigned char *GetTextureBuffer(FTexture *tex, int &w, int &h);
-	void SetupLevel();
+	void SetupLevel(bool resetBufferIndices);
 
 	void RenderView(player_t* player);
 

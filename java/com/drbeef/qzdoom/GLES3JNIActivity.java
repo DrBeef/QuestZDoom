@@ -166,7 +166,6 @@ import static android.system.Os.setenv;
 		//Create all required folders
 		new File("/sdcard/QzDoom/res").mkdirs();
 		new File("/sdcard/QzDoom/mods").mkdirs();
-		new File("/sdcard/QzDoom/wads").mkdirs();
 		new File("/sdcard/QzDoom/audiopack/snd_fluidsynth").mkdirs();
 
 		copy_asset("/sdcard/QzDoom", "res/lzdoom.pk3");
@@ -174,6 +173,9 @@ import static android.system.Os.setenv;
 		copy_asset("/sdcard/QzDoom", "res/lights.pk3");
 		copy_asset("/sdcard/QzDoom", "res/brightmaps.pk3");
 		copy_asset("/sdcard/QzDoom/audiopack", "snd_fluidsynth/fluidsynth.sf2");
+
+		//Doom Sharware WAD
+		copy_asset("/sdcard/QzDoom", "wads/DOOM1.WAD");
 
 		//Read these from a file and pass through
 		commandLineParams = new String("doom");

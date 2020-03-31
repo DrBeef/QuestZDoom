@@ -583,7 +583,7 @@ void gl_PreprocessLevel()
 
 	if (GLRenderer != NULL) 
 	{
-		GLRenderer->SetupLevel();
+		GLRenderer->SetupLevel(true);
 	}
 
 	InitGLRMapinfoData();

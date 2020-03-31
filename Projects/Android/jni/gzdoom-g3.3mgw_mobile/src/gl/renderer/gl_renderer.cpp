@@ -196,7 +196,7 @@ void FGLRenderer::Initialize(int width, int height)
 	mFBID = 0;
 	mOldFBID = 0;
 
-	SetupLevel();
+	SetupLevel(false);
 	mShaderManager = new FShaderManager;
 	mSamplerManager = new FSamplerManager;
 
@@ -375,8 +375,16 @@ int FGLRenderer::ScreenToWindowY(int y)
 //
 //===========================================================================
 
-void FGLRenderer::SetupLevel()
+void FGLRenderer::SetupLevel(bool resetBufferIndices)
 {
+	if (resetBufferIndices)
+	{
+		VtxBuff = 0;
+		NextVtxBuffer();
+		SkyBuff = 0;
+		NextSkyBuffer();
+	}
+
 #ifdef USE_GL_HW_BUFFERS
 	for (int n = 0; n < nbrHwBuffers; n++)
 	{
