@@ -2320,20 +2320,6 @@ VIDMNU_ENTERTEXT		= "Press ENTER to set mode";
 VIDMNU_TESTTEXT1		= "T to test mode for 5 seconds";
 VIDMNU_TESTTEXT2		= "Please wait 5 seconds...";
 
-// VR Options
-VRMNU_TITLE			    = "VIDEO MODE";
-VRMNU_FULLSCREEN		= "Fullscreen";
-VRMNU_HIDPI			    = "Retina/HiDPI support";
-VRMNU_BRDLSS			= "Borderless Windowed Mode";
-VRMNU_ASPECTRATIO		= "Aspect ratio";
-VRMNU_FORCEASPECT		= "Force aspect ratio";
-VRMNU_CROPASPECT		= "Forced ratio style";
-VRMNU_5X4ASPECTRATIO	= "Enable 5:4 aspect ratio";
-VRMNU_SCALEMODE		    = "Resolution scale";
-VRMNU_SCALEFACTOR		= "Scale Factor";
-VRMNU_ENTERTEXT		    = "Press ENTER to set mode";
-VRMNU_TESTTEXT1		    = "T to test mode for 5 seconds";
-VRMNU_TESTTEXT2		    = "Please wait 5 seconds...";
 
 // Network Options
 NETMNU_TITLE					= "NETWORK OPTIONS";

@@ -352,6 +352,7 @@ OptionMenu "OptionsMenu" protected
 	Submenu "$OPTMNU_SOUND",			"SoundOptions"
 	Submenu "$OPTMNU_DISPLAY",			"VideoOptions"
 	Submenu "$OPTMNU_VIDEO",			"VideoModeMenu"
+	Submenu "VR Options",			    "VROptionsMenu"
 	Submenu "$OPTMNU_CHANGERENDER",		"RendererMenu"
 	StaticText " "
 	Submenu "$OS_TITLE", "os_Menu"
@@ -997,14 +998,6 @@ OptionMenu "HUDOptions" protected
 	Submenu "$HUDMNU_MESSAGE", 				"MessageOptions"
 	Submenu "$HUDMNU_FLASH", 				"FlashOptions"
 	Submenu "$DSPLYMNU_SCOREBOARD", 		"ScoreboardOptions"
-	StaticText " "
-	Option "$HUDMNU_CROSSHAIRON",			"crosshairon", "OnOff"
-	Option "$HUDMNU_CROSSHAIR",				"crosshair", "Crosshairs"
-	Option "$HUDMNU_FORCECROSSHAIR",		"crosshairforce", "OnOff"
-	Option "$HUDMNU_GROWCROSSHAIR",			"crosshairgrow", "OnOff"
-	ColorPicker "$HUDMNU_CROSSHAIRCOLOR", 	"crosshaircolor"
-	Option "$HUDMNU_CROSSHAIRHEALTH",		"crosshairhealth", "CrosshairHealthTypes"
-	Slider "$HUDMNU_CROSSHAIRSCALE",		"crosshairscale", 0.0, 2.0, 0.05, 2
 	StaticText " "
 	Option "$HUDMNU_NAMETAGS",				"displaynametags", "DisplayTagsTypes"
 	Option "$HUDMNU_NAMETAGCOLOR",			"nametagcolor", "TextColors", "displaynametags"
@@ -2271,35 +2264,37 @@ OptionMenu VideoModeMenu protected
  *=======================================*/
 
 
+OptionValue ControlScheme
+{
+	0, "Right-Handed"
+	10, "Left-Handed"
+}
+
 OptionMenu VROptionsMenu protected
 {
-	Title "$VRMNU_TITLE"
+	Title "VR OPTIONS"
 
-	Option "$VRMNU_ASPECTRATIO",		"menu_screenratios", "Ratios"
-	Option "$VIDMNU_FORCEASPECT",		"vid_aspect", "ForceRatios"
-	Option "$VIDMNU_CROPASPECT",		"vid_cropaspect", "CropAspect"
-	Option "$VIDMNU_SCALEMODE",			"vid_scalemode", "ScaleModes"
-	Slider "$VIDMNU_SCALEFACTOR",		"vid_scalefactor", 0.25, 2.0, 0.25, 2
+	Slider "Height Adjust",		        "vr_height_adjust", 0.0, 1.0, 0.01, 2
 
 	StaticText " "
-	Option "$DSPLYMNU_VSYNC",					"vid_vsync", "OnOff"
-	Option "$DSPLYMNU_CAPFPS",					"cl_capfps", "OffOn"
-	
+	Option "Control Scheme",		    "vr_control_scheme", "ControlScheme"
+	Option "Off-hand Move Direction",	"vr_move_use_offhand", "OffOn"
+	Option "Use Teleport",		        "vr_teleport", "OnOff"
+	Slider "Snap-turn Angle",		    "vr_snapTurn", 0.0, 90.0, 1.0, 2
+
 	StaticText " "
-	ScreenResolution "res_0"
-	ScreenResolution "res_1"
-	ScreenResolution "res_2"
-	ScreenResolution "res_3"
-	ScreenResolution "res_4"
-	ScreenResolution "res_5"
-	ScreenResolution "res_6"
-	ScreenResolution "res_7"
-	ScreenResolution "res_8"
-	ScreenResolution "res_9"
-	StaticTextSwitchable "$VIDMNU_ENTERTEXT", "", "VMEnterText"
+	Slider "Weapon Pitch Adjust",		"vr_weaponRotate", -45, 45, 5, 2
+	Slider "Weapon Scale",		        "vr_weaponScale", 0.1, 1.0, 0.01, 2
+
 	StaticText " "
-	StaticTextSwitchable "$VIDMNU_TESTTEXT1", "$VIDMNU_TESTTEXT2", "VMTestText"
-	class VideoModeMenu
+	Option "Show VR HUD FPS",		    "vid_fps", "OnOff"
+
+	StaticText " "
+	Slider "VR HUD Scale",		        "vr_hud_scale", 0.05, 1.0, 0.05, 2
+	Slider "VR HUD Stereo",		        "vr_hud_stereo", 0.05, 2.0, 0.05, 2
+	Slider "VR HUD Pitch Rotate",		"vr_hud_rotate", 0.0, 50.0, 2.0, 2
+	Option "VR HUD Fix Pitch",		    "vr_hud_fixed_pitch", "OnOff"
+	Option "VR HUD Fix Roll",		    "vr_hud_fixed_roll", "OnOff"
 }
 
 /*=======================================

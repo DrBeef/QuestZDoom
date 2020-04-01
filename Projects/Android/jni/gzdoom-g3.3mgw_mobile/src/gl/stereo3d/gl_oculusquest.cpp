@@ -57,15 +57,22 @@ EXTERN_CVAR(Float, movebob);
 EXTERN_CVAR(Bool, gl_billboard_faces_camera);
 EXTERN_CVAR(Int, gl_multisample);
 EXTERN_CVAR(Float, vr_vunits_per_meter)
-EXTERN_CVAR(Float, vr_floor_offset)
+EXTERN_CVAR(Float, vr_height_adjust)
 
 EXTERN_CVAR(Int, vr_control_scheme)
-EXTERN_CVAR(Bool, vr_moveFollowsOffHand)
+EXTERN_CVAR(Bool, vr_move_use_offhand)
 EXTERN_CVAR(Float, vr_weaponRotate);
 EXTERN_CVAR(Float, vr_snapTurn);
 EXTERN_CVAR(Float, vr_ipd);
 EXTERN_CVAR(Float, vr_weaponScale);
 EXTERN_CVAR(Bool, vr_teleport);
+
+//HUD control
+EXTERN_CVAR(Float, vr_hud_scale);
+EXTERN_CVAR(Float, vr_hud_stereo);
+EXTERN_CVAR(Float, vr_hud_rotate);
+EXTERN_CVAR(Bool, vr_hud_fixed_pitch);
+EXTERN_CVAR(Bool, vr_hud_fixed_roll);
 
 double P_XYMovement(AActor *mo, DVector2 scroll);
 extern "C" void VR_GetMove( float *joy_forward, float *joy_side, float *hmd_forward, float *hmd_side, float *up, float *yaw, float *pitch, float *roll );
@@ -113,7 +120,7 @@ namespace s3d
         const player_t & player = players[consoleplayer];
         double vh = player.viewheight; // Doom thinks this is where you are
         double pixelstretch = level.info ? level.info->pixelstretch : 1.2;
-        double hh = ((hmdPosition[1] - vr_floor_offset) * vr_vunits_per_meter) / pixelstretch; // HMD is actually here
+        double hh = ((hmdPosition[1] + vr_height_adjust) * vr_vunits_per_meter) / pixelstretch; // HMD is actually here
         eyeOffset[2] += hh - vh;
 
         outViewShift[0] = eyeOffset[0];
@@ -146,7 +153,7 @@ namespace s3d
         VSMatrix new_projection;
         new_projection.loadIdentity();
 
-        float stereo_separation = (vr_ipd * 0.5) * vr_vunits_per_meter * (eye == 1 ? -1.0 : 1.0);
+        float stereo_separation = (vr_ipd * 0.5) * vr_vunits_per_meter * vr_hud_stereo * (eye == 1 ? -1.0 : 1.0);
         new_projection.translate(stereo_separation, 0, 0);
 
         // doom_units from meters
@@ -157,27 +164,26 @@ namespace s3d
         double pixelstretch = level.info ? level.info->pixelstretch : 1.2;
         new_projection.scale(pixelstretch, pixelstretch, 1.0); // Doom universe is scaled by 1990s pixel aspect ratio
 
-
-        // Follow HMD orientation, EXCEPT for roll angle (keep weapon upright)
+        if (vr_hud_fixed_roll)
         {
             new_projection.rotate(-hmdorientation[ROLL], 0, 0, 1);
+        }
 
-            {
-                new_projection.rotate(-hmdorientation[PITCH], 1, 0, 0);
-            }
+        new_projection.rotate(vr_hud_rotate, 1, 0, 0);
 
-            new_projection.rotate(35, 1, 0, 0);
+        if (vr_hud_fixed_pitch)
+        {
+            new_projection.rotate(-hmdorientation[PITCH], 1, 0, 0);
         }
 
         // hmd coordinates (meters) from ndc coordinates
         // const float weapon_distance_meters = 0.55f;
         // const float weapon_width_meters = 0.3f;
-        const float aspect = SCREENWIDTH / float(SCREENHEIGHT);
         new_projection.translate(0.0, 0.0, 1.0);
         new_projection.scale(
-                -0.3,
-                0.3,
-                -0.3);
+                -vr_hud_scale,
+                vr_hud_scale,
+                -vr_hud_scale);
 
         // ndc coordinates from pixel coordinates
         new_projection.translate(-1.0, 1.0, 0);
@@ -292,8 +298,8 @@ namespace s3d
 
             double pixelstretch = level.info ? level.info->pixelstretch : 1.2;
             if ((vr_control_scheme < 10 && hand == 1)
-                || (vr_control_scheme > 10 && hand == 0)) {
-                mat->translate(-weaponoffset[0], (hmdPosition[1] + weaponoffset[1] - vr_floor_offset) / pixelstretch, weaponoffset[2]);
+                || (vr_control_scheme >= 10 && hand == 0)) {
+                mat->translate(-weaponoffset[0], (hmdPosition[1] + weaponoffset[1] - vr_height_adjust) / pixelstretch, weaponoffset[2]);
 
                 mat->rotate(-90 + (doomYaw - hmdorientation[YAW]) + weaponangles[YAW], 0, 1, 0);
                 mat->rotate(-weaponangles[PITCH], 1, 0, 0);
@@ -301,7 +307,7 @@ namespace s3d
             }
             else
             {
-                mat->translate(-offhandoffset[0], (hmdPosition[1] + offhandoffset[1] - vr_floor_offset) / pixelstretch, offhandoffset[2]);
+                mat->translate(-offhandoffset[0], (hmdPosition[1] + offhandoffset[1] - vr_height_adjust) / pixelstretch, offhandoffset[2]);
 
                 mat->rotate(-90 + (doomYaw - hmdorientation[YAW]) + offhandangles[YAW], 0, 1, 0);
                 mat->rotate(-offhandangles[PITCH], 1, 0, 0);
@@ -417,7 +423,7 @@ namespace s3d
         //Set up stuff used in the tracking code
         vr_weapon_pitchadjust = vr_weaponRotate;
         vr_snapturn_angle = vr_snapTurn;
-        vr_walkdirection = !vr_moveFollowsOffHand;
+        vr_moveuseoffhand = !vr_move_use_offhand;
         QzDoom_getTrackedRemotesOrientation(vr_control_scheme);
 
         //Some crazy stuff to ascertain the actual yaw that doom is using at the right times!
@@ -445,7 +451,7 @@ namespace s3d
 
                     player->mo->AttackPos.X = player->mo->X() - (weaponoffset[0] * vr_vunits_per_meter);
                     player->mo->AttackPos.Y = player->mo->Y() - (weaponoffset[2] * vr_vunits_per_meter);
-                    player->mo->AttackPos.Z = player->mo->Z() + (((hmdPosition[1] + weaponoffset[1] + vr_floor_offset) * vr_vunits_per_meter) / pixelstretch);
+                    player->mo->AttackPos.Z = player->mo->Z() + (((hmdPosition[1] + weaponoffset[1] + vr_height_adjust) * vr_vunits_per_meter) / pixelstretch);
 
                     player->mo->AttackDir = MapAttackDir;
                 }
@@ -457,7 +463,7 @@ namespace s3d
                     FLineTraceData trace;
                     if (trigger_teleport &&
                         P_LineTrace(player->mo, yaw, 8192, pitch, TRF_ABSOFFSET,
-                                    ((hmdPosition[1] + weaponoffset[1] + vr_floor_offset) * vr_vunits_per_meter) / pixelstretch,
+                                    ((hmdPosition[1] + weaponoffset[1] + vr_height_adjust) * vr_vunits_per_meter) / pixelstretch,
                                     -(weaponoffset[2] * vr_vunits_per_meter),
                                     -(weaponoffset[0] * vr_vunits_per_meter), &trace) &&
                         trace.HitType == TRACE_HitFloor) {

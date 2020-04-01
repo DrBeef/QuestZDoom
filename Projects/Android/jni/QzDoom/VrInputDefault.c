@@ -119,7 +119,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             vec3_t rotation = {0};
             QuatToYawPitchRoll(pOffTracking->HeadPose.Pose.Orientation, rotation, offhandangles);
 
-			if (vr_walkdirection == 0) {
+			if (vr_moveuseoffhand != 0) {
 				controllerYawHeading = offhandangles[YAW] - hmdorientation[YAW];
 			}
 			else

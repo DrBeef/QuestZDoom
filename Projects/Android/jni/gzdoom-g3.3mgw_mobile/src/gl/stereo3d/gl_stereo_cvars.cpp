@@ -57,20 +57,20 @@ CVAR(Float, vr_screendist, 0.80f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG) // METERS
 
 // default conversion between (vertical) DOOM units and meters
 CVAR(Float, vr_vunits_per_meter, 30.0f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG) // METERS
-
-CVAR(Float, vr_floor_offset, 0.0f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG) // METERS
-
+CVAR(Float, vr_height_adjust, 0.0f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG) // METERS
 CVAR(Int, vr_control_scheme, 0, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
-
-CVAR(Bool, vr_moveFollowsOffHand, true, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
-
+CVAR(Bool, vr_move_use_offhand, true, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 CVAR(Bool, vr_teleport, false, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
-
 CVAR(Float, vr_weaponRotate, -30, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
-
 CVAR(Float, vr_weaponScale, 1.0f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
-
 CVAR(Float, vr_snapTurn, 45.0f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
+
+//HUD control
+CVAR(Float, vr_hud_scale, 0.5f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
+CVAR(Float, vr_hud_stereo, 1.0f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
+CVAR(Float, vr_hud_rotate, 35.f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
+CVAR(Bool, vr_hud_fixed_pitch, true, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
+CVAR(Bool, vr_hud_fixed_roll, true, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 
 // Manage changing of 3D modes:
 namespace s3d {

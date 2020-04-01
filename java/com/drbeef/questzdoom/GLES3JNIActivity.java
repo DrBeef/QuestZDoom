@@ -153,21 +153,21 @@ import android.support.v4.content.ContextCompat;
 
 	public void create()
 	{
-		copy_asset("/sdcard/QuestZDoom", "commandline.txt");
+		copy_asset("/sdcard/QuestZDoom", "commandline.txt", false);
 
 		//Create all required folders
 		new File("/sdcard/QuestZDoom/res").mkdirs();
 		new File("/sdcard/QuestZDoom/mods").mkdirs();
 		new File("/sdcard/QuestZDoom/audiopack/snd_fluidsynth").mkdirs();
 
-		copy_asset("/sdcard/QuestZDoom", "res/lzdoom.pk3");
-		copy_asset("/sdcard/QuestZDoom", "res/lz_game_support.pk3");
-		copy_asset("/sdcard/QuestZDoom", "res/lights.pk3");
-		copy_asset("/sdcard/QuestZDoom", "res/brightmaps.pk3");
-		copy_asset("/sdcard/QuestZDoom/audiopack", "snd_fluidsynth/fluidsynth.sf2");
+		copy_asset("/sdcard/QuestZDoom", "res/lzdoom.pk3", true);
+		copy_asset("/sdcard/QuestZDoom", "res/lz_game_support.pk3", true);
+		copy_asset("/sdcard/QuestZDoom", "res/lights.pk3", true);
+		copy_asset("/sdcard/QuestZDoom", "res/brightmaps.pk3", true);
+		copy_asset("/sdcard/QuestZDoom/audiopack", "snd_fluidsynth/fluidsynth.sf2", false);
 
 		//Doom Sharware WAD
-		copy_asset("/sdcard/QuestZDoom", "wads/DOOM1.WAD");
+		copy_asset("/sdcard/QuestZDoom", "wads/DOOM1.WAD", false);
 
 		//Read these from a file and pass through
 		commandLineParams = new String("doom");
@@ -197,9 +197,9 @@ import android.support.v4.content.ContextCompat;
 		mNativeHandle = GLES3JNILib.onCreate( this, commandLineParams );
 	}
 	
-	public void copy_asset(String path, String name) {
+	public void copy_asset(String path, String name, boolean force) {
 		File f = new File(path + "/" + name);
-		if (!f.exists()) {
+		if (!f.exists() || force) {
 			
 			//Ensure we have an appropriate folder
 			String fullname = path + "/" + name;

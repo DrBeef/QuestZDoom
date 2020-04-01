@@ -49,7 +49,7 @@ extern vec3_t weaponoffset;
 
 extern bool weaponStabilised;
 extern float vr_weapon_pitchadjust;
-extern bool vr_walkdirection;
+extern bool vr_moveuseoffhand;
 extern float vr_snapturn_angle;
 
 
