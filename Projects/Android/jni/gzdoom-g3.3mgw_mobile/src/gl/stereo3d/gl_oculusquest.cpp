@@ -299,7 +299,7 @@ namespace s3d
             double pixelstretch = level.info ? level.info->pixelstretch : 1.2;
             if ((vr_control_scheme < 10 && hand == 1)
                 || (vr_control_scheme >= 10 && hand == 0)) {
-                mat->translate(-weaponoffset[0], (hmdPosition[1] + weaponoffset[1] - vr_height_adjust) / pixelstretch, weaponoffset[2]);
+                mat->translate(-weaponoffset[0], (hmdPosition[1] + weaponoffset[1] + vr_height_adjust) / pixelstretch, weaponoffset[2]);
 
                 mat->rotate(-90 + (doomYaw - hmdorientation[YAW]) + weaponangles[YAW], 0, 1, 0);
                 mat->rotate(-weaponangles[PITCH], 1, 0, 0);
@@ -307,7 +307,7 @@ namespace s3d
             }
             else
             {
-                mat->translate(-offhandoffset[0], (hmdPosition[1] + offhandoffset[1] - vr_height_adjust) / pixelstretch, offhandoffset[2]);
+                mat->translate(-offhandoffset[0], (hmdPosition[1] + offhandoffset[1] + vr_height_adjust) / pixelstretch, offhandoffset[2]);
 
                 mat->rotate(-90 + (doomYaw - hmdorientation[YAW]) + offhandangles[YAW], 0, 1, 0);
                 mat->rotate(-offhandangles[PITCH], 1, 0, 0);
