@@ -469,8 +469,14 @@ unsigned char *FGLRenderer::GetTextureBuffer(FTexture *tex, int &w, int &h)
 #ifdef USE_GL_HW_BUFFERS
 void FGLRenderer::GPUDropSync()
 {
-    if(nbrHwBuffers > 1)
-	    syncBuff[VtxBuff] = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE,0);
+    if(nbrHwBuffers > 1) {
+        if (syncBuff[VtxBuff] != NULL)
+        {
+            glDeleteSync(syncBuff[VtxBuff]);
+        }
+
+        syncBuff[VtxBuff] = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+    }
 }
 
 void FGLRenderer::GPUWaitSync()
