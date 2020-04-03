@@ -762,13 +762,13 @@ void GLSprite::Process(AActor* thing, sector_t * sector, int thruportal)
 	// Thing is invisible if close to the camera.
 	if (thing->renderflags & RF_MAYBEINVISIBLE)
 	{
-		if (fabs(thingpos.X - r_viewpoint.Pos.X) < 32 && fabs(thingpos.Y - r_viewpoint.Pos.Y) < 32) return;
+		if (fabs(thingpos.X - r_viewpoint.CenterEyePos.X) < 32 && fabs(thingpos.Y - r_viewpoint.CenterEyePos.Y) < 32) return;
 	}
 
 	// Too close to the camera. This doesn't look good if it is a sprite.
-	if (fabs(thingpos.X - r_viewpoint.Pos.X) < 2 && fabs(thingpos.Y - r_viewpoint.Pos.Y) < 2)
+	if (fabs(thingpos.X - r_viewpoint.CenterEyePos.X) < 2 && fabs(thingpos.Y - r_viewpoint.CenterEyePos.Y) < 2)
 	{
-		if (r_viewpoint.Pos.Z >= thingpos.Z - 2 && r_viewpoint.Pos.Z <= thingpos.Z + thing->Height + 2)
+		if (r_viewpoint.CenterEyePos.Z >= thingpos.Z - 2 && r_viewpoint.CenterEyePos.Z <= thingpos.Z + thing->Height + 2)
 		{
 			// exclude vertically moving objects from this check.
 			if (!thing->Vel.isZero())
@@ -790,7 +790,7 @@ void GLSprite::Process(AActor* thing, sector_t * sector, int thruportal)
 			if (speed >= thing->target->radius / 2)
 			{
 				double clipdist = clamp(thing->Speed, thing->target->radius, thing->target->radius * 2);
-				if ((thingpos - r_viewpoint.Pos).LengthSquared() < clipdist * clipdist) return;
+				if ((thingpos - r_viewpoint.CenterEyePos).LengthSquared() < clipdist * clipdist) return;
 			}
 		}
 		thing->flags7 |= MF7_FLYCHEAT;	// do this only once for the very first frame, but not if it gets into range again.
@@ -840,7 +840,7 @@ void GLSprite::Process(AActor* thing, sector_t * sector, int thruportal)
 	if (!modelframe)
 	{
 		bool mirror;
-		DAngle ang = (thingpos - r_viewpoint.Pos).Angle();
+		DAngle ang = (thingpos - r_viewpoint.CenterEyePos).Angle();
 		FTextureID patch;
 		// [ZZ] add direct picnum override
 		if (isPicnumOverride)
@@ -958,7 +958,7 @@ void GLSprite::Process(AActor* thing, sector_t * sector, int thruportal)
 		gltexture = NULL;
 	}
 
-	depth = FloatToFixed((x - r_viewpoint.Pos.X) * r_viewpoint.TanCos + (y - r_viewpoint.Pos.Y) * r_viewpoint.TanSin);
+	depth = FloatToFixed((x - r_viewpoint.CenterEyePos.X) * r_viewpoint.TanCos + (y - r_viewpoint.CenterEyePos.Y) * r_viewpoint.TanSin);
 
 	// light calculation
 
@@ -1286,7 +1286,7 @@ void GLSprite::ProcessParticle (particle_t *particle, sector_t *sector)//, int s
 	z1=z-scalefac;
 	z2=z+scalefac;
 
-	depth = FloatToFixed((x - r_viewpoint.Pos.X) * r_viewpoint.TanCos + (y - r_viewpoint.Pos.Y) * r_viewpoint.TanSin);
+	depth = FloatToFixed((x - r_viewpoint.CenterEyePos.X) * r_viewpoint.TanCos + (y - r_viewpoint.CenterEyePos.Y) * r_viewpoint.TanSin);
 
 	actor=NULL;
 	this->particle=particle;

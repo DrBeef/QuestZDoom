@@ -893,6 +893,7 @@ sector_t * GLSceneDrawer::RenderViewpoint (AActor * camera, GL_IRECT * bounds, f
 		SetViewAngle(r_viewpoint.Angles.Yaw);
 		// Stereo mode specific viewpoint adjustment - temporarily shifts global ViewPos
 		eye->GetViewShift(GLRenderer->mAngles.Yaw.Degrees, viewShift);
+		r_viewpoint.CenterEyePos = r_viewpoint.Pos; // Retain unshifted center eye pos so all sprites show the same frame
 		s3d::ScopedViewShifter viewShifter(viewShift);
 		SetViewMatrix(r_viewpoint.Pos.X, r_viewpoint.Pos.Y, r_viewpoint.Pos.Z, false, false);
 		gl_RenderState.ApplyMatrices();

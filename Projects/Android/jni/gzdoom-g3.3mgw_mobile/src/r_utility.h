@@ -18,6 +18,7 @@ struct FRenderViewpoint
 
 	player_t		*player;		// For which player is this viewpoint being renderered? (can be null for camera textures)
 	DVector3		Pos;			// Camera position
+	DVector3		CenterEyePos;	// Camera position without view shift
 	DVector3		ActorPos;		// Camera actor's position
 	DRotator		Angles;			// Camera angles
 	DVector3		Path[2];		// View path for portal calculations
