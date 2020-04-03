@@ -322,7 +322,8 @@ void GLSceneDrawer::DrawPlayerSprites(sector_t * viewsector, bool hudModelStep)
 		!r_drawplayersprites ||
 		!camera->player ||
 		(player->cheats & CF_CHASECAM) || 
-		(r_deathcamera && camera->health <= 0))
+		(r_deathcamera && camera->health <= 0) ||
+		viewsector == nullptr)
 		return;
 
 	if (!hudModelStep)
