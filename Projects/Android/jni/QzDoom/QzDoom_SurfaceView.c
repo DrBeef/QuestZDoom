@@ -95,7 +95,7 @@ PFNEGLGETSYNCATTRIBKHRPROC		eglGetSyncAttribKHR;
 //Let's go to the maximum!
 int CPU_LEVEL			= 4;
 int GPU_LEVEL			= 4;
-int NUM_MULTI_SAMPLES	= 2;
+int NUM_MULTI_SAMPLES	= 1;
 float SS_MULTIPLIER    = 1.0f;
 
 jclass clazz;
@@ -112,6 +112,7 @@ float degrees(float rad) {
 struct arg_dbl *ss;
 struct arg_int *cpu;
 struct arg_int *gpu;
+struct arg_int *msaa;
 struct arg_end *end;
 
 char **argv;
@@ -1743,6 +1744,7 @@ JNIEXPORT jlong JNICALL Java_com_drbeef_questzdoom_GLES3JNILib_onCreate( JNIEnv 
 			ss   = arg_dbl0("s", "supersampling", "<double>", "super sampling value (e.g. 1.0)"),
             cpu   = arg_int0("c", "cpu", "<int>", "CPU perf index 1-4 (default: 2)"),
             gpu   = arg_int0("g", "gpu", "<int>", "GPU perf index 1-4 (default: 3)"),
+            msaa   = arg_int0("m", "msaa", "<int>", "MSAA 1-4 (default: 1)"),
 			end     = arg_end(20)
 	};
 
@@ -1779,6 +1781,11 @@ JNIEXPORT jlong JNICALL Java_com_drbeef_questzdoom_GLES3JNILib_onCreate( JNIEnv 
         if (gpu->count > 0 && gpu->ival[0] > 0 && gpu->ival[0] < 10)
         {
             GPU_LEVEL = gpu->ival[0];
+        }
+
+        if (msaa->count > 0 && msaa->ival[0] > 0 && msaa->ival[0] < 5)
+        {
+			NUM_MULTI_SAMPLES = msaa->ival[0];
         }
 	}
 
