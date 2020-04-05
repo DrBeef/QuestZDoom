@@ -2283,6 +2283,10 @@ OptionMenu VROptionsMenu protected
 	Slider "Snap-turn Angle",		    "vr_snapTurn", 0.0, 90.0, 1.0, 2
 
 	StaticText " "
+	Slider "Walking Speed",		        "vr_move_speed", 5, 50, 1, 2
+	Slider "Run Multiplier",	        "vr_run_multiplier", 0.0, 4.0, 0.1, 2
+
+	StaticText " "
 	Slider "Weapon Pitch Adjust",		"vr_weaponRotate", -45, 45, 5, 2
 	Slider "Weapon Scale",		        "vr_weaponScale", 0.1, 1.0, 0.01, 2
 
@@ -2611,7 +2615,6 @@ OptionMenu "OpenGLOptions" protected
 {
 	Title "$GLMNU_TITLE"
 	Submenu "$GLMNU_TEXOPT",					"GLTextureGLOptions"
-	Submenu "$GLPREFMNU_VRMODE",				"VR3DMenu"
 	Submenu "$GLMNU_POSTPROCESS",				"PostProcessMenu"
 	StaticText " "
 	Option "$GLPREFMNU_SECLIGHTMODE",			gl_lightmode,					"LightingModes"

@@ -33,16 +33,25 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
     if (getGameState() != 0 || isMenuActive()) //gamestate != GS_LEVEL
     {
         Joy_GenerateButtonEvents((pOffTrackedRemoteOld->Joystick.x > 0.7f ? 1 : 0), (pOffTrackedRemoteNew->Joystick.x > 0.7f ? 1 : 0), 1, KEY_PAD_DPAD_RIGHT);
+        Joy_GenerateButtonEvents((pDominantTrackedRemoteOld->Joystick.x > 0.7f ? 1 : 0), (pDominantTrackedRemoteNew->Joystick.x > 0.7f ? 1 : 0), 1, KEY_PAD_DPAD_RIGHT);
 
         Joy_GenerateButtonEvents((pOffTrackedRemoteOld->Joystick.x < -0.7f ? 1 : 0), (pOffTrackedRemoteNew->Joystick.x < -0.7f ? 1 : 0), 1, KEY_PAD_DPAD_LEFT);
+        Joy_GenerateButtonEvents((pDominantTrackedRemoteOld->Joystick.x < -0.7f ? 1 : 0), (pDominantTrackedRemoteNew->Joystick.x < -0.7f ? 1 : 0), 1, KEY_PAD_DPAD_LEFT);
 
         Joy_GenerateButtonEvents((pOffTrackedRemoteOld->Joystick.y < -0.7f ? 1 : 0), (pOffTrackedRemoteNew->Joystick.y < -0.7f ? 1 : 0), 1, KEY_PAD_DPAD_DOWN);
+        Joy_GenerateButtonEvents((pDominantTrackedRemoteOld->Joystick.y < -0.7f ? 1 : 0), (pDominantTrackedRemoteNew->Joystick.y < -0.7f ? 1 : 0), 1, KEY_PAD_DPAD_DOWN);
 
         Joy_GenerateButtonEvents((pOffTrackedRemoteOld->Joystick.y > 0.7f ? 1 : 0), (pOffTrackedRemoteNew->Joystick.y > 0.7f ? 1 : 0), 1, KEY_PAD_DPAD_UP);
+        Joy_GenerateButtonEvents((pDominantTrackedRemoteOld->Joystick.y > 0.7f ? 1 : 0), (pDominantTrackedRemoteNew->Joystick.y > 0.7f ? 1 : 0), 1, KEY_PAD_DPAD_UP);
 
         handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, domButton1, KEY_PAD_A);
         handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, ovrButton_Trigger, KEY_PAD_A);
         handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, domButton2, KEY_PAD_B);
+
+        handleTrackedControllerButton(pOffTrackedRemoteNew, pOffTrackedRemoteOld, domButton1, KEY_PAD_A);
+        handleTrackedControllerButton(pOffTrackedRemoteNew, pOffTrackedRemoteOld, ovrButton_Trigger, KEY_PAD_A);
+        handleTrackedControllerButton(pOffTrackedRemoteNew, pOffTrackedRemoteOld, domButton2, KEY_PAD_B);
+
         handleTrackedControllerButton(&leftTrackedRemoteState_new, &leftTrackedRemoteState_old, ovrButton_Enter, KEY_PAD_B);
     }
     else
@@ -98,7 +107,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                 float zxDist = length(x, z);
 
                 if (zxDist != 0.0f && z != 0.0f) {
-                    VectorSet(weaponangles, -degrees(atanf(y / zxDist)), -degrees(atan2f(x, -z)), 0.0f);
+                    VectorSet(weaponangles, -degrees(atanf(y / zxDist)), -degrees(atan2f(x, -z)), weaponangles[ROLL]);
                 }
             }
         }
@@ -162,6 +171,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             {
                 ready_teleport = false;
                 trigger_teleport = true;
+                resetDoomYaw = true;
             }
 
 			//Apply a filter and quadratic scaler so small movements are easier to make

@@ -243,7 +243,7 @@ public:
 
 	int PTM_BestColor (const uint32_t *pal_in, int r, int g, int b, int first, int num);
 
-	static float GetZNear() { return 5.f; }
+	static float GetZNear() { return 0.5f; }
 	static float GetZFar() { return 65536.f; }
 };
 

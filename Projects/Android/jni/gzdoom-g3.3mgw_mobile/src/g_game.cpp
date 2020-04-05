@@ -137,6 +137,8 @@ CVAR (Bool, cl_waitforsave, true, CVAR_ARCHIVE | CVAR_GLOBALCONFIG);
 CVAR (Bool, enablescriptscreenshot, false, CVAR_ARCHIVE | CVAR_GLOBALCONFIG);
 EXTERN_CVAR (Float, con_midtime);
 EXTERN_CVAR(Bool, vr_teleport);
+EXTERN_CVAR(Int, vr_move_speed);
+EXTERN_CVAR(Float, vr_run_multiplier);
 
 //==========================================================================
 //
@@ -618,9 +620,9 @@ void G_BuildTiccmd (ticcmd_t *cmd)
 	if (strafe)
 	{
 		if (Button_Right.bDown)
-			side += sidemove[speed];
+			side += (vr_move_speed * (speed ? vr_run_multiplier : 1.0));
 		if (Button_Left.bDown)
-			side -= sidemove[speed];
+			side -= (vr_move_speed * (speed ? vr_run_multiplier : 1.0));
 	}
 	else
 	{
@@ -663,9 +665,9 @@ void G_BuildTiccmd (ticcmd_t *cmd)
 	else
 	{
 		if (Button_Forward.bDown)
-			forward += forwardmove[speed];
+			forward += (vr_move_speed * (speed ? vr_run_multiplier : 1.0));
 		if (Button_Back.bDown)
-			forward -= forwardmove[speed];
+			forward -= (vr_move_speed * (speed ? vr_run_multiplier : 1.0));
 	}
 
 	if (Button_MoveRight.bDown)
@@ -701,47 +703,13 @@ void G_BuildTiccmd (ticcmd_t *cmd)
 	if (Button_MoveUp.bDown)		cmd->ucmd.buttons |= BT_MOVEUP;
 	if (Button_ShowScores.bDown)	cmd->ucmd.buttons |= BT_SHOWSCORES;
 
-	// Handle joysticks/game controllers.
-	if (0) {
-		float joyaxes[NUM_JOYAXIS];
-		I_GetAxes(joyaxes);
-
-		// Remap some axes depending on button state.
-		if (Button_Strafe.bDown || (Button_Mlook.bDown && lookstrafe)) {
-			joyaxes[JOYAXIS_Side] = joyaxes[JOYAXIS_Yaw];
-			joyaxes[JOYAXIS_Yaw] = 0;
-		}
-		if (Button_Mlook.bDown) {
-			joyaxes[JOYAXIS_Pitch] = joyaxes[JOYAXIS_Forward];
-			joyaxes[JOYAXIS_Forward] = 0;
-		}
-
-		if (joyaxes[JOYAXIS_Pitch] != 0) {
-			G_AddViewPitch(joyint(joyaxes[JOYAXIS_Pitch] * 2048));
-		}
-		if (joyaxes[JOYAXIS_Yaw] != 0) {
-			G_AddViewAngle(joyint(-1280 * joyaxes[JOYAXIS_Yaw]));
-		}
-
-		side -= joyint(sidemove[speed] * joyaxes[JOYAXIS_Side]);
-		forward += joyint(joyaxes[JOYAXIS_Forward] * forwardmove[speed]);
-		fly += joyint(joyaxes[JOYAXIS_Up] * 2048);
-
-		// Handle mice.
-		if (!Button_Mlook.bDown && !freelook)
-		{
-			forward += (int)((float)mousey * m_forward);
-		}
-	}
-
-	float joyforward=0;
-	float joyside=0;
-	float dummy=0;
-
 	if (!vr_teleport) {
+		float joyforward=0;
+		float joyside=0;
+		float dummy=0;
 		VR_GetMove(&joyforward, &joyside, &dummy, &dummy, &dummy, &dummy, &dummy, &dummy);
-		side += joyint(joyside * sidemove[speed]);
-		forward += joyint(joyforward * forwardmove[speed]);
+		side += joyint(joyside * (vr_move_speed * (speed ? vr_run_multiplier : 1.0)));
+		forward += joyint(joyforward * (vr_move_speed * (speed ? vr_run_multiplier : 1.0)));
 	}
 
 	cmd->ucmd.pitch = LocalViewPitch >> 16;
