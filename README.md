@@ -21,7 +21,7 @@ This is just an engine port; though the apk does contain the shareware version o
 Copying the Full Game WAD files to your Oculus Quest
 ----------------------------------------------------
 
-Copy the PAK files from the installed Quake2 game folder on your PC to the /Quake2Quest folder on your Oculus Quest when it is connected to the PC. You have to have run Quake2Quest at least once for the folder to be created and if you don't see it when you connect your Quest to the PC you might have to restart the Quest.
+Copy the WAD files from the installed Doom game folder on your PC to the /QuestZDoom/wads folder on your Oculus Quest when it is connected to the PC. You have to have run QuestZDoom at least once for the folder to be created and if you don't see it when you connect your Quest to the PC you might have to restart the Quest.
 
 
 
@@ -36,43 +36,79 @@ I have included a teleport mechanism for locomotiom, so I would recommend trying
 Controls
 --------
 
-All these controls are for right-handed mode and are the basic/default mappings, all button pushes map internally to a key press and they can be easily remapped to any function in the options menu. Furthermore, each button has a secondary mode when the dominant hand grip trigger is pushed. So for example in right-hand mode the A button will open doors (by sending a Space key) but with the grip trigger held down it will send a '' key to the game instead (which can be remapped as desired)
+All these controls are for right-handed mode and are the basic/default mappings, all button pushes map internally to a key press and they can be easily remapped to any function in the options menu. Furthermore, each button has a secondary mode when the dominant hand grip trigger is pushed. So for example in right-hand mode the A button will open doors (by sending a Space key) but with the grip trigger held down it will send a different key to the game instead (which can be remapped as desired)
 
 
 * Open the in-game menu with the left-controller menu button (same irrespective of right/left handed control)
+
+*Primary Button Functions*
+
 * A Button - Open Door / Switch
 * B Button - Jump
 * Y Button - 
 * X Button - 
+
 * Dominant-Hand Controller - Weapon orientation
 * Dominant-Hand Thumbstick - left/right Snap turn, up/down weapon change
 * Dominant-Hand Thumbstick click - 
-* Dominant-Hand Trigger - Fire
-* Dominant Grip Button - 
+* Dominant-Hand Trigger - Fire Weapon
+* Dominant Grip Button - When held down, secondary button functions are available
+
 * Off-Hand Controller - Direction of movement (or if configured settings HMD direction is used)
 * Off-Hand Thumbstick - locomotion / teleport
 * Off-Hand Trigger - Run
 * Off-Hand Grip Button - Weapon Stabilisation - two handed weapon mode
 * Off-Hand Thumbstick click - 
 
+*Secondary Button Functions*
+
+Accessed by holding down the dominant hand grip button - All these can be reassigned in the options menu
+
+* A Button - 
+* B Button - 
+* Y Button - 
+* X Button - 
+
+* Dominant-Hand Thumbstick click - 
+* Dominant-Hand Trigger - Secondary Fire Weapon
+
+* Off-Hand Trigger - 
+* Off-Hand Thumbstick click - 
 
 
 Things to note / FAQs:
 ----------------------
 
 * Mods and Texture packs work as per GZDoom
+* I won't be implementing a laser sight
+* I won't be implementing a vignette comfort mask for locomotion, that is what the teleport is for
 
+
+Mods:
+-----
+
+In order to use mods, you need to supply command line params. For example to play Brutal Doom with the 3D weapon model pack:
+
+'''
+qzdoom
+'''
+
+
+Recommendations:
+----------------
+
+* Play Brutal Doom
+* Use the excellent weapon model pack from  which can be found here:
 
 
 Known Issues:
 -------------
 
+_Performance_: Vanilla unmodded Doom is fine, however once you start using mods then the GZDoom engine is quite resource hungry. Brutal Doom is great fun and plays pretty well, but performance is mediocre at best, so you have been warned. Expect significant framedrops when there is a lot going on, this is unfortunately just a result of the system requirements of the engine.
 
 
 Credits:
 --------
-
-The game includes Hi Res textures, skins and items previously collected by the user Realistic. We could not find the original author of these weapons, nor does the pack include any licensing at all. If you are the author of these textures please feel free to contact us and we would be happy to credit you or remove.
 
 I would like to thank the following teams and individual for making this possible:
 
