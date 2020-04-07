@@ -382,6 +382,27 @@ namespace s3d
         return dir;
     }
 
+    bool OculusQuestMode::GetTeleportLocation(DVector3 &out) const
+    {
+        // Teleport?
+        DAngle yaw((doomYaw - hmdorientation[YAW]) + offhandangles[YAW]);
+        DAngle pitch(offhandangles[PITCH]);
+        double pixelstretch = level.info ? level.info->pixelstretch : 1.2;
+        player_t* player = r_viewpoint.camera ? r_viewpoint.camera->player : nullptr;
+
+        FLineTraceData trace;
+        if (ready_teleport &&
+            P_LineTrace(player->mo, yaw, 8192, pitch, TRF_ABSOFFSET,
+                        ((hmdPosition[1] + offhandoffset[1] + vr_height_adjust) * vr_vunits_per_meter) / pixelstretch,
+                        -(offhandoffset[2] * vr_vunits_per_meter),
+                        -(offhandoffset[0] * vr_vunits_per_meter), &trace) &&
+                (trace.HitType == TRACE_HitFloor)) {
+            out = trace.HitLocation;
+            return true;
+        }
+
+        return false;
+    }
 
     /* virtual */
     void OculusQuestMode::SetUp() const
@@ -463,9 +484,9 @@ namespace s3d
                     FLineTraceData trace;
                     if (trigger_teleport &&
                         P_LineTrace(player->mo, yaw, 8192, pitch, TRF_ABSOFFSET,
-                                    ((hmdPosition[1] + weaponoffset[1] + vr_height_adjust) * vr_vunits_per_meter) / pixelstretch,
-                                    -(weaponoffset[2] * vr_vunits_per_meter),
-                                    -(weaponoffset[0] * vr_vunits_per_meter), &trace) &&
+                                    ((hmdPosition[1] + offhandoffset[1] + vr_height_adjust) * vr_vunits_per_meter) / pixelstretch,
+                                    -(offhandoffset[2] * vr_vunits_per_meter),
+                                    -(offhandoffset[0] * vr_vunits_per_meter), &trace) &&
                         trace.HitType == TRACE_HitFloor) {
                         auto vel = player->mo->Vel;
                         player->mo->Vel = DVector3(trace.HitLocation.X - player->mo->X(),

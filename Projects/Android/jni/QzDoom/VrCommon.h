@@ -58,6 +58,7 @@ extern vec3_t offhandoffset;
 
 extern bool player_moving;
 
+extern bool ready_teleport;
 extern bool trigger_teleport;
 
 extern bool shutdown;

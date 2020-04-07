@@ -63,6 +63,7 @@ vec3_t offhandangles;
 vec3_t offhandoffset;
 bool player_moving;
 bool shutdown;
+bool ready_teleport;
 bool trigger_teleport;
 
 
@@ -1309,6 +1310,7 @@ void VR_Init()
 	vr_weapon_pitchadjust = -30.0;
 
 	shutdown = false;
+    ready_teleport = false;
     trigger_teleport = false;
 }
 

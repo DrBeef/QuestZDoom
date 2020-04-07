@@ -81,6 +81,7 @@ public:
 	virtual bool GetWeaponTransform(VSMatrix* out) const override;
 	virtual bool RenderPlayerSpritesCrossed() const { return true; }
 	virtual bool RenderPlayerSpritesInScene() const { return true; }
+	virtual bool GetTeleportLocation(DVector3 &out) const override;
 
 	void getTracking(ovrTracking2 *tracking) const;
 

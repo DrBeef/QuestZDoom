@@ -97,7 +97,8 @@ public:
 	virtual bool GetWeaponTransform(VSMatrix* out) const { return false; }
 	virtual bool RenderPlayerSpritesCrossed() const { return false; }
 	virtual bool RenderPlayerSpritesInScene() const { return false; }
-	
+	virtual bool GetTeleportLocation(DVector3 &out) const { return false; }
+
 protected:
 	TArray<const EyePose *> eye_ptrs;
 

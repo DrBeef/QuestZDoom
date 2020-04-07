@@ -102,6 +102,8 @@ static FRandom pr_teleport("A_Teleport");
 static FRandom pr_bfgselfdamage("BFGSelfDamage");
 FRandom pr_cajump("CustomJump");
 
+CVAR(Bool, vr_recoil, false, CVAR_ARCHIVE|CVAR_GLOBALCONFIG)
+
 //==========================================================================
 //
 // ACustomInventory :: CallStateChain
@@ -1294,7 +1296,7 @@ DEFINE_ACTION_FUNCTION(AActor, A_Recoil)
 
 	//We don't want to adjust the player's camera - that could make them sick
 	player_t* player = r_viewpoint.camera ? r_viewpoint.camera->player : nullptr;
-	if (player != nullptr && self != nullptr && player->mo == self)
+	if (!vr_recoil && player != nullptr && self != nullptr && player->mo == self)
 	{
 		return 0;
 	}
@@ -2829,7 +2831,7 @@ DEFINE_ACTION_FUNCTION(AActor, A_SetAngle)
 
 	//We don't want to adjust the player's camera - that could make them sick
 	player_t* player = r_viewpoint.camera ? r_viewpoint.camera->player : nullptr;
-	if (player != nullptr && ref != nullptr && player->mo == ref)
+	if (!vr_recoil && player != nullptr && ref != nullptr && player->mo == ref)
 	{
 		return 0;
 	}
@@ -2860,7 +2862,7 @@ DEFINE_ACTION_FUNCTION(AActor, A_SetPitch)
 
 	//We don't want to adjust the player's camera - that could make them sick
 	player_t* player = r_viewpoint.camera ? r_viewpoint.camera->player : nullptr;
-	if (player != nullptr && ref != nullptr && player->mo == ref)
+	if (!vr_recoil && player != nullptr && ref != nullptr && player->mo == ref)
 	{
 		return 0;
 	}
@@ -2890,7 +2892,7 @@ DEFINE_ACTION_FUNCTION(AActor, A_SetRoll)
 
 	//We don't want to adjust the player's camera - that could make them sick
 	player_t* player = r_viewpoint.camera ? r_viewpoint.camera->player : nullptr;
-	if (player != nullptr && ref != nullptr && player->mo == ref)
+	if (!vr_recoil && player != nullptr && ref != nullptr && player->mo == ref)
 	{
 		return 0;
 	}

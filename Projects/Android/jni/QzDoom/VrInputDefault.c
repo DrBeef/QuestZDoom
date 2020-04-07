@@ -162,7 +162,6 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 				  pOffTracking->HeadPose.Pose.Position.z);
 
 			//Teleport - only does anything if vr_teleport cvar is true
-			static bool ready_teleport = false;
 			if (pOffTrackedRemoteOld->Joystick.y > 0.7f && !ready_teleport)
             {
                 ready_teleport = true;
