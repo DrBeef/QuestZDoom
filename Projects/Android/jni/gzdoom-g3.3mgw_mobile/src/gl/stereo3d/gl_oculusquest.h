@@ -94,14 +94,14 @@ protected:
 	OculusQuestEyePose rightEyeView;
 
 	mutable int cachedScreenBlocks;
-	mutable int cachedViewwidth, cachedViewheight, cachedViewwindowx, cachedViewwindowy;
-	mutable F2DDrawer * cached2DDrawer;
-	mutable F2DDrawer * crossHairDrawer;
 	mutable ovrTracking2 tracking;
 
 private:
 	typedef Stereo3DMode super;
 	uint32_t sceneWidth, sceneHeight;
+
+    mutable DVector3        m_TeleportLocation;
+    mutable int             m_TeleportTarget;
 };
 
 } /* namespace st3d */

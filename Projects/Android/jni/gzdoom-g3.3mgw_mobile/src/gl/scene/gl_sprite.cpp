@@ -754,24 +754,28 @@ void GLSprite::Process(AActor* thing, sector_t * sector, int thruportal)
 	if (thruportal == 1) thingpos += Displacements.getOffset(thing->Sector->PortalGroup, sector->PortalGroup);
 
 	// Some added checks if the camera actor is not supposed to be seen. It can happen that some portal setup has this actor in view in which case it may not be skipped here
-	float transparencyOverride = -1;
 	if (thing == camera) {
+
+        DVector3 thingorigin = thing->Pos();
+
+        //If we get here, then we want to override the location of the camera actor
+        if (s3d::Stereo3DMode::getCurrentMode().GetTeleportLocation(thingpos))
+        {
+            thingorigin = thingpos;
+
+            //Scale Doom Guy up a bit
+            sprscale *= 1.2;
+        }
+
 		if (!r_viewpoint.showviewer) {
-			DVector3 thingorigin = thing->Pos();
 			if (thruportal == 1)
 				thingorigin += Displacements.getOffset(thing->Sector->PortalGroup,
 													   sector->PortalGroup);
 
 			if (fabs(thingorigin.X - r_viewpoint.ActorPos.X) < 2 &&
-				fabs(thingorigin.Y - r_viewpoint.ActorPos.Y) < 2)
+				fabs(thingorigin.Y - r_viewpoint.ActorPos.Y) < 2) {
 				return;
-		}
-
-		//If we get here, then we want to override the location of the camera actor
-		if (s3d::Stereo3DMode::getCurrentMode().GetTeleportLocation(thingpos))
-		{
-            thing->SetXYZ(thingpos);
-			transparencyOverride = 0.5;
+			}
 		}
 	}
 
@@ -1043,7 +1047,7 @@ void GLSprite::Process(AActor* thing, sector_t * sector, int thruportal)
 	translation = thing->Translation;
 
 	OverrideShader = -1;
-	trans = (transparencyOverride == -1.f) ? (float)thing->Alpha : transparencyOverride;
+	trans = (float)thing->Alpha;
 	hw_styleflags = STYLEHW_Normal;
 
 	if (RenderStyle.BlendOp >= STYLEOP_Fuzz && RenderStyle.BlendOp <= STYLEOP_FuzzOrRevSub)

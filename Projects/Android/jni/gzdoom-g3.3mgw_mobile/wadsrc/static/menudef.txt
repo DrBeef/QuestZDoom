@@ -2288,7 +2288,7 @@ OptionMenu VROptionsMenu protected
 	Option "Control Scheme",		    "vr_control_scheme", "ControlScheme"
 	Option "Off-hand Move Direction",	"vr_move_use_offhand", "OffOn"
 	Option "Use Teleport",		        "vr_teleport", "OnOff"
-	Slider "Snap-turn Angle",		    "vr_snapTurn", 0.0, 90.0, 1.0, 2c
+	Slider "Snap-turn Angle",		    "vr_snapTurn", 0.0, 90.0, 1.0, 2
 
 	StaticText " "
 	Slider "Walking Speed",		        "vr_move_speed", 5, 50, 1, 2
@@ -2298,7 +2298,7 @@ OptionMenu VROptionsMenu protected
 	Slider "Weapon Pitch Adjust",		"vr_weaponRotate", -45, 45, 5, 2
 	Slider "Weapon Scale",		        "vr_weaponScale", 0.1, 1.0, 0.01, 2
 	Option "Weapon Sprite 3D",			"r_PlayerSprites3DMode", "Sprites3DMode"
-	Slider "Weapon Fat Item Width",		"gl_fatItemWidth", 0, 1, 0.05, 0
+	Slider "Weapon Fat Item Width",		"gl_fatItemWidth", 0.0, 1.0, 0.1, 2
 	Option "Weapon Recoil",		        "vr_recoil", "OnOff"
 
 	StaticText " "

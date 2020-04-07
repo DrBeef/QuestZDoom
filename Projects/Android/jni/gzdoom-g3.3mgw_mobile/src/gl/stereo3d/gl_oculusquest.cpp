@@ -271,19 +271,6 @@ namespace s3d
         gl_RenderState.EnableModelMatrix(false);
     }
 
-    static void vSMatrixFromOvrMatrix(VSMatrix& m1, const ovrMatrix4f& m2)
-    {
-        float tmp[16];
-        for (int i = 0; i < 4; ++i) {
-            for (int j = 0; j < 4; ++j) {
-                //Do the transpose step at the same time
-                tmp[4 * j + 1] = m2.M[i][j];
-            }
-        }
-
-        m1.loadMatrix(&tmp[0]);
-    }
-
     bool OculusQuestMode::GetHandTransform(int hand, VSMatrix* mat) const
     {
         AActor* playermo = r_viewpoint.camera->player->mo;
@@ -384,20 +371,10 @@ namespace s3d
 
     bool OculusQuestMode::GetTeleportLocation(DVector3 &out) const
     {
-        // Teleport?
-        DAngle yaw((doomYaw - hmdorientation[YAW]) + offhandangles[YAW]);
-        DAngle pitch(offhandangles[PITCH]);
-        double pixelstretch = level.info ? level.info->pixelstretch : 1.2;
-        player_t* player = r_viewpoint.camera ? r_viewpoint.camera->player : nullptr;
-
-        FLineTraceData trace;
-        if (ready_teleport &&
-            P_LineTrace(player->mo, yaw, 8192, pitch, TRF_ABSOFFSET,
-                        ((hmdPosition[1] + offhandoffset[1] + vr_height_adjust) * vr_vunits_per_meter) / pixelstretch,
-                        -(offhandoffset[2] * vr_vunits_per_meter),
-                        -(offhandoffset[0] * vr_vunits_per_meter), &trace) &&
-                (trace.HitType == TRACE_HitFloor)) {
-            out = trace.HitLocation;
+        if (vr_teleport &&
+            ready_teleport &&
+            m_TeleportTarget == TRACE_HitFloor) {
+            out = m_TeleportLocation;
             return true;
         }
 
@@ -478,19 +455,31 @@ namespace s3d
                 }
 
                 if (vr_teleport) {
-                    // Teleport?
+
                     DAngle yaw((doomYaw - hmdorientation[YAW]) + offhandangles[YAW]);
                     DAngle pitch(offhandangles[PITCH]);
-                    FLineTraceData trace;
-                    if (trigger_teleport &&
-                        P_LineTrace(player->mo, yaw, 8192, pitch, TRF_ABSOFFSET,
-                                    ((hmdPosition[1] + offhandoffset[1] + vr_height_adjust) * vr_vunits_per_meter) / pixelstretch,
-                                    -(offhandoffset[2] * vr_vunits_per_meter),
-                                    -(offhandoffset[0] * vr_vunits_per_meter), &trace) &&
-                        trace.HitType == TRACE_HitFloor) {
+                    double pixelstretch = level.info ? level.info->pixelstretch : 1.2;
+
+                    // Teleport Logic
+                    if (ready_teleport) {
+                        FLineTraceData trace;
+                        if (P_LineTrace(player->mo, yaw, 8192, pitch, TRF_ABSOFFSET|TRF_BLOCKUSE|TRF_BLOCKSELF|TRF_SOLIDACTORS,
+                                        ((hmdPosition[1] + offhandoffset[1] + vr_height_adjust) *
+                                         vr_vunits_per_meter) / pixelstretch,
+                                        -(offhandoffset[2] * vr_vunits_per_meter),
+                                        -(offhandoffset[0] * vr_vunits_per_meter), &trace))
+                        {
+                            m_TeleportTarget = trace.HitType;
+                            m_TeleportLocation = trace.HitLocation;
+                        } else {
+                            m_TeleportTarget = TRACE_HitNone;
+                            m_TeleportLocation = DVector3(0, 0, 0);
+                        }
+                    }
+                    else if (trigger_teleport && m_TeleportTarget == TRACE_HitFloor) {
                         auto vel = player->mo->Vel;
-                        player->mo->Vel = DVector3(trace.HitLocation.X - player->mo->X(),
-                                                   trace.HitLocation.Y - player->mo->Y(), 0);
+                        player->mo->Vel = DVector3(m_TeleportLocation.X - player->mo->X(),
+                                                   m_TeleportLocation.Y - player->mo->Y(), 0);
                         bool wasOnGround = player->mo->Z() <= player->mo->floorz;
                         double oldZ = player->mo->Z();
                         P_XYMovement(player->mo, DVector2(0, 0));
