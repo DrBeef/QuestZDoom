@@ -126,6 +126,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 			offhandoffset[2] = v[0];
 
             vec3_t rotation = {0};
+            rotation[PITCH] = 20;
             QuatToYawPitchRoll(pOffTracking->HeadPose.Pose.Orientation, rotation, offhandangles);
 
 			if (vr_moveuseoffhand != 0) {
