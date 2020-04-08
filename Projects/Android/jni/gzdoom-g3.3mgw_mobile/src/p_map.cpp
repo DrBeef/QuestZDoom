@@ -4432,13 +4432,14 @@ AActor *P_LineAttack(AActor *t1, DAngle angle, double distance,
 		// We need to preserve this info from the damage type because the actual damage type can get overridden by the puff
 		pflag = DMG_PLAYERATTACK;
 
-		//Haptics
-		long rightHanded = vr_control_scheme < 10;
-        QzDoom_Vibrate(150, rightHanded ? 1 : 0, 0.8);
-		if (weaponStabilised)
-		{
-            QzDoom_Vibrate(150, rightHanded ? 0 : 1, 0.6);
-		}
+		if ( damage > 0) {
+            //Haptics
+            long rightHanded = vr_control_scheme < 10;
+            QzDoom_Vibrate(150, rightHanded ? 1 : 0, 0.8);
+            if (weaponStabilised) {
+                QzDoom_Vibrate(150, rightHanded ? 0 : 1, 0.6);
+            }
+        }
 	}
 
 	// [MC] If overriding, set it to the base of the actor.
