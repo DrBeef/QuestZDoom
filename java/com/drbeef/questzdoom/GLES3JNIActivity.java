@@ -164,6 +164,7 @@ import android.support.v4.content.ContextCompat;
 		copy_asset("/sdcard/QuestZDoom", "res/lz_game_support.pk3", true);
 		copy_asset("/sdcard/QuestZDoom", "res/lights.pk3", true);
 		copy_asset("/sdcard/QuestZDoom", "res/brightmaps.pk3", true);
+		copy_asset("/sdcard/QuestZDoom", "mods/laser-sight-0.5.5-vr.pk3", false);
 		copy_asset("/sdcard/QuestZDoom/audiopack", "snd_fluidsynth/fluidsynth.sf2", false);
 
 		//Doom Sharware WAD
