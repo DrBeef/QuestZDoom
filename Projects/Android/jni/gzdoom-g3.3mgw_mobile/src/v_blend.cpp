@@ -54,8 +54,8 @@
 #include "g_levellocals.h"
 #include "vm.h"
 
-CVAR( Float, blood_fade_scalar, 1.0f, CVAR_ARCHIVE )	// [SP] Pulled from Skulltag - changed default from 0.5 to 1.0
-CVAR( Float, pickup_fade_scalar, 1.0f, CVAR_ARCHIVE )	// [SP] Uses same logic as blood_fade_scalar except for pickups
+CVAR( Float, blood_fade_scalar, 0.0f, CVAR_ARCHIVE )	// Default ro 0.0 for VR
+CVAR( Float, pickup_fade_scalar, 0.0f, CVAR_ARCHIVE )	// Default ro 0.0 for VR
 
 // [RH] Amount of red flash for up to 114 damage points. Calculated by hand
 //		using a logarithmic scale and my trusty HP48G.
