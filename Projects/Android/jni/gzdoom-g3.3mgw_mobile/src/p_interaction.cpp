@@ -1000,7 +1000,7 @@ static int hasBuddha(player_t *player)
 	return 0;
 }
 
-
+extern "C" void QzDoom_Vibrate(float duration, int channel, float intensity );
 
 // Returns the amount of damage actually inflicted upon the target, or -1 if
 // the damage was cancelled.
@@ -1352,7 +1352,10 @@ static int DamageMobj (AActor *target, AActor *inflictor, AActor *source, int da
 		temp = damage < 100 ? damage : 100;
 		if (player == &players[consoleplayer])
 		{
-			I_Tactile (40,10,40+temp*2);
+			//Haptic feedback when hurt - level indicates amount of damage
+			float level = (float)(0.4 + (0.6 * (temp / 100.0)));
+			QzDoom_Vibrate(200, 0, level); // left
+			QzDoom_Vibrate(200, 1, level); // right
 		}
 	}
 	else

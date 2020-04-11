@@ -59,6 +59,7 @@ bool weaponStabilised;
 float vr_weapon_pitchadjust;
 bool vr_moveuseoffhand;
 float vr_snapturn_angle;
+float vr_use_teleport;
 vec3_t offhandangles;
 vec3_t offhandoffset;
 bool player_moving;
@@ -98,6 +99,7 @@ int CPU_LEVEL			= 4;
 int GPU_LEVEL			= 4;
 int NUM_MULTI_SAMPLES	= 1;
 float SS_MULTIPLIER    = 1.0f;
+int DISPLAY_REFRESH		= 72;
 
 jclass clazz;
 
@@ -114,6 +116,7 @@ struct arg_dbl *ss;
 struct arg_int *cpu;
 struct arg_int *gpu;
 struct arg_int *msaa;
+struct arg_int *refresh;
 struct arg_end *end;
 
 char **argv;
@@ -1474,6 +1477,9 @@ void * AppThreadFunction(void * parm ) {
 		return NULL;
 	}
 
+	//Set the screen refresh
+	vrapi_SetDisplayRefreshRate(gAppState.Ovr, DISPLAY_REFRESH);
+
 	// Create the scene if not yet created.
 	ovrScene_Create( m_width, m_height, &gAppState.Scene, &java );
 
@@ -1747,6 +1753,7 @@ JNIEXPORT jlong JNICALL Java_com_drbeef_questzdoom_GLES3JNILib_onCreate( JNIEnv 
             cpu   = arg_int0("c", "cpu", "<int>", "CPU perf index 1-4 (default: 2)"),
             gpu   = arg_int0("g", "gpu", "<int>", "GPU perf index 1-4 (default: 3)"),
             msaa   = arg_int0("m", "msaa", "<int>", "MSAA 1-4 (default: 1)"),
+            refresh   = arg_int0("r", "refresh", "<int>", "Display Refresh 60 or 72 (default: 72)"),
 			end     = arg_end(20)
 	};
 
@@ -1789,9 +1796,12 @@ JNIEXPORT jlong JNICALL Java_com_drbeef_questzdoom_GLES3JNILib_onCreate( JNIEnv 
         {
 			NUM_MULTI_SAMPLES = msaa->ival[0];
         }
-	}
 
-	//initialize_gl4es();
+        if (refresh->count > 0 && (refresh->ival[0] == 60 || refresh->ival[0] == 72))
+        {
+			DISPLAY_REFRESH = refresh->ival[0];
+        }
+	}
 
 	ovrAppThread * appThread = (ovrAppThread *) malloc( sizeof( ovrAppThread ) );
 	ovrAppThread_Create( appThread, env, activity, activityClass );

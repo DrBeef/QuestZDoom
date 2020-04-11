@@ -163,15 +163,14 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 				  pOffTracking->HeadPose.Pose.Position.z);
 
 			//Teleport - only does anything if vr_teleport cvar is true
-			if (pOffTrackedRemoteOld->Joystick.y > 0.7f && !ready_teleport)
-            {
-                ready_teleport = true;
-            }
-			else if (pOffTrackedRemoteOld->Joystick.y < 0.7f & ready_teleport)
-            {
-                ready_teleport = false;
-                trigger_teleport = true;
-                resetDoomYaw = true;
+			if (vr_use_teleport) {
+                if (pOffTrackedRemoteOld->Joystick.y > 0.7f && !ready_teleport) {
+                    ready_teleport = true;
+                } else if (pOffTrackedRemoteOld->Joystick.y < 0.7f & ready_teleport) {
+                    ready_teleport = false;
+                    trigger_teleport = true;
+                    resetDoomYaw = true;
+                }
             }
 
 			//Apply a filter and quadratic scaler so small movements are easier to make

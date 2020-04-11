@@ -418,10 +418,12 @@ namespace s3d
         //Get controller state here
         QzDoom_getHMDOrientation(&tracking);
 
-        //Set up stuff used in the tracking code
+        //Set up stuff used in the tracking code - getting the CVARS in the C code would be a faff, so just
+        //set some variables - lazy, should do it properly..
         vr_weapon_pitchadjust = vr_weaponRotate;
         vr_snapturn_angle = vr_snapTurn;
         vr_moveuseoffhand = !vr_move_use_offhand;
+        vr_use_teleport = vr_teleport;
         QzDoom_getTrackedRemotesOrientation(vr_control_scheme);
 
         //Some crazy stuff to ascertain the actual yaw that doom is using at the right times!
