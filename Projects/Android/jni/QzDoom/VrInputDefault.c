@@ -316,7 +316,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                                      ((pDominantTrackedRemoteNew->Buttons & domButton2) != 0) && dominantGripPushedNew ? 1 : 0,
                                      1, KEY_RSHIFT);
 
-            //Toggle Map
+            //No Binding
             Joy_GenerateButtonEvents(((pDominantTrackedRemoteOld->Buttons & ovrButton_Joystick) != 0) && dominantGripPushedOld ? 1 : 0,
                                      ((pDominantTrackedRemoteNew->Buttons & ovrButton_Joystick) != 0) && dominantGripPushedNew ? 1 : 0,
                                      1, KEY_TAB);
@@ -336,7 +336,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                                      ((pOffTrackedRemoteNew->Buttons & offButton1) != 0) && !dominantGripPushedNew ? 1 : 0,
                                      1, KEY_PAD_X);
 
-            //Jump
+            //Toggle Map
             Joy_GenerateButtonEvents(((pOffTrackedRemoteOld->Buttons & offButton2) != 0) && !dominantGripPushedOld ? 1 : 0,
                                      ((pOffTrackedRemoteNew->Buttons & offButton2) != 0) && !dominantGripPushedNew ? 1 : 0,
                                      1, KEY_PAD_Y);

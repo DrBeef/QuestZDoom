@@ -887,20 +887,7 @@ void QzDoom_Vibrate(float duration, int channel, float intensity )
 	vibration_channel_intensity[channel] = intensity;
 }
 
-void getVROrigins(vec3_t _weaponoffset, vec3_t _weaponangles, vec3_t _hmdPosition)
-{
-	VectorCopy(weaponoffset, _weaponoffset);
-	VectorCopy(weaponangles, _weaponangles);
-	VectorCopy(hmdPosition, _hmdPosition);
-}
-
-
 void VR_DoomMain(int argc, char** argv);
-
-float VR_GetRawYaw()
-{
-    return snapTurn;
-}
 
 void VR_GetMove( float *joy_forward, float *joy_side, float *hmd_forward, float *hmd_side, float *up, float *yaw, float *pitch, float *roll )
 {
@@ -913,7 +900,6 @@ void VR_GetMove( float *joy_forward, float *joy_side, float *hmd_forward, float 
 	*pitch = hmdorientation[PITCH];
 	*roll = hmdorientation[ROLL];
 }
-
 
 
 /*

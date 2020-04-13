@@ -48,7 +48,7 @@ f8 togglemessages
 f9 quickload
 f11 bumpgamma
 f10 menu_quit
-tab togglemap
+pad_y togglemap
 pause pause
 sysrq screenshot
 t messagemode
