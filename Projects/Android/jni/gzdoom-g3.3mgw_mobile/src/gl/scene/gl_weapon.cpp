@@ -197,7 +197,7 @@ void GLSceneDrawer::DrawPSprite (player_t * player,DPSprite *psp, float sx, floa
 			x1 = vw / 2 + (x1 - vw / 2) * gl_fatItemWidth;
 			x2 = vw / 2 + (x2 - vw / 2) * gl_fatItemWidth;
 
-			float inc = (x2 - x1) / 10.0f;
+			float inc = (x2 - x1) / 12.0f;
 			for (float x = x1; x <= x2; x += inc)
 			{
 				FQuadDrawer qd2;

@@ -273,7 +273,7 @@ namespace s3d
 
     bool OculusQuestMode::GetHandTransform(int hand, VSMatrix* mat) const
     {
-        player_t *player = r_viewpoint.camera->player;
+        player_t* player = r_viewpoint.camera ? r_viewpoint.camera->player : nullptr;
         if (player)
         {
             AActor* playermo = player->mo;
