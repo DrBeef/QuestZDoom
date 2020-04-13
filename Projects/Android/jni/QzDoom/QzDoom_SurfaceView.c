@@ -864,11 +864,6 @@ void setHMDPosition( float x, float y, float z, float yaw )
 	}
 }
 
-bool isMultiplayer()
-{
-	return false;//Cvar_VariableValue("maxclients") > 1;
-}
-
 
 /*
 ========================

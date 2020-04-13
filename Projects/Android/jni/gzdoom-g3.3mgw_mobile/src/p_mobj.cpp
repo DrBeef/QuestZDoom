@@ -6771,22 +6771,25 @@ AActor *P_SpawnPlayerMissile (AActor *source, double x, double y, double z,
 		MissileActor->Vel3DFromAngle(pitch, MissileActor->Speed);
 	}
 
-
-	//Haptics
-	long rightHanded = vr_control_scheme < 10;
-    QzDoom_Vibrate(150, rightHanded ? 1 : 0, 0.8);
-	if (weaponStabilised)
-	{
-        QzDoom_Vibrate(150, rightHanded ? 0 : 1, 0.6);
-	}
-
-
 	if (MissileActor->flags4 & MF4_SPECTRAL)
 	{
 		MissileActor->SetFriendPlayer(source->player);
 	}
+
 	if (P_CheckMissileSpawn (MissileActor, source->radius))
 	{
+	    //Could be the Brutal Doom flashlight!
+		if (MissileActor->DamageType.GetIndex() != 0)
+		{
+			//Haptics
+			long rightHanded = vr_control_scheme < 10;
+			QzDoom_Vibrate(150, rightHanded ? 1 : 0, 0.8);
+			if (weaponStabilised)
+			{
+				QzDoom_Vibrate(150, rightHanded ? 0 : 1, 0.6);
+			}
+		}
+
 		return MissileActor;
 	}
 	return NULL;

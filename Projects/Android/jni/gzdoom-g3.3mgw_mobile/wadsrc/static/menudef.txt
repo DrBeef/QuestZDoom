@@ -2304,8 +2304,8 @@ OptionMenu VROptionsMenu protected
 
 	StaticText " "
 	Slider "VR HUD Scale",		        "vr_hud_scale", 0.05, 1.0, 0.05, 2
-	Slider "VR HUD Stereo",		        "vr_hud_stereo", 0.05, 2.0, 0.05, 2
-	Slider "VR HUD Pitch Rotate",		"vr_hud_rotate", 0.0, 50.0, 2.0, 2
+	Slider "VR HUD Stereo",		        "vr_hud_stereo", 0.0, 3.0, 0.1, 2
+	Slider "VR HUD Pitch Rotate",		"vr_hud_rotate", 0.0, 50.0, 1.0, 2
 	Option "VR HUD Fix Pitch",		    "vr_hud_fixed_pitch", "OnOff"
 	Option "VR HUD Fix Roll",		    "vr_hud_fixed_roll", "OnOff"
 }

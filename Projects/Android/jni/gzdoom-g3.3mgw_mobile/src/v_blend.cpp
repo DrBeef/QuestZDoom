@@ -99,6 +99,8 @@ void V_AddBlend (float r, float g, float b, float a, float v_blend[4])
 //
 //---------------------------------------------------------------------------
 
+extern "C" void QzDoom_Vibrate(float duration, int channel, float intensity );
+
 void V_AddPlayerBlend (player_t *CPlayer, float blend[4], float maxinvalpha, int maxpainblend)
 {
 	int cnt;
@@ -125,6 +127,10 @@ void V_AddPlayerBlend (player_t *CPlayer, float blend[4], float maxinvalpha, int
 	if (CPlayer->bonuscount)
 	{
 		cnt = CPlayer->bonuscount << 3;
+
+		//Super short haptic blip on pickup
+		QzDoom_Vibrate(50, 0, 0.7); // left
+		QzDoom_Vibrate(50, 1, 0.7); // right
 
 		// [SP] Allow player to tone down intensity of pickup flash.
 		cnt = (int)( cnt * pickup_fade_scalar );

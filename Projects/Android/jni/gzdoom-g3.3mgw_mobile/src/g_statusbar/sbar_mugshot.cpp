@@ -337,6 +337,8 @@ bool FMugShot::SetState(const char *state_name, bool wait_till_done, bool reset)
 //
 //===========================================================================
 
+extern "C" void QzDoom_Vibrate(float duration, int channel, float intensity );
+
 CVAR(Bool,st_oldouch,false,CVAR_ARCHIVE)
 int FMugShot::UpdateState(player_t *player, StateFlags stateflags)
 {
@@ -348,6 +350,10 @@ int FMugShot::UpdateState(player_t *player, StateFlags stateflags)
 		{
 			if (player->bonuscount)
 			{
+				//Short haptic blip on pickup
+				QzDoom_Vibrate(80, 0, 1.0); // left
+				QzDoom_Vibrate(80, 1, 1.0); // right
+
 				SetState("grin", false);
 				return 0;
 			}
