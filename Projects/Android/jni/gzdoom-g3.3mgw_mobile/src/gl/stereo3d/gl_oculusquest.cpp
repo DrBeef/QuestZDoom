@@ -273,10 +273,12 @@ namespace s3d
 
     bool OculusQuestMode::GetHandTransform(int hand, VSMatrix* mat) const
     {
-        AActor* playermo = r_viewpoint.camera->player->mo;
-        DVector3 pos = playermo->InterpolatedPosition(r_viewpoint.TicFrac);
-
+        player_t *player = r_viewpoint.camera->player;
+        if (player)
         {
+            AActor* playermo = player->mo;
+            DVector3 pos = playermo->InterpolatedPosition(r_viewpoint.TicFrac);
+
             mat->loadIdentity();
 
             mat->translate(pos.X, pos.Z, pos.Y);
