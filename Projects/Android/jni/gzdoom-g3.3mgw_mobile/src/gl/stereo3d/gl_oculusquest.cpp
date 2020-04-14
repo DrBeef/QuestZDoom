@@ -76,9 +76,7 @@ EXTERN_CVAR(Bool, vr_hud_fixed_roll);
 
 double P_XYMovement(AActor *mo, DVector2 scroll);
 extern "C" void VR_GetMove( float *joy_forward, float *joy_side, float *hmd_forward, float *hmd_side, float *up, float *yaw, float *pitch, float *roll );
-void I_Quit();
-
-extern int game_running;
+void ST_Endoom();
 
 namespace s3d
 {
@@ -392,8 +390,7 @@ namespace s3d
 
         if (shutdown)
         {
-            game_running = false;
-            I_Quit();
+            ST_Endoom();
 
             return;
         }

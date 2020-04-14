@@ -48,19 +48,12 @@ import android.support.v4.content.ContextCompat;
 	private SurfaceHolder mSurfaceHolder;
 	private long mNativeHandle;
 
-	// Main components
-	protected static GLES3JNIActivity mSingleton;
-
 	// Audio
 	protected static AudioTrack mAudioTrack;
 	protected static AudioRecord mAudioRecord;
 
-	public static void initialize() {
-		// The static nature of the singleton and Android quirkyness force us to initialize everything here
-		// Otherwise, when exiting the app and returning to it, these variables *keep* their pre exit values
-		mSingleton = null;
-		mAudioTrack = null;
-		mAudioRecord = null;
+	public void shutdown() {
+		System.exit(0);
 	}
 
 	@Override protected void onCreate( Bundle icicle )
@@ -68,12 +61,6 @@ import android.support.v4.content.ContextCompat;
 		Log.v( TAG, "----------------------------------------------------------------" );
 		Log.v( TAG, "GLES3JNIActivity::onCreate()" );
 		super.onCreate( icicle );
-
-		GLES3JNIActivity.initialize();
-
-		// So we can call stuff from static callbacks
-		mSingleton = this;
-
 
 		mView = new SurfaceView( this );
 		setContentView( mView );
@@ -245,7 +232,7 @@ import android.support.v4.content.ContextCompat;
 		Log.v( TAG, "GLES3JNIActivity::onStart()" );
 		super.onStart();
 
-		GLES3JNILib.onStart( mNativeHandle );
+		GLES3JNILib.onStart( mNativeHandle, this );
 	}
 
 	@Override protected void onResume()
@@ -282,8 +269,6 @@ import android.support.v4.content.ContextCompat;
 		GLES3JNILib.onDestroy( mNativeHandle );
 
 		super.onDestroy();
-		// Reset everything in case the user re opens the app
-		GLES3JNIActivity.initialize();
 		mNativeHandle = 0;
 	}
 

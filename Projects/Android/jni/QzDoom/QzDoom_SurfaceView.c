@@ -1406,7 +1406,7 @@ bool QzDoom_processMessageQueue() {
 }
 
 void showLoadingIcon();
-
+void jni_shutdown();
 
 void * AppThreadFunction(void * parm ) {
 	gAppThread = (ovrAppThread *) parm;
@@ -1478,6 +1478,9 @@ void * AppThreadFunction(void * parm ) {
 
 	//We are done, shutdown cleanly
 	shutdownVR();
+
+	//Ask Java to shut down
+    jni_shutdown();
 
 	return NULL;
 }
@@ -1711,9 +1714,26 @@ Activity lifecycle
 ================================================================================
 */
 
+jmethodID android_shutdown;
+static JavaVM *jVM;
+static jobject shutdownCallbackObj=0;
+
+void jni_shutdown()
+{
+    ALOGV("Calling: jni_shutdown");
+    JNIEnv *env;
+    jobject tmp;
+    if (((*jVM)->GetEnv(jVM, (void**) &env, JNI_VERSION_1_4))<0)
+    {
+        (*jVM)->AttachCurrentThread(jVM,&env, NULL);
+    }
+    return (*env)->CallVoidMethod(env, shutdownCallbackObj, android_shutdown);
+}
+
 int JNI_OnLoad(JavaVM* vm, void* reserved)
 {
 	JNIEnv *env;
+    jVM = vm;
 	if((*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_4) != JNI_OK)
 	{
 		ALOGE("Failed JNI_OnLoad");
@@ -1796,9 +1816,14 @@ JNIEXPORT jlong JNICALL Java_com_drbeef_questzdoom_GLES3JNILib_onCreate( JNIEnv 
 }
 
 
-JNIEXPORT void JNICALL Java_com_drbeef_questzdoom_GLES3JNILib_onStart( JNIEnv * env, jobject obj, jlong handle)
+JNIEXPORT void JNICALL Java_com_drbeef_questzdoom_GLES3JNILib_onStart( JNIEnv * env, jobject obj, jlong handle, jobject obj1)
 {
 	ALOGV( "    GLES3JNILib::onStart()" );
+
+    shutdownCallbackObj = (jobject)(*env)->NewGlobalRef(env, obj1);
+    jclass callbackClass = (*env)->GetObjectClass(env, shutdownCallbackObj);
+
+    android_shutdown = (*env)->GetMethodID(env,callbackClass,"shutdown","()V");
 
 	ovrAppThread * appThread = (ovrAppThread *)((size_t)handle);
 	ovrMessage message;

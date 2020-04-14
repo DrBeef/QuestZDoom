@@ -374,9 +374,11 @@ bool FTTYStartupScreen::NetLoop(bool (*timer_callback)(void *), void *userdata)
 	}
 }
 
+extern int game_running;
+extern bool wantToRestart;
+
 void ST_Endoom()
 {
-	I_ShutdownJoysticks();
-	call_terms();
-	exit(0);
+    game_running = false;
+    wantToRestart = true;
 }
