@@ -46,6 +46,8 @@
 #define ST_RAMPAGEDELAY 		(2*TICRATE)
 #define ST_MUCHPAIN 			20
 
+EXTERN_CVAR(Float, vr_pickup_haptic_level)
+
 TArray<FMugShotState> MugShotStates;
 
 
@@ -351,8 +353,10 @@ int FMugShot::UpdateState(player_t *player, StateFlags stateflags)
 			if (player->bonuscount)
 			{
 				//Short haptic blip on pickup
-				QzDoom_Vibrate(80, 0, 1.0); // left
-				QzDoom_Vibrate(80, 1, 1.0); // right
+				if (vr_pickup_haptic_level > 0.0) {
+					QzDoom_Vibrate(80, 0, vr_pickup_haptic_level); // left
+					QzDoom_Vibrate(80, 1, vr_pickup_haptic_level); // right
+				}
 
 				SetState("grin", false);
 				return 0;

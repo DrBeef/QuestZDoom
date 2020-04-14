@@ -370,11 +370,10 @@ void M_StartControlPanel (bool makeSound)
 	BackbuttonAlpha = 0;
 }
 
-int isMenuActive()
+int getMenuState()
 {
-	return menuactive == MENU_On ? 1 : 0;
+	return (int)menuactive;
 }
-
 
 //=============================================================================
 //

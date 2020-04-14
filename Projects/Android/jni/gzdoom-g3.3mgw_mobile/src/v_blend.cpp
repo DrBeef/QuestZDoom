@@ -57,6 +57,8 @@
 CVAR( Float, blood_fade_scalar, 0.0f, CVAR_ARCHIVE )	// Default ro 0.0 for VR
 CVAR( Float, pickup_fade_scalar, 0.0f, CVAR_ARCHIVE )	// Default ro 0.0 for VR
 
+EXTERN_CVAR(Float, vr_pickup_haptic_level)
+
 // [RH] Amount of red flash for up to 114 damage points. Calculated by hand
 //		using a logarithmic scale and my trusty HP48G.
 static uint8_t DamageToAlpha[114] =
@@ -129,8 +131,10 @@ void V_AddPlayerBlend (player_t *CPlayer, float blend[4], float maxinvalpha, int
 		cnt = CPlayer->bonuscount << 3;
 
 		//Super short haptic blip on pickup
-		QzDoom_Vibrate(50, 0, 0.7); // left
-		QzDoom_Vibrate(50, 1, 0.7); // right
+		if (vr_pickup_haptic_level > 0.0) {
+			QzDoom_Vibrate(50, 0, vr_pickup_haptic_level); // left
+			QzDoom_Vibrate(50, 1, vr_pickup_haptic_level); // right
+		}
 
 		// [SP] Allow player to tone down intensity of pickup flash.
 		cnt = (int)( cnt * pickup_fade_scalar );

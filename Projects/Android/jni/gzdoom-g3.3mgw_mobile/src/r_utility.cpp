@@ -75,6 +75,7 @@
 
 extern bool DrawFSHUD;		// [RH] Defined in d_main.cpp
 EXTERN_CVAR (Bool, cl_capfps)
+EXTERN_CVAR (Float, vr_quake_haptic_level)
 
 // TYPES -------------------------------------------------------------------
 
@@ -749,6 +750,8 @@ static double QuakePower(double factor, double intensity, double offset)
 	return factor * (offset + randumb);
 }
 
+extern "C" void QzDoom_Vibrate(float duration, int channel, float intensity );
+
 //==========================================================================
 //
 // R_SetupFrame
@@ -920,6 +923,14 @@ void R_SetupFrame (FRenderViewpoint &viewpoint, FViewWindow &viewwindow, AActor 
 			{
 				viewpoint.Pos.Z += QuakePower(quakefactor, jiggers.Intensity.Z, jiggers.Offset.Z);
 			}
+
+			//Haptic Quake
+            if (vr_quake_haptic_level > 0.0) {
+                double left = QuakePower(vr_quake_haptic_level, jiggers.Intensity.X, jiggers.Offset.X);
+                double right = QuakePower(vr_quake_haptic_level, jiggers.Intensity.Y, jiggers.Offset.Y);
+                QzDoom_Vibrate(10, 0, (float)left); // left
+                QzDoom_Vibrate(10, 1, (float)right); // right
+            }
 		}
 	}
 

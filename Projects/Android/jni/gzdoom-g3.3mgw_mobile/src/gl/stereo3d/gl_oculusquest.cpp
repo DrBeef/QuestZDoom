@@ -405,7 +405,7 @@ namespace s3d
             movebob = 0;
         }
 
-        if (gamestate == GS_LEVEL && !isMenuActive()) {
+        if (gamestate == GS_LEVEL && !getMenuState()) {
             cachedScreenBlocks = screenblocks;
             screenblocks = 12;
             QzDoom_setUseScreenLayer(false);
@@ -429,13 +429,13 @@ namespace s3d
         QzDoom_getTrackedRemotesOrientation(vr_control_scheme);
 
         //Some crazy stuff to ascertain the actual yaw that doom is using at the right times!
-        if (gamestate != GS_LEVEL || isMenuActive() || (gamestate == GS_LEVEL && resetDoomYaw))
+        if (gamestate != GS_LEVEL || getMenuState() || (gamestate == GS_LEVEL && resetDoomYaw))
         {
             doomYaw = (float)r_viewpoint.Angles.Yaw.Degrees;
             if (gamestate == GS_LEVEL && resetDoomYaw) {
                 resetDoomYaw = false;
             }
-            if (gamestate != GS_LEVEL || isMenuActive())
+            if (gamestate != GS_LEVEL || getMenuState())
             {
                 resetDoomYaw = true;
             }
@@ -561,7 +561,7 @@ namespace s3d
             G_AddViewPitch(mAngleFromRadians(dPitch));
         }
 
-        if (gamestate == GS_LEVEL && !isMenuActive())
+        if (gamestate == GS_LEVEL && !getMenuState())
         {
             doomYaw += hmdYawDeltaDegrees;
         }

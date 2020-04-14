@@ -120,7 +120,7 @@ extern	EMenuState		menuactive; 	// Menu overlayed?
 extern	int				paused; 		// Game Pause?
 extern	bool			pauseext;
 
-extern "C" int isMenuActive();
+extern "C" int getMenuState();
 
 
 extern	bool			viewactive;

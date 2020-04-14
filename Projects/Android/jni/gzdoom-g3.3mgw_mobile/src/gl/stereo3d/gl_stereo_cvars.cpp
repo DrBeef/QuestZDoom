@@ -67,6 +67,9 @@ CVAR(Float, vr_snapTurn, 45.0f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 CVAR(Int, vr_move_speed, 24, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 CVAR(Float, vr_run_multiplier, 1.6, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 
+CVAR(Float, vr_pickup_haptic_level, 0.2, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
+CVAR(Float, vr_quake_haptic_level, 0.8, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
+
 //HUD control
 CVAR(Float, vr_hud_scale, 0.3f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 CVAR(Float, vr_hud_stereo, 1.8f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
