@@ -2281,6 +2281,7 @@ OptionMenu VROptionsMenu protected
 
 	StaticText " "
 	Option "Control Scheme",		    "vr_control_scheme", "ControlScheme"
+	Option "Switch Thumsticks",		    "vr_switch_sticks", "OnOff"
 	Option "Off-hand Move Direction",	"vr_move_use_offhand", "OffOn"
 	Option "Use Teleport",		        "vr_teleport", "OnOff"
 	Slider "Snap-turn Angle",		    "vr_snapTurn", 0.0, 90.0, 1.0, 2

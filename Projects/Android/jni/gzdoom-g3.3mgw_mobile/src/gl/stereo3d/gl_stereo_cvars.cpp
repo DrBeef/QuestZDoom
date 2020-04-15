@@ -66,6 +66,7 @@ CVAR(Float, vr_weaponScale, 1.0f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 CVAR(Float, vr_snapTurn, 45.0f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 CVAR(Int, vr_move_speed, 24, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 CVAR(Float, vr_run_multiplier, 1.6, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
+CVAR(Bool, vr_switch_sticks, false, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 
 CVAR(Float, vr_pickup_haptic_level, 0.2, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 CVAR(Float, vr_quake_haptic_level, 0.8, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)

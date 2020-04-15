@@ -66,6 +66,7 @@ EXTERN_CVAR(Float, vr_snapTurn);
 EXTERN_CVAR(Float, vr_ipd);
 EXTERN_CVAR(Float, vr_weaponScale);
 EXTERN_CVAR(Bool, vr_teleport);
+EXTERN_CVAR(Bool, vr_switch_sticks);
 
 //HUD control
 EXTERN_CVAR(Float, vr_hud_scale);
@@ -421,6 +422,7 @@ namespace s3d
         //set some variables - lazy, should do it properly..
         vr_weapon_pitchadjust = vr_weaponRotate;
         vr_snapturn_angle = vr_snapTurn;
+        vr_switchsticks = vr_switch_sticks;
         vr_moveuseoffhand = !vr_move_use_offhand;
         vr_use_teleport = vr_teleport;
         QzDoom_getTrackedRemotesOrientation(vr_control_scheme);

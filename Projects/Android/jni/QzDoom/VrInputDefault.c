@@ -30,7 +30,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
     //Menu button - invoke menu
     handleTrackedControllerButton(&leftTrackedRemoteState_new, &leftTrackedRemoteState_old, ovrButton_Enter, KEY_ESCAPE);
 
-    if (getGameState() != 0 || getMenuState() != 0) // If getMenuState returns 2, then we are waiting for a key mapping input, so send normal keymappings
+    if (getGameState() != 0 || getMenuState() == 1) // If getMenuState returns 2, then we are waiting for a key mapping input, so send normal keymappings, don't send these
     {
         Joy_GenerateButtonEvents((pOffTrackedRemoteOld->Joystick.x > 0.7f ? 1 : 0), (pOffTrackedRemoteNew->Joystick.x > 0.7f ? 1 : 0), 1, KEY_PAD_DPAD_RIGHT);
         Joy_GenerateButtonEvents((pDominantTrackedRemoteOld->Joystick.x > 0.7f ? 1 : 0), (pDominantTrackedRemoteNew->Joystick.x > 0.7f ? 1 : 0), 1, KEY_PAD_DPAD_RIGHT);
@@ -51,6 +51,22 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
     bool dominantGripPushedNew =
             (pDominantTrackedRemoteNew->Buttons & ovrButton_GripTrigger) != 0;
 
+
+    ovrInputStateTrackedRemote *pPrimaryTrackedRemoteNew, *pPrimaryTrackedRemoteOld,  *pSecondaryTrackedRemoteNew, *pSecondaryTrackedRemoteOld;
+    if (vr_switchsticks)
+    {
+        pPrimaryTrackedRemoteNew = pOffTrackedRemoteNew;
+        pPrimaryTrackedRemoteOld = pOffTrackedRemoteOld;
+        pSecondaryTrackedRemoteNew = pDominantTrackedRemoteNew;
+        pSecondaryTrackedRemoteOld = pDominantTrackedRemoteOld;
+    }
+    else
+    {
+        pPrimaryTrackedRemoteNew = pDominantTrackedRemoteNew;
+        pPrimaryTrackedRemoteOld = pDominantTrackedRemoteOld;
+        pSecondaryTrackedRemoteNew = pOffTrackedRemoteNew;
+        pSecondaryTrackedRemoteOld = pOffTrackedRemoteOld;
+    }
 
     // Only do the following if we are definitely not in the menu
     if (getMenuState() == 0)
@@ -166,9 +182,9 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 
             //Teleport - only does anything if vr_teleport cvar is true
             if (vr_use_teleport) {
-                if (pOffTrackedRemoteOld->Joystick.y > 0.7f && !ready_teleport) {
+                if (pSecondaryTrackedRemoteOld->Joystick.y > 0.7f && !ready_teleport) {
                     ready_teleport = true;
-                } else if (pOffTrackedRemoteOld->Joystick.y < 0.7f & ready_teleport) {
+                } else if (pSecondaryTrackedRemoteOld->Joystick.y < 0.7f & ready_teleport) {
                     ready_teleport = false;
                     trigger_teleport = true;
                     resetDoomYaw = true;
@@ -177,10 +193,10 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 
             //Apply a filter and quadratic scaler so small movements are easier to make
             //and we don't get movement jitter when the joystick doesn't quite center properly
-            float dist = length(pOffTrackedRemoteNew->Joystick.x, pOffTrackedRemoteNew->Joystick.y);
+            float dist = length(pSecondaryTrackedRemoteNew->Joystick.x, pSecondaryTrackedRemoteNew->Joystick.y);
             float nlf = nonLinearFilter(dist);
-            float x = nlf * pOffTrackedRemoteNew->Joystick.x;
-            float y = nlf * pOffTrackedRemoteNew->Joystick.y;
+            float x = nlf * pSecondaryTrackedRemoteNew->Joystick.x;
+            float y = nlf * pSecondaryTrackedRemoteNew->Joystick.y;
 
             //Apply a simple deadzone
             player_moving = (fabs(x) + fabs(y)) > 0.05f;
@@ -199,7 +215,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 
             // Turning logic
             static int increaseSnap = true;
-            if (pDominantTrackedRemoteNew->Joystick.x > 0.6f) {
+            if (pPrimaryTrackedRemoteNew->Joystick.x > 0.6f) {
                 if (increaseSnap) {
                     resetDoomYaw = true;
                     snapTurn -= vr_snapturn_angle;
@@ -211,12 +227,12 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                         snapTurn += 360.f;
                     }
                 }
-            } else if (pDominantTrackedRemoteNew->Joystick.x < 0.4f) {
+            } else if (pPrimaryTrackedRemoteNew->Joystick.x < 0.4f) {
                 increaseSnap = true;
             }
 
             static int decreaseSnap = true;
-            if (pDominantTrackedRemoteNew->Joystick.x < -0.6f) {
+            if (pPrimaryTrackedRemoteNew->Joystick.x < -0.6f) {
                 if (decreaseSnap) {
                     resetDoomYaw = true;
                     snapTurn += vr_snapturn_angle;
@@ -230,7 +246,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                         snapTurn -= 360.f;
                     }
                 }
-            } else if (pDominantTrackedRemoteNew->Joystick.x > -0.4f) {
+            } else if (pPrimaryTrackedRemoteNew->Joystick.x > -0.4f) {
                 decreaseSnap = true;
             }
         }
@@ -239,13 +255,13 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
     //Now handle all the buttons - irrespective of menu state - we might be trying to remap stuff
     {
         {
-            //Weapon Chooser - This _could_ be remapped
+            //Default this is Weapon Chooser - This _could_ be remapped
             static int itemSwitched = 0;
-            if (between(-0.2f, pDominantTrackedRemoteNew->Joystick.x, 0.2f) &&
-                (between(0.8f, pDominantTrackedRemoteNew->Joystick.y, 1.0f) ||
-                 between(-1.0f, pDominantTrackedRemoteNew->Joystick.y, -0.8f))) {
+            if (between(-0.2f, pPrimaryTrackedRemoteNew->Joystick.x, 0.2f) &&
+                (between(0.8f, pPrimaryTrackedRemoteNew->Joystick.y, 1.0f) ||
+                 between(-1.0f, pPrimaryTrackedRemoteNew->Joystick.y, -0.8f))) {
                 if (itemSwitched == 0) {
-                    if (between(0.8f, pDominantTrackedRemoteNew->Joystick.y, 1.0f)) {
+                    if (between(0.8f, pPrimaryTrackedRemoteNew->Joystick.y, 1.0f)) {
                         Joy_GenerateButtonEvents(0, 1, 1, KEY_MWHEELDOWN);
                         itemSwitched = 1;
                     } else {
@@ -260,6 +276,32 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                     Joy_GenerateButtonEvents(1, 0, 1, KEY_MWHEELUP);
                 }
                 itemSwitched = 0;
+            }
+        }
+
+        //If snap turn set to 0, then we can use left/right on the stick as mappable functions
+        if (vr_snapturn_angle == 0.0)
+        {
+            static int invSwitched = 0;
+            if (between(-0.2f, pPrimaryTrackedRemoteNew->Joystick.y, 0.2f) &&
+                (between(0.8f, pPrimaryTrackedRemoteNew->Joystick.x, 1.0f) ||
+                 between(-1.0f, pPrimaryTrackedRemoteNew->Joystick.x, -0.8f))) {
+                if (invSwitched == 0) {
+                    if (between(0.8f, pPrimaryTrackedRemoteNew->Joystick.x, 1.0f)) {
+                        Joy_GenerateButtonEvents(0, 1, 1, KEY_MWHEELLEFT);
+                        invSwitched = 1;
+                    } else {
+                        Joy_GenerateButtonEvents(0, 1, 1, KEY_MWHEELRIGHT);
+                        invSwitched = 2;
+                    }
+                }
+            } else {
+                if (invSwitched == 1) {
+                    Joy_GenerateButtonEvents(1, 0, 1, KEY_MWHEELLEFT);
+                } else if (invSwitched == 2) {
+                    Joy_GenerateButtonEvents(1, 0, 1, KEY_MWHEELRIGHT);
+                }
+                invSwitched = 0;
             }
 
         }

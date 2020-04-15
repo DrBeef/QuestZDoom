@@ -59,6 +59,7 @@ bool weaponStabilised;
 float vr_weapon_pitchadjust;
 bool vr_moveuseoffhand;
 float vr_snapturn_angle;
+bool vr_switchsticks;
 float vr_use_teleport;
 vec3_t offhandangles;
 vec3_t offhandoffset;
