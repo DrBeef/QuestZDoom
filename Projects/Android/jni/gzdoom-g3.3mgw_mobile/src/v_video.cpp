@@ -857,6 +857,29 @@ void DFrameBuffer::CopyWithGammaBgra(void *output, int pitch, const uint8_t *gam
 	}
 }
 
+//==========================================================================
+//
+// DFrameBuffer :: DrawVersionString
+//
+// Draws the version string to the main screen
+//
+//==========================================================================
+
+void DFrameBuffer::DrawVersionString ()
+{
+	if (gamestate == GS_STARTUP ||
+			gamestate == GS_DEMOSCREEN) {
+		char buff[60];
+
+		int textScale = active_con_scale();
+
+		mysnprintf(buff, countof(buff), "%s", GetVersionString());
+		DrawText(ConFont, CR_WHITE, 0, 0, (char *) &buff[0],
+				 DTA_VirtualWidth, screen->GetWidth() / textScale,
+				 DTA_VirtualHeight, screen->GetHeight() / textScale,
+				 DTA_KeepRatio, true, TAG_DONE);
+	}
+}
 
 //==========================================================================
 //

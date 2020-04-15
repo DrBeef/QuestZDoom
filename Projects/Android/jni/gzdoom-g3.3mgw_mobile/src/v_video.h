@@ -515,6 +515,7 @@ public:
 
 protected:
 	void DrawRateStuff ();
+	void DrawVersionString ();
 	void CopyFromBuff (uint8_t *src, int srcPitch, int width, int height, uint8_t *dest);
 	void CopyWithGammaBgra(void *output, int pitch, const uint8_t *gammared, const uint8_t *gammagreen, const uint8_t *gammablue, PalEntry flash, int flash_amount);
 

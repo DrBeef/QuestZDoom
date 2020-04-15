@@ -179,6 +179,7 @@ void OpenGLFrameBuffer::Update()
 	Begin2D(false);
 
 	DrawRateStuff();
+	DrawVersionString();
 	GLRenderer->Flush();
 
 	Swap();
