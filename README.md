@@ -80,7 +80,7 @@ Things to note / FAQs:
 ----------------------
 
 * Mods and Texture packs work as per GZDoom
-* I won't be implementing a laser sight
+* I won't be implementing a laser sight - There is a mod included in the mods folder that once enabled will give you a configurable laser-spot
 * I won't be implementing a vignette comfort mask for locomotion, that is what the teleport is for
 
 
@@ -93,7 +93,7 @@ This is a port of the LZDoom engine, so any mod that works with that should work
 Recommendations:
 ----------------
 
-* Use the QuestZDoom Launcher to play lots of different mods
+* Use Baggyg's QuestZDoom Launcher to play lots of different mods
 
 
 Known Issues:
@@ -107,10 +107,10 @@ Credits:
 
 I would like to thank the following teams and individuals for making this possible:
 
-* Emile Belanger - For being happy and helpful regarding using his Android build of LZDoom as a basis for this. See his other Android ports [here](http://www.beloko.com/)
 * [The ZDoom Teams](https://zdoom.org/index) - For the excellent engine this based upon.
+* Emile Belanger - For being happy for me to use his Android build of LZDoom as a basis for this. See his other Android ports [here](http://www.beloko.com/)
 * Everyone involved in the OpenVR GZDoom project, from which a lot of the 6DoF weapon functionality for this project was taken or used as inspiration
-* Baggyg - My long-time VR friend whose roles in this have been varied and all helpful, also the creator of the excellent QuestZDoom Launcher, a must-have tool for playing mods in QUestZDoom
+* Baggyg - My long-time VR friend whose roles in this have once again been varied and all helpful, also the creator of the excellent QuestZDoom Launcher, a must-have tool for playing mods in QUestZDoom - DO INSTALL THIS!!!
 * The [SideQuest](https://sidequestvr.com/#/news) team - For making it easy for people to install this
 * KollegeMostrich - For the various bits of artwork used for this github repo and the SideQuest listing
 * m8f () - For the excellent Laser Sight mod which I was given permission to distribute as part of this project, invaluable for playing some mods in VR that don't have iron-sights for aiming.
