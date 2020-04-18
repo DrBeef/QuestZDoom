@@ -87,34 +87,30 @@ Things to note / FAQs:
 Mods:
 -----
 
-In order to use mods, you need to supply command line params. For example to play Brutal Doom with the 3D weapon model pack:
-
-'''
-qzdoom
-'''
+This is a port of the LZDoom engine, so any mod that works with that should work with this.
 
 
 Recommendations:
 ----------------
 
-* Play Brutal Doom
-* Use the excellent weapon model pack from  which can be found here:
+* Use the QuestZDoom Launcher to play lots of different mods
 
 
 Known Issues:
 -------------
 
-_Performance_: Vanilla unmodded Doom is fine, however once you start using mods then the GZDoom engine is quite resource hungry. Brutal Doom is great fun and plays pretty well, but performance is mediocre at best, so you have been warned. Expect significant framedrops when there is a lot going on, this is unfortunately just a result of the system requirements of the engine.
+_Performance_: Vanilla unmodded Doom is fine, however once you start using mods then the GZDoom engine is quite resource hungry. Brutal Doom is great fun and plays pretty well, but performance can be shaky, so you have been warned. Expect significant framedrops when there is a lot going on, this is unfortunately just a result of the system requirements of the engine. Suggestion is to reduce supersampling to 0.9 to get much improved performance.
 
 
 Credits:
 --------
 
-I would like to thank the following teams and individual for making this possible:
+I would like to thank the following teams and individuals for making this possible:
 
 * Emile Belanger - For being happy and helpful regarding using his Android build of LZDoom as a basis for this. See his other Android ports [here](http://www.beloko.com/)
 * [The ZDoom Teams](https://zdoom.org/index) - For the excellent engine this based upon.
-* FishBiter and anyone involved in the OpenVR GZDoom project, from which a lot of the functionality for this project was taken or used as inspiration
-* Baggyg - My long-time VR friend whose roles in this have been varied and all helpful, also the creator of excellent websites/artwork/assets for this mod as well as altering models to be more VR friendly
+* Everyone involved in the OpenVR GZDoom project, from which a lot of the 6DoF weapon functionality for this project was taken or used as inspiration
+* Baggyg - My long-time VR friend whose roles in this have been varied and all helpful, also the creator of the excellent QuestZDoom Launcher, a must-have tool for playing mods in QUestZDoom
 * The [SideQuest](https://sidequestvr.com/#/news) team - For making it easy for people to install this
-
+* KollegeMostrich - For the various bits of artwork used for this github repo and the SideQuest listing
+* m8f () - For the excellent Laser Sight mod which I was given permission to distribute as part of this project, invaluable for playing some mods in VR that don't have iron-sights for aiming.
