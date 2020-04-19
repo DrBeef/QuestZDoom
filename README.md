@@ -18,6 +18,15 @@ IMPORTANT NOTE
 This is just an engine port; though the apk does contain the shareware version of Doom, not the full game. If you wish to play the full game you must purchase it yourself, steam is most straightforward:  https://store.steampowered.com/app/2280/Ultimate_Doom/
 
 
+
+This port features..
+--------------------
+
+* Two handed weapon grip
+* Haptic Feedback
+* Smooth Locomotion, Teleport locomotion, Smooth/Snap turn
+
+
 Copying the Full Game WAD files to your Oculus Quest
 ----------------------------------------------------
 
@@ -46,7 +55,7 @@ All these controls are for right-handed mode and are the basic/default mappings,
 * A Button - Open Door / Switch
 * B Button - Jump
 * Y Button - 
-* X Button - 
+* X Button - Delete a button mapping in the menu
 
 * Dominant-Hand Controller - Weapon orientation
 * Dominant-Hand Thumbstick - left/right Snap turn, up/down weapon change
@@ -87,7 +96,7 @@ Things to note / FAQs:
 Mods:
 -----
 
-This is a port of the LZDoom engine, so any mod that works with that should work with this.
+This is a port of the LZDoom (3.83a) engine, so any mod that works with that should work with this.
 
 
 Recommendations:
