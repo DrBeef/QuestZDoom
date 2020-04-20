@@ -23,8 +23,9 @@ This port features..
 --------------------
 
 * Two handed weapon grip
-* Haptic Feedback
+* Awesome Haptic Feedback
 * Smooth Locomotion, Teleport locomotion, Smooth/Snap turn
+* All the cool mod support of LZDoom
 
 
 Copying the Full Game WAD files to your Oculus Quest
@@ -54,12 +55,12 @@ All these controls are for right-handed mode and are the basic/default mappings,
 
 * A Button - Open Door / Switch
 * B Button - Jump
-* Y Button - 
-* X Button - Delete a button mapping in the menu
+* Y Button - Toggle AutoMap
+* X Button - Unmapped  [Delete a button mapping in the menu]
 
 * Dominant-Hand Controller - Weapon orientation
 * Dominant-Hand Thumbstick - left/right Snap turn, up/down weapon change
-* Dominant-Hand Thumbstick click - 
+* Dominant-Hand Thumbstick click - Unmapped
 * Dominant-Hand Trigger - Fire Weapon
 * Dominant Grip Button - When held down, secondary button functions are available
 
@@ -67,22 +68,22 @@ All these controls are for right-handed mode and are the basic/default mappings,
 * Off-Hand Thumbstick - locomotion / teleport
 * Off-Hand Trigger - Run
 * Off-Hand Grip Button - Weapon Stabilisation - two handed weapon mode
-* Off-Hand Thumbstick click - 
+* Off-Hand Thumbstick click - Unmapped
 
 *Secondary Button Functions*
 
 Accessed by holding down the dominant hand grip button - All these can be reassigned in the options menu
 
-* A Button - 
-* B Button - 
-* Y Button - 
-* X Button - 
+* A Button - Unmapped
+* B Button - Unmapped
+* Y Button - Unmapped
+* X Button - Unmapped
 
-* Dominant-Hand Thumbstick click - 
-* Dominant-Hand Trigger - Secondary Fire Weapon
+* Dominant-Hand Thumbstick click - Unmapped
+* Dominant-Hand Trigger - Alt Fire Weapon
 
-* Off-Hand Trigger - 
-* Off-Hand Thumbstick click - 
+* Off-Hand Trigger - Unmapped
+* Off-Hand Thumbstick click - Unmapped
 
 
 Things to note / FAQs:
