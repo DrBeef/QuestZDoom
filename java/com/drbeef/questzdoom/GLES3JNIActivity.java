@@ -138,8 +138,7 @@ import android.support.v4.content.ContextCompat;
 		checkPermissionsAndInitialize();
 	}
 
-	public void create()
-	{
+	public void create() {
 		copy_asset("/sdcard/QuestZDoom", "commandline.txt", false);
 
 		//Create all required folders
@@ -151,14 +150,17 @@ import android.support.v4.content.ContextCompat;
 		copy_asset("/sdcard/QuestZDoom", "res/lz_game_support.pk3", true);
 		copy_asset("/sdcard/QuestZDoom", "res/lights.pk3", true);
 		copy_asset("/sdcard/QuestZDoom", "res/brightmaps.pk3", true);
-		copy_asset("/sdcard/QuestZDoom", "mods/laser-sight-0.5.5-vr.pk3", false);
+
+		copy_asset("/sdcard/QuestZDoom", "mods/cheats-menu.pk3", true);
+		copy_asset("/sdcard/QuestZDoom", "mods/laser-sight-0.5.5-vr.pk3", true);
+
 		copy_asset("/sdcard/QuestZDoom/audiopack", "snd_fluidsynth/fluidsynth.sf2", false);
 
 		//Doom Sharware WAD
 		copy_asset("/sdcard/QuestZDoom", "wads/DOOM1.WAD", false);
 
 		//Read these from a file and pass through
-		commandLineParams = new String("doom");
+		commandLineParams = new String("qzdoom");
 
 		//See if user is trying to use command line params
 		if(new File("/sdcard/QuestZDoom/commandline.txt").exists()) // should exist!

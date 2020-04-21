@@ -1,0 +1,32 @@
+OptionMenu cheat_Options
+{
+  Title			"Console Cheat Commands"
+  
+  StaticText	""
+  Option 		"Enable Cheats", 	"allcheats", "OnOff"
+
+  StaticText	""
+  Command		"No Clip",			"noclip"
+  Command		"IDFA",				"idfa"
+  Command		"IDKFA",			"idkfa"
+  Command		"IDDQD",			"iddqd"
+  Command		"POWER-UP",			"powerup"
+
+  StaticText	""
+  Command		"GOD",			    "god"
+  Command		"GOD2",			    "god2"
+  Command		"BUDDHA",		    "buddha"
+  Command		"BUDDHA2",		    "buddha2"
+  Command		"ANUBIS",		    "anubis"
+  Command		"RESURRECT",		    "resurrect"
+
+  StaticText	""
+  Command		"NO TARGET",		"notarget"
+  Command		"FLY",		        "fly"
+}
+
+AddOptionMenu OptionsMenu
+{
+  StaticText ""
+  Submenu    "Cheat Commands", cheat_Options
+}
