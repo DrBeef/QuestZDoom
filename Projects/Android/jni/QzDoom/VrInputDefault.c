@@ -182,9 +182,9 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 
             //Teleport - only does anything if vr_teleport cvar is true
             if (vr_use_teleport) {
-                if (pSecondaryTrackedRemoteOld->Joystick.y > 0.7f && !ready_teleport) {
+                if ((pSecondaryTrackedRemoteOld->Joystick.y > 0.7f) && !ready_teleport) {
                     ready_teleport = true;
-                } else if (pSecondaryTrackedRemoteOld->Joystick.y < 0.7f & ready_teleport) {
+                } else if ((pSecondaryTrackedRemoteOld->Joystick.y < 0.7f) && ready_teleport) {
                     ready_teleport = false;
                     trigger_teleport = true;
                 }
