@@ -187,7 +187,6 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                 } else if (pSecondaryTrackedRemoteOld->Joystick.y < 0.7f & ready_teleport) {
                     ready_teleport = false;
                     trigger_teleport = true;
-                    resetDoomYaw = true;
                 }
             }
 

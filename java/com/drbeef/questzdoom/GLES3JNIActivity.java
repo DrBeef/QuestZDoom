@@ -151,7 +151,7 @@ import android.support.v4.content.ContextCompat;
 		copy_asset("/sdcard/QuestZDoom", "res/lights.pk3", true);
 		copy_asset("/sdcard/QuestZDoom", "res/brightmaps.pk3", true);
 
-		copy_asset("/sdcard/QuestZDoom", "mods/cheats-menu.pk3", true);
+		copy_asset("/sdcard/QuestZDoom", "mods/Ultimate-Cheat-Menu.zip", true);
 		copy_asset("/sdcard/QuestZDoom", "mods/laser-sight-0.5.5-vr.pk3", true);
 
 		copy_asset("/sdcard/QuestZDoom/audiopack", "snd_fluidsynth/fluidsynth.sf2", false);
