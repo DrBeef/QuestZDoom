@@ -867,6 +867,14 @@ void DFrameBuffer::CopyWithGammaBgra(void *output, int pitch, const uint8_t *gam
 
 void DFrameBuffer::DrawVersionString ()
 {
+	static uint64_t first = screen->FrameTime;
+
+	//Only show version string for 5 seconds
+	if ((screen->FrameTime - first) > 5000)
+	{
+		return;
+	}
+
 	if (gamestate == GS_STARTUP ||
 			gamestate == GS_DEMOSCREEN) {
 		char buff[60];

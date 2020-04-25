@@ -42,7 +42,7 @@ import android.support.v4.content.ContextCompat;
 	private static final int READ_EXTERNAL_STORAGE_PERMISSION_ID = 1;
 	private static final int WRITE_EXTERNAL_STORAGE_PERMISSION_ID = 2;
 
-	String commandLineParams;
+	private String commandLineParams;
 
 	private SurfaceView mView;
 	private SurfaceHolder mSurfaceHolder;
@@ -138,12 +138,23 @@ import android.support.v4.content.ContextCompat;
 		checkPermissionsAndInitialize();
 	}
 
+	private boolean isPackageInstalled(String packageName, PackageManager packageManager) {
+		try {
+			packageManager.getPackageGids(packageName);
+			return true;
+		} catch (PackageManager.NameNotFoundException e) {
+			return false;
+		}
+	}
+
 	public void create() {
+
 		copy_asset("/sdcard/QuestZDoom", "commandline.txt", false);
 
 		//Create all required folders
 		new File("/sdcard/QuestZDoom/res").mkdirs();
 		new File("/sdcard/QuestZDoom/mods").mkdirs();
+		new File("/sdcard/QuestZDoom/wads").mkdirs();
 		new File("/sdcard/QuestZDoom/audiopack/snd_fluidsynth").mkdirs();
 
 		copy_asset("/sdcard/QuestZDoom", "res/lzdoom.pk3", true);
@@ -155,9 +166,6 @@ import android.support.v4.content.ContextCompat;
 		copy_asset("/sdcard/QuestZDoom", "mods/laser-sight-0.5.5-vr.pk3", true);
 
 		copy_asset("/sdcard/QuestZDoom/audiopack", "snd_fluidsynth/fluidsynth.sf2", false);
-
-		//Doom Sharware WAD
-		copy_asset("/sdcard/QuestZDoom", "wads/DOOM1.WAD", false);
 
 		//Read these from a file and pass through
 		commandLineParams = new String("qzdoom");
@@ -184,7 +192,12 @@ import android.support.v4.content.ContextCompat;
 			}
 		}
 
-		mNativeHandle = GLES3JNILib.onCreate( this, commandLineParams );
+		//If there are no IWADS, then should exit after creating the folders
+		//to allow the launcher app to do its thing, otherwise it would crash anyway
+		//Check that launcher is installed too
+        boolean hasIWADsAndLauncher = ((new File("/sdcard/QuestZDoom/wads").listFiles().length) > 0) &&
+				isPackageInstalled("com.Baggyg.QuestZDoom_Launcher", this.getPackageManager());
+		mNativeHandle = GLES3JNILib.onCreate( this, commandLineParams, hasIWADsAndLauncher);
 	}
 	
 	public void copy_asset(String path, String name, boolean force) {

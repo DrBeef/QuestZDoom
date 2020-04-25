@@ -1,1 +1,1 @@
-qzdoom -iwad wads/DOOM1.WAD
+qzdoom
