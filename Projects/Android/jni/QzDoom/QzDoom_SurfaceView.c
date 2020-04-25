@@ -159,7 +159,8 @@ LAMBDA1VR Stuff
 //This is now controlled by the engine
 static bool useVirtualScreen = true;
 
-static bool hasIWADsAndLauncher = false;
+static bool hasIWADs = false;
+static bool hasLauncher = false;
 
 void QzDoom_setUseScreenLayer(bool use)
 {
@@ -1475,11 +1476,15 @@ void * AppThreadFunction(void * parm ) {
 		showLoadingIcon();
 	}
 
-	if (hasIWADsAndLauncher) {
+	if (hasIWADs && hasLauncher) {
 		//Should now be all set up and ready - start the Doom main loop
 		VR_DoomMain(argc, argv);
 	} else {
-        vrapi_ShowFatalError(&gAppState.Java, "Missing Launcher", "Please install Baggyg's Launcher to start QuestZDoom correctly", "", 666);
+	    if (!hasLauncher) {
+            vrapi_ShowFatalError(&gAppState.Java, "Missing Launcher",
+                                 "Please install Baggyg's Launcher to start QuestZDoom correctly",
+                                 "QuestZDoom", 666);
+        }
 	}
 
 	//We are done, shutdown cleanly
@@ -1750,7 +1755,7 @@ int JNI_OnLoad(JavaVM* vm, void* reserved)
 }
 
 JNIEXPORT jlong JNICALL Java_com_drbeef_questzdoom_GLES3JNILib_onCreate( JNIEnv * env, jclass activityClass, jobject activity,
-																	   jstring commandLineParams, jboolean jHasIWADs)
+																	   jstring commandLineParams, jboolean jHasIWADs, jboolean jHasLauncher)
 {
 	ALOGV( "    GLES3JNILib::onCreate()" );
 
@@ -1767,7 +1772,8 @@ JNIEXPORT jlong JNICALL Java_com_drbeef_questzdoom_GLES3JNILib_onCreate( JNIEnv 
 	jboolean iscopy;
 	const char *arg = (*env)->GetStringUTFChars(env, commandLineParams, &iscopy);
 
-	hasIWADsAndLauncher = jHasIWADs != 0;
+	hasIWADs = jHasIWADs != 0;
+	hasLauncher = jHasLauncher != 0;
 
 	char *cmdLine = NULL;
 	if (arg && strlen(arg))

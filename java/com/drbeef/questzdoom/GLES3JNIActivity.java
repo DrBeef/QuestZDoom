@@ -195,9 +195,9 @@ import android.support.v4.content.ContextCompat;
 		//If there are no IWADS, then should exit after creating the folders
 		//to allow the launcher app to do its thing, otherwise it would crash anyway
 		//Check that launcher is installed too
-        boolean hasIWADsAndLauncher = ((new File("/sdcard/QuestZDoom/wads").listFiles().length) > 0) &&
-				isPackageInstalled("com.Baggyg.QuestZDoom_Launcher", this.getPackageManager());
-		mNativeHandle = GLES3JNILib.onCreate( this, commandLineParams, hasIWADsAndLauncher);
+        boolean hasIWADs = ((new File("/sdcard/QuestZDoom/wads").listFiles().length) > 0);
+		boolean hasLauncher = isPackageInstalled("com.Baggyg.QuestZDoom_Launcher", this.getPackageManager());
+		mNativeHandle = GLES3JNILib.onCreate( this, commandLineParams, hasIWADs, hasLauncher );
 	}
 	
 	public void copy_asset(String path, String name, boolean force) {
