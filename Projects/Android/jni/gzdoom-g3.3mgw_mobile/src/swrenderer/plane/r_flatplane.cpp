@@ -203,7 +203,7 @@ namespace swrenderer
 			drawerargs.SetLight(basecolormap, (float)(GlobVis * fabs(viewport->CenterY - y)), planeshade);
 		}
 
-		if (r_dynlights)
+		if (vr_dynlights)
 		{
 			int tx = x1;
 			bool mirror = !!(Thread->Portal->MirrorFlags & RF_XFLIP);

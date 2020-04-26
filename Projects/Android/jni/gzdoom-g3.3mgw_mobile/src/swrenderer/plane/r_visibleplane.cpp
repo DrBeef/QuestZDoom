@@ -67,7 +67,7 @@ namespace swrenderer
 
 	void VisiblePlane::AddLights(RenderThread *thread, FLightNode *node)
 	{
-		if (!r_dynlights)
+		if (!vr_dynlights)
 			return;
 
 		CameraLight *cameraLight = CameraLight::Instance();

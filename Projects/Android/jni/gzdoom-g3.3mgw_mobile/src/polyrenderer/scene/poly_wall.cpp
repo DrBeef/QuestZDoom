@@ -405,7 +405,7 @@ void RenderPolyWall::Render(PolyRenderThread *thread)
 
 void RenderPolyWall::SetDynLights(PolyRenderThread *thread, PolyDrawArgs &args)
 {
-	if (!r_dynlights)
+	if (!vr_dynlights)
 	{
 		args.SetLights(nullptr, 0);
 		return;

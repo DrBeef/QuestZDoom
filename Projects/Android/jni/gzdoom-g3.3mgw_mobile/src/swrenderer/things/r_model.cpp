@@ -152,7 +152,7 @@ namespace swrenderer
 
 	void SWModelRenderer::AddLights(AActor *actor)
 	{
-		if (r_dynlights && actor)
+		if (vr_dynlights && actor)
 		{
 			auto &addedLights = Thread->AddedLightsArray;
 

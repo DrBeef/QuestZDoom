@@ -246,7 +246,7 @@ namespace swrenderer
 		bool fullbright = !vis->foggy && ((renderflags & RF_FULLBRIGHT) || (thing->flags5 & MF5_BRIGHT));
 		bool fadeToBlack = (vis->RenderStyle.Flags & STYLEF_FadeToBlack) != 0;
 		
-		if (r_dynlights && gl_light_sprites)
+		if (vr_dynlights && gl_light_sprites)
 		{
 			float lit_red = 0;
 			float lit_green = 0;

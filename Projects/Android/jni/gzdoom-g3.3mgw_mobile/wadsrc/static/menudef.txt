@@ -2277,39 +2277,46 @@ OptionMenu VROptionsMenu protected
 {
 	Title "VR OPTIONS"
 
+	StaticText "Misc"
 	Slider "Height Adjust",		        "vr_height_adjust", 0.0, 1.0, 0.01, 2
 
-	StaticText " "
+	StaticText ""
+	StaticText "VR Controls"
 	Option "Control Scheme",		    "vr_control_scheme", "ControlScheme"
 	Option "Switch Thumsticks",		    "vr_switch_sticks", "OnOff"
 	Option "Off-hand Move Direction",	"vr_move_use_offhand", "OffOn"
-	Option "Use Teleport",		        "vr_teleport", "OnOff"
 	Slider "Snap-turn Angle",		    "vr_snapTurn", 0.0, 90.0, 1.0, 2
 
-	StaticText " "
-	Slider "Item Pickup Haptic Level",  "vr_pickup_haptic_level", 0.0, 1.0, 0.1, 2
-	Slider "Quake Haptic Level",        "vr_quake_haptic_level", 0.0, 1.0, 0.1, 2
-
-	StaticText " "
+	StaticText "Locomotion"
+	Option "Use Teleport",		        "vr_teleport", "OnOff"
 	Slider "Walking Speed",		        "vr_move_speed", 5, 50, 1, 2
 	Slider "Run Multiplier",	        "vr_run_multiplier", 0.0, 4.0, 0.1, 2
 
-	StaticText " "
+	StaticText ""
+	StaticText "Haptics"
+	Slider "Item Pickup Haptic Level",  "vr_pickup_haptic_level", 0.0, 1.0, 0.1, 2
+	Slider "Quake Haptic Level",        "vr_quake_haptic_level", 0.0, 1.0, 0.1, 2
+
+	StaticText ""
+	StaticText "Weapon"
 	Slider "Weapon Pitch Adjust",		"vr_weaponRotate", -45, 45, 5, 2
 	Slider "Weapon Scale",		        "vr_weaponScale", 0.1, 1.0, 0.01, 2
 	Option "Weapon Sprite 3D",			"r_PlayerSprites3DMode", "Sprites3DMode"
 	Slider "Weapon Fat Item Width",		"gl_fatItemWidth", 0.1, 1.0, 0.1, 2
 	Option "Weapon Recoil",		        "vr_recoil", "OnOff"
 
-	StaticText " "
-	Option "Show VR HUD FPS",		    "vid_fps", "OnOff"
-
-	StaticText " "
+	StaticText ""
+	StaticText "HUD"
 	Slider "VR HUD Scale",		        "vr_hud_scale", 0.05, 1.0, 0.05, 2
 	Slider "VR HUD Stereo",		        "vr_hud_stereo", 0.0, 3.0, 0.1, 2
 	Slider "VR HUD Pitch Rotate",		"vr_hud_rotate", 0.0, 50.0, 1.0, 2
 	Option "VR HUD Fix Pitch",		    "vr_hud_fixed_pitch", "OnOff"
 	Option "VR HUD Fix Roll",		    "vr_hud_fixed_roll", "OnOff"
+
+	StaticText ""
+	StaticText "Display"
+	Option "Show VR HUD FPS",		    "vid_fps", "OnOff"
+	Option "Dynamic Lights (CAUTION)",	"vr_dynlights", "OnOff"
 }
 
 /*=======================================
@@ -2612,7 +2619,6 @@ OptionMenu "GLTextureGLOptions" protected
 OptionMenu "GLLightOptions" protected
 {
 	Title "$GLLIGHTMNU_TITLE"
-	Option "$TCMNU_DYNLIGHTS",					"r_dynlights", "OnOff"
 	Option "$GLLIGHTMNU_LIGHTSENABLED",			gl_lights,				"OnOff"
 	Option "$GLLIGHTMNU_CLIPLIGHTS",			gl_lights_checkside,	"YesNo"
 	Option "$GLLIGHTMNU_LIGHTSPRITES",			gl_light_sprites,		"YesNo"

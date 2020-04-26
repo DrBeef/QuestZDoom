@@ -1479,13 +1479,27 @@ void * AppThreadFunction(void * parm ) {
 	if (hasIWADs && hasLauncher) {
 		//Should now be all set up and ready - start the Doom main loop
 		VR_DoomMain(argc, argv);
-	} else {
+	}
+	//Doesn't work
+	/*
+	else {
 	    if (!hasLauncher) {
             vrapi_ShowFatalError(&gAppState.Java, "Missing Launcher",
-                                 "Please install Baggyg's Launcher to start QuestZDoom correctly",
+                                 "Please install and run QuestZDoom Launcher to start correctly",
                                  "QuestZDoom", 666);
+        } else {
+            vrapi_ShowFatalError(&gAppState.Java, "No IWADs Found",
+                                 "Please install a valid IWAD using QuestZDoom Launcher",
+                                 "QuestZDoom", 666);
+	    }
+
+        while (!destroyed) {
+            QzDoom_processMessageQueue();
+            QzDoom_getTrackedRemotesOrientation(0);
+            incrementFrameIndex();
+            showLoadingIcon();
         }
-	}
+	}*/
 
 	//We are done, shutdown cleanly
 	shutdownVR();

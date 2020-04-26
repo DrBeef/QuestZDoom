@@ -71,6 +71,10 @@ CVAR(Bool, vr_switch_sticks, false, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 CVAR(Float, vr_pickup_haptic_level, 0.2, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 CVAR(Float, vr_quake_haptic_level, 0.8, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 
+//Our own control over dynamic lights
+CVAR(Bool, vr_dynlights, 0, CVAR_ARCHIVE | CVAR_GLOBALCONFIG);
+
+
 //HUD control
 CVAR(Float, vr_hud_scale, 0.3f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 CVAR(Float, vr_hud_stereo, 1.8f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
