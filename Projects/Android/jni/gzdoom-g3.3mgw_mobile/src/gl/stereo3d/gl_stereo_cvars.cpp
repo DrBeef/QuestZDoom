@@ -74,8 +74,8 @@ CVAR(Float, vr_quake_haptic_level, 0.8, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 
 //HUD control
 CVAR(Float, vr_hud_scale, 0.3f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
-CVAR(Float, vr_hud_stereo, 1.8f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
-CVAR(Float, vr_hud_rotate, 35.f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
+CVAR(Float, vr_hud_stereo, 1.5f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
+CVAR(Float, vr_hud_rotate, 13.f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 CVAR(Bool, vr_hud_fixed_pitch, true, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 CVAR(Bool, vr_hud_fixed_roll, true, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 

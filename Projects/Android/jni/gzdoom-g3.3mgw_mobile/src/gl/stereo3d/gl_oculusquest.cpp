@@ -226,7 +226,7 @@ namespace s3d
     OculusQuestMode::OculusQuestMode()
             : leftEyeView(0)
             , rightEyeView(1)
-            , sceneWidth(0), sceneHeight(0)
+            , sceneWidth(0), sceneHeight(0), cachedScreenBlocks(0)
     {
         eye_ptrs.Push(&leftEyeView);
         eye_ptrs.Push(&rightEyeView);
@@ -289,6 +289,8 @@ namespace s3d
                 || (vr_control_scheme >= 10 && hand == 0)) {
                 mat->translate(-weaponoffset[0], (hmdPosition[1] + weaponoffset[1] + vr_height_adjust) / pixelstretch, weaponoffset[2]);
 
+                mat->scale(1, 1 / pixelstretch, 1);
+
                 mat->rotate(-90 + (doomYaw - hmdorientation[YAW]) + weaponangles[YAW], 0, 1, 0);
                 mat->rotate(-weaponangles[PITCH], 1, 0, 0);
                 mat->rotate(-weaponangles[ROLL], 0, 0, 1);
@@ -296,6 +298,8 @@ namespace s3d
             else
             {
                 mat->translate(-offhandoffset[0], (hmdPosition[1] + offhandoffset[1] + vr_height_adjust) / pixelstretch, offhandoffset[2]);
+
+                mat->scale(1, 1 / pixelstretch, 1);
 
                 mat->rotate(-90 + (doomYaw - hmdorientation[YAW]) + offhandangles[YAW], 0, 1, 0);
                 mat->rotate(-offhandangles[PITCH], 1, 0, 0);
@@ -583,7 +587,7 @@ namespace s3d
 /* virtual */
     void OculusQuestMode::TearDown() const
     {
-        if (gamestate == GS_LEVEL) {
+        if (gamestate == GS_LEVEL && cachedScreenBlocks != 0) {
             screenblocks = cachedScreenBlocks;
         }
         super::TearDown();
