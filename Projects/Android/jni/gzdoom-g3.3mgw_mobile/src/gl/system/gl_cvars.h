@@ -21,7 +21,9 @@ EXTERN_CVAR(Bool, gl_usefb)
 
 EXTERN_CVAR(Int, gl_weaponlight)
 
-EXTERN_CVAR (Bool, gl_lights);
+EXTERN_CVAR (Bool, vr_dynlights);
+
+EXTERN_CVAR (Bool, gl_lights); // Now does nothing - replaced by our vr cvar
 EXTERN_CVAR (Bool, gl_lights_checkside);
 EXTERN_CVAR (Bool, gl_light_sprites);
 EXTERN_CVAR (Bool, gl_light_particles);

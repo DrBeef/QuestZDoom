@@ -269,7 +269,7 @@ void RenderPolyPlane::SetLightLevel(PolyRenderThread *thread, PolyDrawArgs &args
 
 void RenderPolyPlane::SetDynLights(PolyRenderThread *thread, PolyDrawArgs &args, subsector_t *sub, bool ceiling)
 {
-	if (!vr_dynlights)
+	if (!r_dynlights)
 	{
 		args.SetLights(nullptr, 0);
 		return;

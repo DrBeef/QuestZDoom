@@ -493,7 +493,7 @@ void GLWall::RenderTranslucentWall()
 {
 	if (gltexture)
 	{
-		if (mDrawer->FixedColormap == CM_DEFAULT && gl_lights && gl.lightmethod == LM_DIRECT)
+		if (mDrawer->FixedColormap == CM_DEFAULT && vr_dynlights && gl.lightmethod == LM_DIRECT)
 		{
 			SetupLights();
 		}

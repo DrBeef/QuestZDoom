@@ -52,7 +52,7 @@
 #include "r_thread.h"
 #include "swrenderer/scene/r_light.h"
 
-CVAR(Bool, r_dynlights, 0, CVAR_ARCHIVE | CVAR_GLOBALCONFIG); // Now does nothing in VR
+CVAR(Bool, r_dynlights, 0, CVAR_ARCHIVE | CVAR_GLOBALCONFIG);
 CVAR(Bool, r_fuzzscale, 1, CVAR_ARCHIVE | CVAR_GLOBALCONFIG);
 
 namespace swrenderer

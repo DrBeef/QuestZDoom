@@ -4,7 +4,7 @@
 #include "cycler.h"
 #include "g_levellocals.h"
 
-EXTERN_CVAR(Bool, gl_lights)
+EXTERN_CVAR(Bool, vr_dynlights)
 
 class FSerializer;
 

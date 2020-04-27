@@ -111,7 +111,7 @@ PolyModelRenderer::PolyModelRenderer(PolyRenderThread *thread, const Mat4f &worl
 
 void PolyModelRenderer::AddLights(AActor *actor)
 {
-	if (vr_dynlights && actor)
+	if (r_dynlights && actor)
 	{
 		auto &addedLights = Thread->AddedLightsArray;
 

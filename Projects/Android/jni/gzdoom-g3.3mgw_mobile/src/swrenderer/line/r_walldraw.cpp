@@ -185,7 +185,7 @@ namespace swrenderer
 		float zcol = 1.0f / wcol;
 		float zbufferdepth = 1.0f / (zcol / Thread->Viewport->viewwindow.FocalTangent);
 
-		if (vr_dynlights && light_list)
+		if (r_dynlights && light_list)
 		{
 			auto viewport = Thread->Viewport.get();
 			

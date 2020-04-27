@@ -284,7 +284,7 @@ void GLWall::DrawDecal(DBaseDecal *decal)
 	}
 
 	// calculate dynamic light effect.
-	if (gl_lights && GLRenderer->mLightCount && !mDrawer->FixedColormap && gl_light_sprites)
+	if (vr_dynlights && GLRenderer->mLightCount && !mDrawer->FixedColormap && gl_light_sprites)
 	{
 		// Note: This should be replaced with proper shader based lighting.
 		double x, y;

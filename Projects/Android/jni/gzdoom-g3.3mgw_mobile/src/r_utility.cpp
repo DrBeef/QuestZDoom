@@ -361,7 +361,7 @@ double R_GetGlobVis(const FViewWindow &viewwindow, double vis)
 //
 //==========================================================================
 
-CUSTOM_CVAR (Int, screenblocks, 10, CVAR_ARCHIVE)
+CUSTOM_CVAR (Int, screenblocks, 11, CVAR_ARCHIVE)
 {
 	if (self > 12)
 		self = 12;

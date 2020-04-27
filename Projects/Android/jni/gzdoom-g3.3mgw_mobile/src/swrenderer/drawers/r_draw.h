@@ -16,7 +16,7 @@ EXTERN_CVAR(Float, r_lod_bias);
 EXTERN_CVAR(Int, r_drawfuzz);
 EXTERN_CVAR(Bool, r_drawtrans);
 EXTERN_CVAR(Float, transsouls);
-EXTERN_CVAR(Bool, vr_dynlights);
+EXTERN_CVAR(Bool, r_dynlights);
 EXTERN_CVAR(Bool, r_fuzzscale);
 
 class DrawerCommandQueue;
