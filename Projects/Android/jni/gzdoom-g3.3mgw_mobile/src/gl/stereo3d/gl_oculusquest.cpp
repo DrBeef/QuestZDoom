@@ -75,9 +75,19 @@ EXTERN_CVAR(Float, vr_hud_rotate);
 EXTERN_CVAR(Bool, vr_hud_fixed_pitch);
 EXTERN_CVAR(Bool, vr_hud_fixed_roll);
 
+//Automap  control
+EXTERN_CVAR(Bool, vr_automap_use_hud);
+EXTERN_CVAR(Float, vr_automap_scale);
+EXTERN_CVAR(Float, vr_automap_stereo);
+EXTERN_CVAR(Float, vr_automap_rotate);
+EXTERN_CVAR(Bool,  vr_automap_fixed_pitch);
+EXTERN_CVAR(Bool,  vr_automap_fixed_roll);
+
 double P_XYMovement(AActor *mo, DVector2 scroll);
 extern "C" void VR_GetMove( float *joy_forward, float *joy_side, float *hmd_forward, float *hmd_side, float *up, float *yaw, float *pitch, float *roll );
 void ST_Endoom();
+
+extern bool		automapactive;	// in AM_map.c
 
 namespace s3d
 {
@@ -147,12 +157,18 @@ namespace s3d
         return true;
     }
 
+    template<class TYPE>
+    TYPE& getHUDValue(TYPE &automap, TYPE &hud)
+    {
+        return (automapactive && !vr_automap_use_hud) ? automap : hud;
+    }
+
     VSMatrix OculusQuestEyePose::getHUDProjection() const
     {
         VSMatrix new_projection;
         new_projection.loadIdentity();
 
-        float stereo_separation = (vr_ipd * 0.5) * vr_vunits_per_meter * vr_hud_stereo * (eye == 1 ? -1.0 : 1.0);
+        float stereo_separation = (vr_ipd * 0.5) * vr_vunits_per_meter * getHUDValue<FFloatCVar>(vr_automap_stereo, vr_hud_stereo) * (eye == 1 ? -1.0 : 1.0);
         new_projection.translate(stereo_separation, 0, 0);
 
         // doom_units from meters
@@ -161,16 +177,16 @@ namespace s3d
                 vr_vunits_per_meter,
                 -vr_vunits_per_meter);
         double pixelstretch = level.info ? level.info->pixelstretch : 1.2;
-        new_projection.scale(pixelstretch, pixelstretch, 1.0); // Doom universe is scaled by 1990s pixel aspect ratio
+        new_projection.scale(1.0, pixelstretch, 1.0); // Doom universe is scaled by 1990s pixel aspect ratio
 
-        if (vr_hud_fixed_roll)
+        if (getHUDValue<FBoolCVar>(vr_automap_fixed_roll,vr_hud_fixed_roll))
         {
             new_projection.rotate(-hmdorientation[ROLL], 0, 0, 1);
         }
 
-        new_projection.rotate(vr_hud_rotate, 1, 0, 0);
+        new_projection.rotate(getHUDValue<FFloatCVar>(vr_automap_rotate, vr_hud_rotate), 1, 0, 0);
 
-        if (vr_hud_fixed_pitch)
+        if (getHUDValue<FBoolCVar>(vr_automap_fixed_pitch, vr_hud_fixed_pitch))
         {
             new_projection.rotate(-hmdorientation[PITCH], 1, 0, 0);
         }
@@ -179,10 +195,11 @@ namespace s3d
         // const float weapon_distance_meters = 0.55f;
         // const float weapon_width_meters = 0.3f;
         new_projection.translate(0.0, 0.0, 1.0);
+        double vr_scale = getHUDValue<FFloatCVar>(vr_automap_scale, vr_hud_scale);
         new_projection.scale(
-                -vr_hud_scale,
-                vr_hud_scale,
-                -vr_hud_scale);
+                -vr_scale,
+                vr_scale,
+                -vr_scale);
 
         // ndc coordinates from pixel coordinates
         new_projection.translate(-1.0, 1.0, 0);

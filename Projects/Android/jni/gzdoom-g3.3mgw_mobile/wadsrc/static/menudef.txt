@@ -2273,6 +2273,29 @@ OptionValue "Sprites3DMode"
 	3, "Fat Item"
 }
 
+OptionMenu VRHUDOptions protected
+{
+	Title "VR HUD OPTIONS"
+
+	StaticText ""
+	StaticText "HUD"
+	Slider "VR HUD Scale",		        "vr_hud_scale", 0.05, 1.0, 0.05, 2
+	Slider "VR HUD Stereo Effect",		"vr_hud_stereo", 0.0, 5.0, 0.1, 2
+	Slider "VR HUD Pitch Rotate",		"vr_hud_rotate", 0.0, 50.0, 1.0, 2
+	Option "VR HUD Fix Pitch",		    "vr_hud_fixed_pitch", "OnOff"
+	Option "VR HUD Fix Roll",		    "vr_hud_fixed_roll", "OnOff"
+
+	StaticText ""
+	StaticText "Automap"
+	Option "VR Automap Use HUD Settings",   "vr_automap_use_hud", "YesNo"
+	StaticText ""
+	Slider "VR Automap Scale",		        "vr_automap_scale", 0.05, 1.0, 0.05, 2
+	Slider "VR Automap Stereo Effect",		"vr_automap_stereo", 0.0, 5.0, 0.1, 2
+	Slider "VR Automap Pitch Rotate",		"vr_automap_rotate", 0.0, 50.0, 1.0, 2
+	Option "VR Automap Fix Pitch",		    "vr_automap_fixed_pitch", "OnOff"
+	Option "VR Automap Fix Roll",		    "vr_automap_fixed_roll", "OnOff"
+}
+
 OptionMenu VROptionsMenu protected
 {
 	Title "VR OPTIONS"
@@ -2306,12 +2329,7 @@ OptionMenu VROptionsMenu protected
 	Option "Weapon Recoil",		        "vr_recoil", "OnOff"
 
 	StaticText ""
-	StaticText "HUD"
-	Slider "VR HUD Scale",		        "vr_hud_scale", 0.05, 1.0, 0.05, 2
-	Slider "VR HUD Stereo",		        "vr_hud_stereo", 0.0, 3.0, 0.1, 2
-	Slider "VR HUD Pitch Rotate",		"vr_hud_rotate", 0.0, 50.0, 1.0, 2
-	Option "VR HUD Fix Pitch",		    "vr_hud_fixed_pitch", "OnOff"
-	Option "VR HUD Fix Roll",		    "vr_hud_fixed_roll", "OnOff"
+    Submenu "VR HUD/Automap Options",	"VRHUDOptions"
 
 	StaticText ""
 	StaticText "Display"
@@ -2656,18 +2674,6 @@ OptionMenu "OpenGLOptions" protected
 	Slider "$GLPREFMNU_MENUBLUR",				gl_menu_blur, 0, 5.0, 0.5, 2
 	StaticText " "
 	Option "$GLPREFMNU_MULTISAMPLE", 			gl_multisample,					"Multisample"
-}
-
-OptionMenu "VR3DMenu" protected
-{
-	Title "$GLPREFMNU_VRMODE"
-	Option "$GLMNU_3DMODE",					vr_mode, 						"VRMode"
-	IfOption(Windows)
-	{
-		Option "$GLPREFMNU_VRQUADSTEREO",			vr_enable_quadbuffered,			"OnOff"
-	}
-	Slider "$GLPREFMNU_VRIPD",					vr_ipd,							0.041, 0.073, 0.001, 3
-	Slider "$GLPREFMNU_VRSCREENDIST",			vr_screendist,					0.2, 10.0, 0.1, 1
 }
 
 OptionMenu "PostProcessMenu" protected

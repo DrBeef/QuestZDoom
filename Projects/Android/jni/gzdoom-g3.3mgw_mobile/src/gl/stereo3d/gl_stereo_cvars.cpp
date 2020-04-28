@@ -71,13 +71,21 @@ CVAR(Bool, vr_switch_sticks, false, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 CVAR(Float, vr_pickup_haptic_level, 0.2, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 CVAR(Float, vr_quake_haptic_level, 0.8, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 
-
 //HUD control
 CVAR(Float, vr_hud_scale, 0.3f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 CVAR(Float, vr_hud_stereo, 1.5f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 CVAR(Float, vr_hud_rotate, 13.f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 CVAR(Bool, vr_hud_fixed_pitch, true, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 CVAR(Bool, vr_hud_fixed_roll, true, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
+
+//AutoMap control - Uses HUD settings by default, can be configured separately
+CVAR(Bool, vr_automap_use_hud, true, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
+CVAR(Float, vr_automap_scale, 0.3f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
+CVAR(Float, vr_automap_stereo, 1.5f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
+CVAR(Float, vr_automap_rotate, 13.f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
+CVAR(Bool, vr_automap_fixed_pitch, true, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
+CVAR(Bool, vr_automap_fixed_roll, true, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
+
 
 // Manage changing of 3D modes:
 namespace s3d {
