@@ -78,8 +78,23 @@ CUSTOM_CVAR(Int, uiscale, 0, CVAR_ARCHIVE | CVAR_NOINITCALL)
 	setsizeneeded = true;
 }
 
+int VR_GetUIScale(int altval)
+{
+	int scaleval;
+	if (altval > 0) scaleval = altval;
+	else if (uiscale == 0)
+	{
+		scaleval = screen->GetHeight() / 320;
+	}
+	else scaleval = uiscale;
+
+	return MAX(1, scaleval);
+}
+
 int GetUIScale(int altval)
 {
+	return VR_GetUIScale(altval);
+	/*
 	int scaleval;
 	if (altval > 0) scaleval = altval;
 	else if (uiscale == 0)
@@ -95,7 +110,7 @@ int GetUIScale(int altval)
 	int vmax = screen->GetHeight() / 200;
 	int hmax = screen->GetWidth() / 320;
 	int max = MAX(vmax, hmax);
-	return MAX(1,MIN(scaleval, max));
+	return MAX(1,MIN(scaleval, max));*/
 }
 
 // [RH] Stretch values to make a 320x200 image best fit the screen

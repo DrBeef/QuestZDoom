@@ -199,13 +199,13 @@ CUSTOM_CVAR(Float, fluid_gain, 0.5, CVAR_ARCHIVE|CVAR_GLOBALCONFIG)
 		currSong->FluidSettingNum("synth.gain", self);
 }
 
-CUSTOM_CVAR(Bool, fluid_reverb, false, CVAR_ARCHIVE|CVAR_GLOBALCONFIG)
+CUSTOM_CVAR(Bool, fluid_reverb, true, CVAR_ARCHIVE|CVAR_GLOBALCONFIG) // default to true for VR
 {
 	if (currSong != NULL)
 		currSong->FluidSettingInt("synth.reverb.active", self);
 }
 
-CUSTOM_CVAR(Bool, fluid_chorus, false, CVAR_ARCHIVE|CVAR_GLOBALCONFIG)
+CUSTOM_CVAR(Bool, fluid_chorus, true, CVAR_ARCHIVE|CVAR_GLOBALCONFIG) // default to true for VR
 {
 	if (currSong != NULL)
 		currSong->FluidSettingInt("synth.chorus.active", self);

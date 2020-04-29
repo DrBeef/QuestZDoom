@@ -393,8 +393,10 @@ namespace s3d
 
     bool OculusQuestMode::GetTeleportLocation(DVector3 &out) const
     {
+        player_t* player = r_viewpoint.camera ? r_viewpoint.camera->player : nullptr;
         if (vr_teleport &&
             ready_teleport &&
+            (player && player->mo->health > 0) &&
             m_TeleportTarget == TRACE_HitFloor) {
             out = m_TeleportLocation;
             return true;
@@ -478,7 +480,7 @@ namespace s3d
                     player->mo->AttackDir = MapAttackDir;
                 }
 
-                if (vr_teleport) {
+                if (vr_teleport && player->mo->health > 0) {
 
                     DAngle yaw((doomYaw - hmdorientation[YAW]) + offhandangles[YAW]);
                     DAngle pitch(offhandangles[PITCH]);

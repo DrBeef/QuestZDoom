@@ -73,15 +73,15 @@ CVAR(Float, vr_quake_haptic_level, 0.8, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 
 //HUD control
 CVAR(Float, vr_hud_scale, 0.3f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
-CVAR(Float, vr_hud_stereo, 1.5f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
-CVAR(Float, vr_hud_rotate, 13.f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
-CVAR(Bool, vr_hud_fixed_pitch, true, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
+CVAR(Float, vr_hud_stereo, 1.4f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
+CVAR(Float, vr_hud_rotate, 10.f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
+CVAR(Bool, vr_hud_fixed_pitch, false, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 CVAR(Bool, vr_hud_fixed_roll, true, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 
-//AutoMap control - Uses HUD settings by default, can be configured separately
-CVAR(Bool, vr_automap_use_hud, true, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
-CVAR(Float, vr_automap_scale, 0.3f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
-CVAR(Float, vr_automap_stereo, 1.5f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
+//AutoMap control
+CVAR(Bool, vr_automap_use_hud, false, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
+CVAR(Float, vr_automap_scale, 0.4f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
+CVAR(Float, vr_automap_stereo, 1.0f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 CVAR(Float, vr_automap_rotate, 13.f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 CVAR(Bool, vr_automap_fixed_pitch, true, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 CVAR(Bool, vr_automap_fixed_roll, true, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)

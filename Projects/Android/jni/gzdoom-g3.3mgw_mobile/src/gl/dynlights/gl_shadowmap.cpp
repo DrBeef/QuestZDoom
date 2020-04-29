@@ -77,7 +77,7 @@ ADD_STAT(shadowmap)
 	return out;
 }
 
-CUSTOM_CVAR(Int, gl_shadowmap_quality, 512, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
+CUSTOM_CVAR(Int, gl_shadowmap_quality, 128, CVAR_ARCHIVE | CVAR_GLOBALCONFIG) // default to 128 for VR
 {
 	switch (self)
 	{
