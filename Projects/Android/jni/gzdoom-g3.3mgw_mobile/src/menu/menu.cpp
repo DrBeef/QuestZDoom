@@ -66,7 +66,7 @@ int DMenu::InMenu;
 // Todo: Move these elsewhere
 //
 CVAR (Float, mouse_sensitivity, 1.5f, CVAR_ARCHIVE|CVAR_GLOBALCONFIG)
-CVAR (Bool, show_messages, true, CVAR_ARCHIVE|CVAR_GLOBALCONFIG)
+CVAR (Bool, show_messages, false, CVAR_ARCHIVE|CVAR_GLOBALCONFIG) // Defaulted to off for VR
 CVAR (Bool, show_obituaries, true, CVAR_ARCHIVE)
 CVAR (Int, m_showinputgrid, 0, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 CVAR(Bool, m_blockcontrollers, false, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)

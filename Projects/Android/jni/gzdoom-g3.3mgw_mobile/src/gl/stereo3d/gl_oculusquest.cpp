@@ -370,7 +370,6 @@ namespace s3d
             DVector3 direction = { pc * yaw.Cos(), pc * yaw.Sin(), -pitch.Sin() };
             return direction;
         }
-        double pc = pitch.Cos();
 
         yaw -= actor->Angles.Yaw;
 
@@ -378,7 +377,7 @@ namespace s3d
         //pitch -= actor->Angles.Pitch;
         pitch.Degrees = 0;
 
-        pc = pitch.Cos();
+        double pc = pitch.Cos();
 
         LSVec3 local = { (float)(pc * yaw.Cos()), (float)(pc * yaw.Sin()), (float)(-pitch.Sin()), 0.0f };
 
@@ -472,6 +471,9 @@ namespace s3d
                 //Weapon firing tracking - Thanks Fishbiter for the inspiration of how/where to use this!
                 {
                     player->mo->OverrideAttackPosDir = true;
+
+                    player->mo->AttackPitch = -weaponangles[PITCH];
+                    player->mo->AttackAngle = -90 + (doomYaw - hmdorientation[YAW]) + weaponangles[YAW];
 
                     player->mo->AttackPos.X = player->mo->X() - (weaponoffset[0] * vr_vunits_per_meter);
                     player->mo->AttackPos.Y = player->mo->Y() - (weaponoffset[2] * vr_vunits_per_meter);

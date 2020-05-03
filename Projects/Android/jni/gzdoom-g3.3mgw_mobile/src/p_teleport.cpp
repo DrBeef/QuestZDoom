@@ -50,7 +50,7 @@
 
 static FRandom pr_teleport ("Teleport");
 
-CVAR (Bool, telezoom, true, CVAR_ARCHIVE|CVAR_GLOBALCONFIG);
+CVAR (Bool, telezoom, false, CVAR_ARCHIVE|CVAR_GLOBALCONFIG); // Default to off for VR
 
 //==========================================================================
 //

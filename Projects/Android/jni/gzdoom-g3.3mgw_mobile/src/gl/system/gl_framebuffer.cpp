@@ -66,7 +66,7 @@ void gl_PrintStartupLog();
 
 extern bool vid_hdr_active;
 
-CUSTOM_CVAR(Int, vid_hwgamma, 2, CVAR_ARCHIVE | CVAR_GLOBALCONFIG | CVAR_NOINITCALL)
+CUSTOM_CVAR(Int, vid_hwgamma, 0, CVAR_ARCHIVE | CVAR_GLOBALCONFIG | CVAR_NOINITCALL) //Defaulted off for VR
 {
 	if (self < 0 || self > 2) self = 2;
 	if (GLRenderer != NULL && GLRenderer->framebuffer != NULL) GLRenderer->framebuffer->DoSetGamma();

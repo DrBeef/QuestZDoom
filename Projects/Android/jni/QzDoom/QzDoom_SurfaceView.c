@@ -1288,7 +1288,7 @@ void VR_Init()
 	remote_movementUp = 0.0f;
 	positional_movementSideways = 0.0f;
 	positional_movementForward = 0.0f;
-	snapTurn = 90.0f; // start partly turned
+	snapTurn = 0.0f; // start partly turned
 
 	//init randomiser
 	srand(time(NULL));

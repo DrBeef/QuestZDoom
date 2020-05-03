@@ -71,7 +71,7 @@ CUSTOM_CVAR (Float, vid_contrast, 1.f, CVAR_ARCHIVE|CVAR_GLOBALCONFIG)
 	}
 }
 
-CUSTOM_CVAR (Float, vid_saturation, 1.f, CVAR_ARCHIVE|CVAR_GLOBALCONFIG)
+CUSTOM_CVAR (Float, vid_saturation, 1.2f, CVAR_ARCHIVE|CVAR_GLOBALCONFIG) //Defaulted for VR
 {
 	if (screen != NULL)
 	{

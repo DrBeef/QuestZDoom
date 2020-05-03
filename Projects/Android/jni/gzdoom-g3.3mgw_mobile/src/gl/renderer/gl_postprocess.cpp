@@ -150,7 +150,7 @@ CUSTOM_CVAR(Bool, gl_paltonemap_reverselookup, true, CVAR_ARCHIVE | CVAR_NOINITC
 		GLRenderer->ClearTonemapPalette();
 }
 
-CVAR(Float, gl_menu_blur, -1.0f, CVAR_ARCHIVE)
+CVAR(Float, gl_menu_blur, 0.0f, CVAR_ARCHIVE)
 
 EXTERN_CVAR(Float, vid_brightness)
 EXTERN_CVAR(Float, vid_contrast)

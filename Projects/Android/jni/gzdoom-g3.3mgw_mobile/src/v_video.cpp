@@ -195,7 +195,7 @@ CUSTOM_CVAR (Int, vid_refreshrate, 0, CVAR_ARCHIVE|CVAR_GLOBALCONFIG)
 	}
 }
 
-CUSTOM_CVAR (Float, dimamount, -1.f, CVAR_ARCHIVE)
+CUSTOM_CVAR (Float, dimamount, 0.f, CVAR_ARCHIVE)
 {
 	if (self < 0.f && self != -1.f)
 	{

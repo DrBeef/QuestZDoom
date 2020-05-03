@@ -191,19 +191,19 @@ extend class Actor
 {
 	//
 	// A_BFGSpray
-	// Spawn a BFG explosion on every monster in view
+	// Spawn a BFG explosion on every monster in 360 arc of detonating missile
 	//
-	void A_BFGSpray(class<Actor> spraytype = "BFGExtra", int numrays = 40, int damagecnt = 15, double ang = 90, double distance = 16*64, double vrange = 32, int defdamage = 0, int flags = 0)
+	void A_BFGSpray(class<Actor> spraytype = "BFGExtra", int numrays = 160, int damagecnt = 15, double ang = 360, double distance = 12*64, double vrange = 45, int defdamage = 0, int flags = BFGF_MISSILEORIGIN)
 	{
 		int damage;
 		FTranslatedLineTarget t;
 
 		// validate parameters
 		if (spraytype == null) spraytype = "BFGExtra";
-		if (numrays <= 0) numrays = 40;
+		if (numrays <= 0) numrays = 140;
 		if (damagecnt <= 0) damagecnt = 15;
-		if (ang == 0) ang = 90.;
-		if (distance <= 0) distance = 16 * 64;
+		if (ang == 0) ang = 360.;
+		if (distance <= 0) distance = 10 * 64;
 		if (vrange == 0) vrange = 32.;
 
 		// [RH] Don't crash if no target
@@ -216,7 +216,7 @@ extend class Actor
 		// offset angles from its attack ang
 		for (int i = 0; i < numrays; i++)
 		{
-			double an = angle - ang / 2 + ang / numrays*i;
+			double an = angle - ang / 2 + ((ang / numrays) * i);
 
 			originator.AimLineAttack(an, distance, t, vrange);
 

@@ -4179,7 +4179,7 @@ struct aim_t
 					}
 					else continue;					// shot over the thing
 				}
-				continue;					// shot under the thing
+				else continue;					// shot under the thing
 			}
 
 			if (crossedffloors)
@@ -4314,17 +4314,27 @@ DAngle P_AimLineAttack(AActor *t1, DAngle angle, double distance, FTranslatedLin
 
 	aim_t aim;
 
+	DVector3 pos = t1->Pos();
+	DAngle attackPitch = t1->Angles.Pitch;
+	DAngle attackAngle = angle;
+	if (t1->player != nullptr && t1->player->mo->OverrideAttackPosDir)
+    {
+	    pos = t1->player->mo->AttackPos;
+		attackPitch = t1->player->mo->AttackPitch;
+        attackAngle = t1->player->mo->AttackAngle + (angle - t1->Angles.Yaw);
+    }
+
 	aim.flags = flags;
 	aim.shootthing = t1;
-	aim.friender = (friender == NULL) ? t1 : friender;
+	aim.friender = (friender == nullptr) ? t1 : friender;
 	aim.aimdir = aim_t::aim_up | aim_t::aim_down;
-	aim.startpos = t1->Pos();
-	aim.aimtrace = angle.ToVector(distance);
+	aim.startpos = pos;
+	aim.aimtrace = attackAngle.ToVector(distance);
 	aim.limitz = aim.shootz = shootz;
-	aim.toppitch = t1->Angles.Pitch - vrange;
-	aim.bottompitch = t1->Angles.Pitch + vrange;
+	aim.toppitch = attackPitch - vrange;
+	aim.bottompitch = attackPitch + vrange;
 	aim.attackrange = distance;
-	aim.aimpitch = t1->Angles.Pitch;
+	aim.aimpitch = attackPitch;
 	aim.lastsector = t1->Sector;
 	aim.startfrac = 0;
 	aim.unlinked = false;
@@ -4338,7 +4348,13 @@ DAngle P_AimLineAttack(AActor *t1, DAngle angle, double distance, FTranslatedLin
 	{
 		*pLineTarget = *result;
 	}
-	return result->linetarget ? result->pitch : t1->Angles.Pitch;
+
+	if (result->linetarget)
+	{
+		return result->pitch;
+	}
+
+	return t1->Angles.Pitch;
 }
 
 //==========================================================================

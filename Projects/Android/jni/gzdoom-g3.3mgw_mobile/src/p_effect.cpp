@@ -130,7 +130,7 @@ void P_InitParticles ();
 
 // [BC] Allow the maximum number of particles to be specified by a cvar (so people
 // with lots of nice hardware can have lots of particles!).
-CUSTOM_CVAR( Int, r_maxparticles, 4000, CVAR_ARCHIVE )
+CUSTOM_CVAR( Int, r_maxparticles, 100, CVAR_ARCHIVE ) //Default to min for VR
 {
 	if ( self == 0 )
 		self = 4000;
