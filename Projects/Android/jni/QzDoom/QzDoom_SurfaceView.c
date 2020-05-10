@@ -47,7 +47,9 @@ long long global_time;
 float playerHeight;
 float playerYaw;
 bool resetDoomYaw;
+bool resetPreviousPitch;
 float doomYaw;
+float previousPitch;
 float vrFOV;
 vec3_t worldPosition;
 vec3_t hmdPosition;
@@ -1283,6 +1285,7 @@ void VR_Init()
 	//Initialise all our variables
 	playerYaw = 0.0f;
     resetDoomYaw = true;
+	resetPreviousPitch = true;
 	remote_movementSideways = 0.0f;
 	remote_movementForward = 0.0f;
 	remote_movementUp = 0.0f;

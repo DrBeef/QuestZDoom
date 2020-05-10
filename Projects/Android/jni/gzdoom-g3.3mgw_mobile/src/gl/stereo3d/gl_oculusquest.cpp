@@ -578,11 +578,18 @@ namespace s3d
 
         // Pitch
         {
-            double viewPitchInDoom = GLRenderer->mAngles.Pitch.Radians();
-            double dPitch =
-                    - DEG2RAD(pitch)
-                    - viewPitchInDoom;
-            G_AddViewPitch(mAngleFromRadians(dPitch));
+            if (resetPreviousPitch)
+            {
+                previousPitch = GLRenderer->mAngles.Pitch.Degrees;
+                resetPreviousPitch = false;
+            }
+
+            double hmdPitchDeltaDegrees = pitch - previousPitch;
+
+            ALOGV("dPitch = %f", hmdPitchDeltaDegrees );
+
+            G_AddViewPitch(mAngleFromRadians(DEG2RAD(-hmdPitchDeltaDegrees)));
+            previousPitch = pitch;
         }
 
         if (gamestate == GS_LEVEL && !getMenuState())

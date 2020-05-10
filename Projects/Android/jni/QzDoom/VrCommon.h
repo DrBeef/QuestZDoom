@@ -35,6 +35,8 @@ extern float playerHeight;
 extern float playerYaw;
 extern bool resetDoomYaw;
 extern float doomYaw;
+extern bool resetPreviousPitch;
+extern float previousPitch;
 
 extern float vrFOV;
 

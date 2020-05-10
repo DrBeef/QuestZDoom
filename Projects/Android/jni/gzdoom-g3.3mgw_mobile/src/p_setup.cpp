@@ -3807,8 +3807,9 @@ void P_SetupLevel(const char *lumpname, int position, bool newGame)
 		AnnounceGameStart();
 	}
 
-	//Trigger a Yaw recalc in the QuestZDoom code to avoid moving in the wrong direction
+	//Trigger a Yaw/Pitch recalc in the QuestZDoom code to avoid moving in the wrong direction
 	resetDoomYaw = true;
+	resetPreviousPitch = true;
 
 	// This check was previously done at run time each time the heightsec was checked.
 	// However, since 3D floors are static data, we can easily precalculate this and store it in the sector's flags for quick access.
