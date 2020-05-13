@@ -139,3 +139,10 @@ I would like to thank the following teams and individuals for making this possib
 * The [SideQuest](https://sidequestvr.com/#/news) team - For making it easy for people to install this
 * m8f (mmaulwurff) - For the excellent [Laser Sight mod](https://github.com/mmaulwurff/laser-sight) which I was given permission to distribute as part of this project (modified slightly for VR), invaluable for playing some mods in VR that don't have iron-sights for aiming.
 * FreeDoom / Fraggle - For giving us download access to the FreeDoom distribution in the QuestZDoom Launcher
+
+Disclaimer
+----------
+
+'QuestZDoom' is not affiliated, associated, authorized, endorsed by, or in any way officially connected with ID Software or Bethesda, or any of its subsidiaries or its affiliates. No copyrighted assets are included within the install.
+
+If you have any queries please contact us at: general@questzdoom.com
