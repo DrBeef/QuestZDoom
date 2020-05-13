@@ -116,6 +116,7 @@ Recommendations
 ---------------
 
 * Use Baggyg's QuestZDoom Launcher to play lots of different mods (this can be found on SideQuest)
+* Please visit the official [QuestZDoom web-site](https://www.questzdoom.com/index.html) for lots more information on how to make the most of this port and the QuestZDoom Launcher
 
 
 Known Issues
