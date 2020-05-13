@@ -15,8 +15,9 @@ https://github.com/the-expanse/SideQuest/releases
 IMPORTANT NOTE
 --------------
 
-This is just an engine port; though the apk does contain the shareware version of Doom, not the full game. If you wish to play the full game you must purchase it yourself, steam is most straightforward:  https://store.steampowered.com/app/2280/Ultimate_Doom/
+This is just an engine port, no game assets are included whatsoever. To play any of the commercial games (Doom, Doom 2, Heretic, Hexen) you will need to own them, buying them on team is most straightforward:  https://store.steampowered.com/app/2280/Ultimate_Doom/
 
+You can play many wads/mods without having to own the full version of Doom. The excellent FreeDoom project functions well as a base IWAD and can be downloaded directly using the QuestZDoom Launcher (which is a must have install for this to work correctly).
 
 
 This port features..
@@ -32,7 +33,6 @@ Copying the Full Game WAD files to your Oculus Quest
 ----------------------------------------------------
 
 Copy the WAD files from the installed Doom game folder on your PC to the /QuestZDoom/wads folder on your Oculus Quest when it is connected to the PC. You have to have run QuestZDoom at least once for the folder to be created and if you don't see it when you connect your Quest to the PC you might have to restart the Quest.
-
 
 
 Caveats
@@ -103,7 +103,7 @@ This is a port of the LZDoom (3.83a) engine, so any mod that works with that sho
 Recommendations:
 ----------------
 
-* Use Baggyg's QuestZDoom Launcher to play lots of different mods
+* Use Baggyg's QuestZDoom Launcher to play lots of different mods (this can be found on SideQuest)
 
 
 Known Issues:
@@ -119,10 +119,11 @@ I would like to thank the following teams and individuals for making this possib
 
 * [The ZDoom Teams](https://zdoom.org/index) - For the excellent engine this based upon.
 * Emile Belanger - For being happy for me to use his Android build of LZDoom as a basis for this. See his other Android ports [here](http://www.beloko.com/)
-* Everyone involved in the OpenVR GZDoom project, from which a lot of the 6DoF weapon functionality for this project was taken or used as inspiration
+* Everyone involved in the GZ3Doom project (PC VR GZDoom implementation), from which a lot of the 6DoF weapon functionality for this project was taken or used as inspiration
 * Baggyg - My long-time VR friend whose roles in this have once again been varied and all helpful, also the creator of the excellent QuestZDoom Launcher, a must-have tool for playing mods in QUestZDoom - DO INSTALL THIS!!!
-* VR_Bummser / MrNeitey - Also a long time VR friend and huge contributor to the DrBeef port community, dedicated testing and [video production](https://www.youtube.com/user/MrNeitey/videos)
+* VR_Bummser - Also a long time VR friend and huge contributor to the DrBeef port community, dedicated testing and [video production](https://www.youtube.com/user/MrNeitey/videos)
 * Daniel Teich - For the various bits of artwork used for this github repo and the SideQuest listing
 * Chris Collins - GeneralUserGS Soundfont
 * The [SideQuest](https://sidequestvr.com/#/news) team - For making it easy for people to install this
 * m8f (mmaulwurff) - For the excellent [Laser Sight mod](https://github.com/mmaulwurff/laser-sight) which I was given permission to distribute as part of this project (modified slightly for VR), invaluable for playing some mods in VR that don't have iron-sights for aiming.
+* FreeDoom / Fraggle - For giving us download access to the FreeDoom distribution in the QuestZDoom Launcher
