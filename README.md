@@ -1,5 +1,5 @@
-QuestZDoom
-==========
+![QuestZDoom Banner](https://www.questzdoom.com/img/banner2.jpg)
+===
 
 Welcome to the VR port of the popular LZDoom/GZDoom engine for the Oculus Quest.
 
@@ -9,6 +9,9 @@ The easiest way to install this on your Quest is using SideQuest, a Desktop app 
 
 Download SideQuest here:
 https://github.com/the-expanse/SideQuest/releases
+
+
+### Please visit the official [QuestZDoom web-site](https://www.questzdoom.com/index.html) for lots more information on how to make the most of this port and the QuestZDoom Launcher
 
 
 
@@ -38,7 +41,7 @@ Copy the WAD files from the installed Doom game folder on your PC to the /QuestZ
 Caveats
 -------
 
-WARNING:  There is a good chance that unless you have your VR-legs this will probably make you feel  sick. The moment you start to feel under the weather YOU MUST STOP PLAYING for a good period of time before you try again. I will not be held responsible for anyone making themselves ill.
+### WARNING:  There is a good chance that unless you have your VR-legs this will probably make you feel  sick. The moment you start to feel under the weather YOU MUST STOP PLAYING for a good period of time before you try again. I will not be held responsible for anyone making themselves ill.
 
 I have included a teleport mechanism for locomotiom, so I would recommend trying that if you do start to feel unwell.
 
@@ -85,8 +88,17 @@ Accessed by holding down the dominant hand grip button - All these can be reassi
 * Off-Hand Trigger - Unmapped
 * Off-Hand Thumbstick click - Unmapped
 
+Teleport
+--------
 
-Things to note / FAQs:
+Once you have enabled teleport locomotion in the VR Options menu:
+1. Point your off-hand controller towards the floow
+1. Push forward on the thumb-stick
+1. Position Doom-Guy to where you wish to teleport
+1. Release the thumbstick to teleport
+
+
+Things to note / FAQs
 ----------------------
 
 * Mods and Texture packs work as per GZDoom
@@ -94,33 +106,33 @@ Things to note / FAQs:
 * I won't be implementing a vignette comfort mask for locomotion, that is what the teleport is for
 
 
-Mods:
------
+Mods
+----
 
 This is a port of the LZDoom (3.83a) engine, so any mod that works with that should work with this.
 
 
-Recommendations:
-----------------
+Recommendations
+---------------
 
 * Use Baggyg's QuestZDoom Launcher to play lots of different mods (this can be found on SideQuest)
 
 
-Known Issues:
--------------
+Known Issues
+------------
 
 _Performance_: Vanilla unmodded Doom is fine, however once you start using mods then the GZDoom engine is quite resource hungry. Brutal Doom is great fun and plays pretty well, but performance can be shaky, so you have been warned. Expect significant framedrops when there is a lot going on, this is unfortunately just a result of the system requirements of the engine. Suggestion is to reduce supersampling to 0.9 to get much improved performance.
 
 
-Credits:
---------
+Credits
+-------
 
 I would like to thank the following teams and individuals for making this possible:
 
 * [The ZDoom Teams](https://zdoom.org/index) - For the excellent engine this based upon.
 * Emile Belanger - For being happy for me to use his Android build of LZDoom as a basis for this. See his other Android ports [here](http://www.beloko.com/)
 * Everyone involved in the GZ3Doom project (PC VR GZDoom implementation), from which a lot of the 6DoF weapon functionality for this project was taken or used as inspiration
-* Baggyg - My long-time VR friend whose roles in this have once again been varied and all helpful, also the creator of the excellent QuestZDoom Launcher, a must-have tool for playing mods in QUestZDoom - DO INSTALL THIS!!!
+* Baggyg - My long-time friend, in and out of cyberspace, whose roles in this have once again been varied and all helpful, also the creator of the excellent QuestZDoom Launcher, a must-have tool for playing mods in QUestZDoom - DO INSTALL THIS (you need to)!!!
 * VR_Bummser - Also a long time VR friend and huge contributor to the DrBeef port community, dedicated testing and [video production](https://www.youtube.com/user/MrNeitey/videos)
 * Daniel Teich - For the various bits of artwork used for this github repo and the SideQuest listing
 * Chris Collins - GeneralUserGS Soundfont
