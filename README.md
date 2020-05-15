@@ -135,7 +135,8 @@ I would like to thank the following teams and individuals for making this possib
 * Everyone involved in the GZ3Doom project (PC VR GZDoom implementation), from which a lot of the 6DoF weapon functionality for this project was taken or used as inspiration
 * Baggyg - My long-time friend, in and out of cyberspace, whose roles in this have once again been varied and all helpful, also the creator of the excellent QuestZDoom Launcher, a must-have tool for playing mods in QUestZDoom - DO INSTALL THIS (you need to)!!!
 * VR_Bummser - Also a long time VR friend and huge contributor to the DrBeef port community, dedicated testing and [video production](https://www.youtube.com/user/MrNeitey/videos)
-* Daniel Teich - For the various bits of artwork used for this github repo and the SideQuest listing
+* Daniel Teich - Art Director / Mod Logos / Launcher Art / Website Graphics / Mod Contributor
+* The Dedicated Closed Beta Testers (RABID, sneakerman)
 * Chris Collins - GeneralUserGS Soundfont
 * The [SideQuest](https://sidequestvr.com/#/news) team - For making it easy for people to install this
 * m8f (mmaulwurff) - For the excellent [Laser Sight mod](https://github.com/mmaulwurff/laser-sight) which I was given permission to distribute as part of this project (modified slightly for VR), invaluable for playing some mods in VR that don't have iron-sights for aiming.
