@@ -11,7 +11,7 @@ Download SideQuest here:
 https://github.com/the-expanse/SideQuest/releases
 
 
-### Please visit the official [QuestZDoom web-site](https://www.questzdoom.com/index.html) for lots more information on how to make the most of this port and the QuestZDoom Launcher
+### Please visit the official [QuestZDoom website](https://www.questzdoom.com/index.html) for lots more information on how to make the most of this port and the QuestZDoom Launcher
 
 
 
