@@ -88,6 +88,18 @@ Accessed by holding down the dominant hand grip button - All these can be reassi
 * Off-Hand Trigger - Unmapped
 * Off-Hand Thumbstick click - Unmapped
 
+
+Button Remapping
+----------------
+
+To clear a button binding, press the X button
+To set a new button mapping press the A button to initiate binding, then press the button you wish to bind
+
+*Remember*
+* All buttons have a secondary mappable binding by holding down the dominant hand grip button
+* The grip buttons _cannot_ be remapped to any other function
+
+
 Teleport
 --------
 
