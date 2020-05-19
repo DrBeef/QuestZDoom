@@ -89,6 +89,19 @@ void ST_Endoom();
 
 extern bool		automapactive;	// in AM_map.c
 
+//bit of a hack, assume player is at "normal" height when not crouching
+float getDoomPlayerHeightWithoutCrouch(const player_t *player)
+{
+    static float height = player->viewheight;
+    if (player->crouching == 0 &&
+            player->crouchfactor == 1.0)
+    {
+        // Doom thinks this is where you are
+        height = player->viewheight;
+    }
+    return height;
+}
+
 namespace s3d
 {
     static DVector3 oculusquest_origin(0, 0, 0);
@@ -124,16 +137,9 @@ namespace s3d
         LSVec3 eyeOffset(tmp[0], tmp[1], tmp[2]);
 
         const player_t & player = players[consoleplayer];
-
-        //bit of a hack, assume player is at "normal" height when not crouching
-        if (player.crouching == 0)
-        {
-            playerHeight = player.viewheight; // Doom thinks this is where you are
-        }
-
         double pixelstretch = level.info ? level.info->pixelstretch : 1.2;
         double hh = ((hmdPosition[1] + vr_height_adjust) * vr_vunits_per_meter) / pixelstretch; // HMD is actually here
-        eyeOffset[2] += hh - playerHeight;
+        eyeOffset[2] += hh - getDoomPlayerHeightWithoutCrouch(&player);
 
         outViewShift[0] = eyeOffset[0];
         outViewShift[1] = eyeOffset[1];
@@ -293,16 +299,10 @@ namespace s3d
             AActor* playermo = player->mo;
             DVector3 pos = playermo->InterpolatedPosition(r_viewpoint.TicFrac);
 
-            //bit of a hack, assume player is at "normal" height when not crouching
-            static double height = 0;
-            if (player->crouching == 0)
-            {
-                height = player->viewheight; // Doom thinks this is where you are
-            }
-
             mat->loadIdentity();
 
-            mat->translate(pos.X, pos.Z + (player->viewheight - height), pos.Y);
+            mat->translate(pos.X, pos.Z + (player->viewheight -
+                    getDoomPlayerHeightWithoutCrouch(player)), pos.Y);
 
             mat->scale(vr_vunits_per_meter, vr_vunits_per_meter, -vr_vunits_per_meter);
 
@@ -480,16 +480,10 @@ namespace s3d
                     player->mo->AttackPitch = -weaponangles[PITCH];
                     player->mo->AttackAngle = -90 + (doomYaw - hmdorientation[YAW]) + weaponangles[YAW];
 
-                    //bit of a hack, assume player is at "normal" height when not crouching
-                    static double height = 0;
-                    if (player->crouching == 0)
-                    {
-                        height = player->viewheight; // Doom thinks this is where you are
-                    }
-
                     player->mo->AttackPos.X = player->mo->X() - (weaponoffset[0] * vr_vunits_per_meter);
                     player->mo->AttackPos.Y = player->mo->Y() - (weaponoffset[2] * vr_vunits_per_meter);
-                    player->mo->AttackPos.Z = player->mo->Z() + (((hmdPosition[1] + weaponoffset[1] + vr_height_adjust) * vr_vunits_per_meter) / pixelstretch) + (player->viewheight - height);
+                    player->mo->AttackPos.Z = player->mo->Z() + (((hmdPosition[1] + weaponoffset[1] + vr_height_adjust) * vr_vunits_per_meter) / pixelstretch) + (player->viewheight -
+                            getDoomPlayerHeightWithoutCrouch(player));
 
                     player->mo->AttackDir = MapAttackDir;
                 }
@@ -564,7 +558,6 @@ namespace s3d
 
         updateHmdPose();
     }
-
 
     void OculusQuestMode::updateHmdPose() const
     {

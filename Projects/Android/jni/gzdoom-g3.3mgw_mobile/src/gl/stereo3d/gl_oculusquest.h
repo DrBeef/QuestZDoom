@@ -57,7 +57,6 @@ public:
 protected:
 	mutable uint32_t framebuffer;
 	int eye;
-	mutable double playerHeight;
 
 	VSMatrix getHUDProjection() const;
 
