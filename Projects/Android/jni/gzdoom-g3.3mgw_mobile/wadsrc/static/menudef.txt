@@ -2333,6 +2333,7 @@ OptionMenu VROptionsMenu protected
 
 	StaticText ""
 	StaticText "Display"
+	Option "Lock FrameRate (IF LOW PERF.)",        "cl_capfps", "OnOff"
 	Option "Show VR HUD FPS",		    "vid_fps", "OnOff"
 	Option "Dynamic Lights (CAUTION)",	"vr_dynlights", "OnOff"
 }
