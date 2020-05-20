@@ -2762,6 +2762,7 @@ GLPREFMNU_FOGMODE 				= "Fog mode";
 GLPREFMNU_FOGFORCEFULLBRIGHT 	= "Fog forces fullbright";
 GLPREFMNU_WPNLIGHTSTR 			= "Weapon light strength";
 GLPREFMNU_ENVIRONMENTMAPMIRROR 	= "Environment map on mirrors";
+GLPREFMNU_PLANEREFLECTION 	    = "Plane Reflections (shiny floors etc)";
 GLPREFMNU_ENV 					= "Enhanced night vision mode";
 GLPREFMNU_ENVSTEALTH 			= "ENV shows stealth monsters";
 GLPREFMNU_SPRBRIGHTFOG 			= "Force brightness in fog";

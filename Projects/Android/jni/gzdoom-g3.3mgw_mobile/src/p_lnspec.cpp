@@ -3409,6 +3409,12 @@ FUNC(LS_Line_SetPortalTarget)
 FUNC(LS_Sector_SetPlaneReflection)
 // Sector_SetPlaneReflection (tag, floor, ceiling)
 {
+	if (!gl_plane_reflection_i)
+	{
+		//If no reflections, just return
+		return true;
+	}
+
 	int secnum;
 	FSectorTagIterator itr(arg0);
 

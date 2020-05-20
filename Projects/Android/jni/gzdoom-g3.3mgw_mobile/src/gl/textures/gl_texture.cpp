@@ -89,7 +89,7 @@ CUSTOM_CVAR(Bool, gl_texture_usehires, true, CVAR_ARCHIVE|CVAR_NOINITCALL)
 	if (GLRenderer != NULL) GLRenderer->FlushTextures();
 }
 
-CVAR(Bool, gl_precache, false, CVAR_ARCHIVE)
+CVAR(Bool, gl_precache, true, CVAR_ARCHIVE)
 
 TexFilter_s TexFilter[]={
 	{GL_NEAREST,					GL_NEAREST,		false},
