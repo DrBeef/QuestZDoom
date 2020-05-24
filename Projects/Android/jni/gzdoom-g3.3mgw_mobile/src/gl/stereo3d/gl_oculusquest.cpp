@@ -54,6 +54,7 @@
 
 EXTERN_CVAR(Int, screenblocks);
 EXTERN_CVAR(Float, movebob);
+EXTERN_CVAR(Bool, cl_noprediction)
 EXTERN_CVAR(Bool, gl_billboard_faces_camera);
 EXTERN_CVAR(Int, gl_multisample);
 EXTERN_CVAR(Float, vr_vunits_per_meter)
@@ -67,6 +68,8 @@ EXTERN_CVAR(Float, vr_ipd);
 EXTERN_CVAR(Float, vr_weaponScale);
 EXTERN_CVAR(Bool, vr_teleport);
 EXTERN_CVAR(Bool, vr_switch_sticks);
+EXTERN_CVAR(Bool, vr_secondary_button_mappings);
+EXTERN_CVAR(Bool, vr_two_handed_weapons);
 
 //HUD control
 EXTERN_CVAR(Float, vr_hud_scale);
@@ -92,13 +95,13 @@ extern bool		automapactive;	// in AM_map.c
 //bit of a hack, assume player is at "normal" height when not crouching
 float getDoomPlayerHeightWithoutCrouch(const player_t *player)
 {
-    static float height = player->viewheight;
-    if (player->crouching == 0 &&
-            player->crouchfactor == 1.0)
+    static float height = 0;
+    if (height == 0)
     {
         // Doom thinks this is where you are
         height = player->viewheight;
     }
+
     return height;
 }
 
@@ -293,6 +296,7 @@ namespace s3d
 
     bool OculusQuestMode::GetHandTransform(int hand, VSMatrix* mat) const
     {
+        double pixelstretch = level.info ? level.info->pixelstretch : 1.2;
         player_t* player = r_viewpoint.camera ? r_viewpoint.camera->player : nullptr;
         if (player)
         {
@@ -301,12 +305,11 @@ namespace s3d
 
             mat->loadIdentity();
 
-            mat->translate(pos.X, pos.Z + (player->viewheight -
-                    getDoomPlayerHeightWithoutCrouch(player)), pos.Y);
+            //We want to offset the weapon exactly from where we are seeing from
+            mat->translate(r_viewpoint.CenterEyePos.X, r_viewpoint.CenterEyePos.Z - getDoomPlayerHeightWithoutCrouch(player), r_viewpoint.CenterEyePos.Y);
 
             mat->scale(vr_vunits_per_meter, vr_vunits_per_meter, -vr_vunits_per_meter);
 
-            double pixelstretch = level.info ? level.info->pixelstretch : 1.2;
             if ((vr_control_scheme < 10 && hand == 1)
                 || (vr_control_scheme >= 10 && hand == 0)) {
                 mat->translate(-weaponoffset[0], (hmdPosition[1] + weaponoffset[1] + vr_height_adjust) / pixelstretch, weaponoffset[2]);
@@ -452,6 +455,8 @@ namespace s3d
         vr_switchsticks = vr_switch_sticks;
         vr_moveuseoffhand = !vr_move_use_offhand;
         vr_use_teleport = vr_teleport;
+        vr_secondarybuttonmappings = vr_secondary_button_mappings;
+        vr_twohandedweapons = vr_two_handed_weapons;
         QzDoom_getTrackedRemotesOrientation(vr_control_scheme);
 
         //Some crazy stuff to ascertain the actual yaw that doom is using at the right times!

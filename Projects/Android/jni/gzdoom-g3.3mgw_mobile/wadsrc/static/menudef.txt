@@ -2280,6 +2280,9 @@ OptionMenu VRHUDOptions protected
 	StaticText ""
 	StaticText "HUD"
 	Slider "VR HUD Scale",		        "vr_hud_scale", 0.05, 1.0, 0.05, 2
+	ScaleSlider "VR HUD Item Scale", 	"hud_scale", -1.0, 8.0, 1.0, "$SCALEMNU_USEUI", "$SCALEMNU_USEFS"
+	ScaleSlider "VR Alt-HUD Item Scale","hud_althudscale", 0.0, 8.0, 1.0, "$SCALEMNU_USEUI"
+	StaticText ""
 	Slider "VR HUD Stereo Effect",		"vr_hud_stereo", 0.0, 5.0, 0.1, 2
 	Slider "VR HUD Pitch Rotate",		"vr_hud_rotate", 0.0, 50.0, 1.0, 2
 	Option "VR HUD Fix Pitch",		    "vr_hud_fixed_pitch", "OnOff"
@@ -2301,19 +2304,24 @@ OptionMenu VROptionsMenu protected
 	Title "VR OPTIONS"
 
 	StaticText "Misc"
-	Slider "Height Adjust",		        "vr_height_adjust", 0.0, 1.0, 0.01, 2
+	Slider "Height Adjust",		        "vr_height_adjust", -0.5, 1.0, 0.01, 2
 
 	StaticText ""
 	StaticText "VR Controls"
 	Option "Control Scheme",		    "vr_control_scheme", "ControlScheme"
 	Option "Switch Thumsticks",		    "vr_switch_sticks", "OnOff"
+	Option "Use Secondary Button Mappings",	"vr_secondary_button_mappings", "OnOff"
+	Option "Two Handed Weapons",	    "vr_two_handed_weapons", "OnOff"
 	Option "Off-hand Move Direction",	"vr_move_use_offhand", "OffOn"
+	StaticText ""
+	StaticText "Set Snap-Turn to < 10 for Smooth Turn"
 	Slider "Snap-turn Angle",		    "vr_snapTurn", 0.0, 90.0, 1.0, 2
 
+	StaticText ""
 	StaticText "Locomotion"
 	Option "Use Teleport",		        "vr_teleport", "OnOff"
 	Slider "Walking Speed",		        "vr_move_speed", 5, 50, 1, 2
-	Slider "Run Multiplier",	        "vr_run_multiplier", 0.0, 4.0, 0.1, 2
+	Slider "Run Multiplier",	        "vr_run_multiplier", 0.0, 5.0, 0.1, 2
 
 	StaticText ""
 	StaticText "Haptics"

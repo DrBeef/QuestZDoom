@@ -27,6 +27,7 @@
 //-----------------------------------------------------------------------------
 
 
+#include <QzDoom/VrCommon.h>
 #include "templates.h"
 #include "doomtype.h"
 #include "doomdef.h"
@@ -198,6 +199,8 @@ bool P_Teleport (AActor *thing, DVector3 pos, DAngle angle, int flags)
 			// [BC] && bHaltVelocity.
 			if (telezoom && thing->player->mo == thing && !(flags & TELF_KEEPVELOCITY))
 				thing->player->FOV = MIN (175.f, thing->player->DesiredFOV + 45.f);
+
+			resetDoomYaw = true;
 		}
 	}
 	// [BC] && bHaltVelocity.
