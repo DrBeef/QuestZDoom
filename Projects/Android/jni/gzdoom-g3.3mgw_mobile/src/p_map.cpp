@@ -4547,8 +4547,8 @@ AActor *P_LineAttack(AActor *t1, DAngle angle, double distance,
 
 		//Include pitch delta here
 		DAngle pitchDelta;
-        pitchDelta.Degrees = (pitch == 0) ? 0.0 : (t1->player->mo->PrevAngles.Pitch - pitch).Degrees;
-		direction = t1->player->mo->AttackDir(t1, angle, t1->player->mo->PrevAngles.Pitch - pitch);
+        pitchDelta = (t1->player->mo->Angles.Pitch - pitch);
+		direction = t1->player->mo->AttackDir(t1, angle, pitchDelta);
 	}
 	else if (flags & LAF_ABSPOSITION)
 	{
