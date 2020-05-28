@@ -747,6 +747,10 @@ void gl_PrecacheTexture(uint8_t *texhitlist, TMap<PClassActor*, bool> &actorhitl
 
 	if (gl_precache)
 	{
+		cycle_t precache;
+		precache.Reset();
+		precache.Clock();
+
 		// cache all used textures
 		for (int i = cnt - 1; i >= 0; i--)
 		{
@@ -762,12 +766,15 @@ void gl_PrecacheTexture(uint8_t *texhitlist, TMap<PClassActor*, bool> &actorhitl
 		}
 
 		// cache all used models
-		FGLModelRenderer renderer(-1);
+		FGLModelRenderer renderer;
 		for (unsigned i = 0; i < Models.Size(); i++)
 		{
 			if (modellist[i]) 
 				Models[i]->BuildVertexBuffer(&renderer);
 		}
+
+		precache.Unclock();
+		DPrintf(DMSG_NOTIFY, "Textures precached in %.3f ms\n", precache.TimeMS());
 	}
 
 	delete[] spritehitlist;

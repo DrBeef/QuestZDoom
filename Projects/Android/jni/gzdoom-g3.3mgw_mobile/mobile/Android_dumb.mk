@@ -1,5 +1,5 @@
 
-LOCAL_PATH := $(call my-dir)/../dumb
+LOCAL_PATH := $(call my-dir)/../libraries/dumb
 
 
 include $(CLEAR_VARS)
@@ -92,7 +92,6 @@ LOCAL_SRC_FILES =  	\
     src/it/readxm2.c \
     src/it/xmeffect.c \
 
-LOCAL_LDLIBS :=  -ldl -llog
 
 include $(BUILD_STATIC_LIBRARY)
 

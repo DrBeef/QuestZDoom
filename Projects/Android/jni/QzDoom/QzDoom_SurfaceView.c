@@ -71,7 +71,7 @@ bool player_moving;
 bool shutdown;
 bool ready_teleport;
 bool trigger_teleport;
-
+bool cinemamode;
 
 #if !defined( EGL_OPENGL_ES3_BIT_KHR )
 #define EGL_OPENGL_ES3_BIT_KHR		0x0040
@@ -173,7 +173,7 @@ void QzDoom_setUseScreenLayer(bool use)
 
 bool QzDoom_useScreenLayer()
 {
-	return useVirtualScreen;
+	return useVirtualScreen || cinemamode;
 }
 
 static void UnEscapeQuotes( char *arg )
@@ -1304,6 +1304,8 @@ void VR_Init()
 	shutdown = false;
     ready_teleport = false;
     trigger_teleport = false;
+
+	cinemamode = false;
 }
 
 static ovrAppThread * gAppThread = NULL;

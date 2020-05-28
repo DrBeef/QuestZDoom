@@ -46,15 +46,9 @@
 #define INITGUID
 #endif
 #include <windows.h>
-#include <mmsystem.h>
 #include <dbt.h>
 #include <dinput.h>
 #include <malloc.h>
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <string.h>
 
 #ifdef _MSC_VER
 #pragma warning(disable:4244)
@@ -78,7 +72,6 @@
 
 
 #include "c_dispatch.h"
-#include "doomtype.h"
 #include "doomdef.h"
 #include "doomstat.h"
 #include "m_argv.h"
@@ -89,19 +82,14 @@
 #include "d_main.h"
 #include "d_gui.h"
 #include "c_console.h"
-#include "c_cvars.h"
-#include "i_system.h"
 #include "s_sound.h"
-#include "m_misc.h"
 #include "gameconfigfile.h"
 #include "win32iface.h"
-#include "templates.h"
-#include "cmdlib.h"
 #include "d_event.h"
 #include "v_text.h"
 #include "version.h"
 #include "events.h"
-#include "atterm.h"
+#include "doomerrors.h"
 
 // Prototypes and declarations.
 #include "rawinput.h"
@@ -450,8 +438,7 @@ LRESULT CALLBACK WndProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_DESTROY:
 		SetPriorityClass (GetCurrentProcess(), NORMAL_PRIORITY_CLASS);
-		//PostQuitMessage (0);
-		exit (0);
+		PostQuitMessage (0);
 		break;
 
 	case WM_HOTKEY:
@@ -659,7 +646,6 @@ bool I_InitInput (void *hwnd)
 	HRESULT hr;
 
 	Printf ("I_InitInput\n");
-	atterm (I_ShutdownInput);
 
 	noidle = !!Args->CheckParm ("-noidle");
 	g_pdi = NULL;
@@ -787,7 +773,7 @@ void I_GetEvent ()
 	while (PeekMessage (&mess, NULL, 0, 0, PM_REMOVE))
 	{
 		if (mess.message == WM_QUIT)
-			exit (mess.wParam);
+			throw CExitEvent(mess.wParam);
 
 		if (GUICapture)
 		{

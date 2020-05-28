@@ -38,16 +38,13 @@
 #ifdef HAVE_FPU_CONTROL
 #include <fpu_control.h>
 #endif
-#include <float.h>
 
 #if defined(__unix__) || defined(__APPLE__)
 #include <unistd.h>
 #endif
 
-#include <time.h>
 #include <math.h>
 #include <assert.h>
-#include <sys/stat.h>
 
 #include "doomerrors.h"
 
@@ -67,7 +64,6 @@
 #include "menu/menu.h"
 #include "c_console.h"
 #include "c_dispatch.h"
-#include "i_system.h"
 #include "i_sound.h"
 #include "i_video.h"
 #include "g_game.h"
@@ -81,49 +77,40 @@
 #include "d_main.h"
 #include "d_dehacked.h"
 #include "cmdlib.h"
-#include "s_sound.h"
-#include "m_swap.h"
 #include "v_text.h"
 #include "gi.h"
-#include "b_bot.h"		//Added by MC:
-#include "stats.h"
 #include "gameconfigfile.h"
 #include "sbar.h"
 #include "decallib.h"
 #include "version.h"
-#include "v_text.h"
 #include "st_start.h"
-#include "templates.h"
 #include "teaminfo.h"
 #include "hardware.h"
 #include "sbarinfo.h"
 #include "d_net.h"
-#include "g_level.h"
 #include "d_event.h"
 #include "d_netinf.h"
-#include "v_palette.h"
 #include "m_cheat.h"
 #include "compatibility.h"
 #include "m_joy.h"
-#include "sc_man.h"
 #include "po_man.h"
-#include "resourcefiles/resourcefile.h"
 #include "r_renderer.h"
 #include "p_local.h"
 #include "autosegs.h"
 #include "fragglescript/t_fs.h"
 #include "g_levellocals.h"
 #include "events.h"
-#include "r_utility.h"
 #include "vm.h"
 #include "types.h"
 #include "r_data/r_vanillatrans.h"
-#include "atterm.h"
 #include "s_music.h"
+#include "swrenderer/r_swcolormaps.h"
 
 EXTERN_CVAR(Bool, hud_althud)
+EXTERN_CVAR(Bool, cl_customizeinvulmap)
 void DrawHUD();
 void D_DoAnonStats();
+void I_DetectOS();
 
 
 // MACROS ------------------------------------------------------------------
@@ -140,11 +127,21 @@ extern void G_NewInit ();
 extern void SetupPlayerClasses ();
 void gl_PatchMenu();	// remove modern OpenGL options on old hardware.
 void DeinitMenus();
+void CloseNetwork();
+void P_Shutdown();
+void M_SaveDefaultsFinal();
+void R_Shutdown();
+//void I_ShutdownInput();
+#ifdef _WIN32
+void StopFPSLimit();
+#endif
+void I_DeleteRenderer();
+
 const FIWADInfo *D_FindIWAD(TArray<FString> &wadfiles, const char *iwad, const char *basewad);
 
 // PUBLIC FUNCTION PROTOTYPES ----------------------------------------------
 
-void D_CheckNetGame ();
+bool D_CheckNetGame ();
 void D_ProcessEvents ();
 void G_BuildTiccmd (ticcmd_t* cmd);
 void D_DoAdvanceDemo ();
@@ -152,6 +149,9 @@ void D_AddWildFile (TArray<FString> &wadfiles, const char *pattern);
 void D_LoadWadSettings ();
 void ParseGLDefs();
 void DrawFullscreenSubtitle(const char *text);
+void D_Cleanup();
+void FreeSBarInfoScript();
+void C_GrabCVarDefaults ();
 
 // PRIVATE FUNCTION PROTOTYPES ---------------------------------------------
 
@@ -261,10 +261,6 @@ cycle_t FrameCycles;
 // [SP] Store the capabilities of the renderer in a global variable, to prevent excessive per-frame processing
 uint32_t r_renderercaps = 0;
 
-#ifndef _WIN32
-volatile
-#endif
-int game_running = 1;
 
 // PRIVATE DATA DEFINITIONS ------------------------------------------------
 
@@ -1014,6 +1010,7 @@ void D_Display ()
 void D_ErrorCleanup ()
 {
 	savegamerestore = false;
+	if (screen)
 	screen->Unlock ();
 	bglobal.RemoveAllBots (true);
 	D_QuitNetGame ();
@@ -1043,7 +1040,6 @@ void D_ErrorCleanup ()
 // calls I_GetTime, I_StartFrame, and I_StartTic
 //
 //==========================================================================
-
 void D_DoomLoop ()
 {
 	int lasttic = 0;
@@ -1056,7 +1052,7 @@ void D_DoomLoop ()
 
 	vid_cursor.Callback();
 
-	do
+	for (;;)
 	{
 		try
 		{
@@ -1114,7 +1110,7 @@ void D_DoomLoop ()
 			Printf("%s", error.stacktrace.GetChars());
 			D_ErrorCleanup();
 		}
-	} while (game_running);
+    }
 }
 
 //==========================================================================
@@ -1222,7 +1218,7 @@ void D_DoStrifeAdvanceDemo ()
 		pagetic = 10 * TICRATE/35;
 		pagename = "";	// PANEL0, but strife0.wad doesn't have it, so don't use it.
 		PageBlank = true;
-		S_Sound (CHAN_VOICE | CHAN_UI, "bishop/active", 1, ATTN_NORM);
+		S_Sound (CHAN_VOICE, CHANF_UI, "bishop/active", 1, ATTN_NORM);
 		break;
 
 	case 2:
@@ -1234,7 +1230,7 @@ void D_DoStrifeAdvanceDemo ()
 		pagetic = 7 * TICRATE;
 		pagename = "PANEL1";
 		subtitle = "TXT_SUB_INTRO1";
-		S_Sound (CHAN_VOICE | CHAN_UI, voices[0], 1, ATTN_NORM);
+		S_Sound (CHAN_VOICE, CHANF_UI, voices[0], 1, ATTN_NORM);
 		// The new Strife teaser has D_FMINTR.
 		// The full retail Strife has D_INTRO.
 		// And the old Strife teaser has both. (I do not know which one it actually uses, nor do I care.)
@@ -1245,35 +1241,35 @@ void D_DoStrifeAdvanceDemo ()
 		pagetic = 9 * TICRATE;
 		pagename = "PANEL2";
 		subtitle = "TXT_SUB_INTRO2";
-		S_Sound (CHAN_VOICE | CHAN_UI, voices[1], 1, ATTN_NORM);
+		S_Sound (CHAN_VOICE, CHANF_UI, voices[1], 1, ATTN_NORM);
 		break;
 
 	case 5:
 		pagetic = 12 * TICRATE;
 		pagename = "PANEL3";
 		subtitle = "TXT_SUB_INTRO3";
-		S_Sound (CHAN_VOICE | CHAN_UI, voices[2], 1, ATTN_NORM);
+		S_Sound (CHAN_VOICE, CHANF_UI, voices[2], 1, ATTN_NORM);
 		break;
 
 	case 6:
 		pagetic = 11 * TICRATE;
 		pagename = "PANEL4";
 		subtitle = "TXT_SUB_INTRO4";
-		S_Sound (CHAN_VOICE | CHAN_UI, voices[3], 1, ATTN_NORM);
+		S_Sound (CHAN_VOICE, CHANF_UI, voices[3], 1, ATTN_NORM);
 		break;
 
 	case 7:
 		pagetic = 10 * TICRATE;
 		pagename = "PANEL5";
 		subtitle = "TXT_SUB_INTRO5";
-		S_Sound (CHAN_VOICE | CHAN_UI, voices[4], 1, ATTN_NORM);
+		S_Sound (CHAN_VOICE, CHANF_UI, voices[4], 1, ATTN_NORM);
 		break;
 
 	case 8:
 		pagetic = 16 * TICRATE;
 		pagename = "PANEL6";
 		subtitle = "TXT_SUB_INTRO6";
-		S_Sound (CHAN_VOICE | CHAN_UI, voices[5], 1, ATTN_NORM);
+		S_Sound (CHAN_VOICE, CHANF_UI, voices[5], 1, ATTN_NORM);
 		break;
 
 	case 9:
@@ -1486,17 +1482,32 @@ void ParseCVarInfo()
 				{
 					cvarflags |= CVAR_LATCH;
 				}
+				else if (stricmp(sc.String, "nosave") == 0)
+				{
+					cvarflags |= CVAR_CONFIG_ONLY;
+				}
 				else
 				{
 					sc.ScriptError("Unknown cvar attribute '%s'", sc.String);
 				}
 				sc.MustGetAnyToken();
 			}
+
+			// Possibility of defining a cvar as 'server nosave' or 'user nosave' is kept for
+			// compatibility reasons.
+			if (cvarflags & CVAR_CONFIG_ONLY)
+			{
+				cvarflags &= ~CVAR_SERVERINFO;
+				cvarflags &= ~CVAR_USERINFO;
+			}
+
 			// Do some sanity checks.
-			if ((cvarflags & (CVAR_SERVERINFO|CVAR_USERINFO)) == 0 ||
+			// No need to check server-nosave and user-nosave combinations because they
+			// are made impossible right above.
+			if ((cvarflags & (CVAR_SERVERINFO|CVAR_USERINFO|CVAR_CONFIG_ONLY)) == 0 ||
 				(cvarflags & (CVAR_SERVERINFO|CVAR_USERINFO)) == (CVAR_SERVERINFO|CVAR_USERINFO))
 			{
-				sc.ScriptError("One of 'server' or 'user' must be specified");
+				sc.ScriptError("One of 'server', 'user', or 'nosave' must be specified");
 			}
 			// The next token must be the cvar type.
 			if (sc.TokenType == TK_Bool)
@@ -2052,23 +2063,6 @@ static void SetMapxxFlag()
 
 //==========================================================================
 //
-// FinalGC
-//
-// If this doesn't free everything, the debug CRT will let us know.
-//
-//==========================================================================
-
-static void FinalGC()
-{
-	delete Args;
-	Args = nullptr;
-	GC::FinalGC = true;
-	GC::FullGC();
-	GC::DelSoftRootHead();	// the soft root head will not be collected by a GC so we have to do it explicitly
-}
-
-//==========================================================================
-//
 // Initialize
 //
 //==========================================================================
@@ -2094,8 +2088,6 @@ static void D_DoomInit()
 
 	// Check response files before coalescing file parameters.
 	M_FindResponseFile ();
-
-	atterm(FinalGC);
 
 	// Combine different file parameters with their pre-switch bits.
 	Args->CollectFiles("-deh", ".deh");
@@ -2333,24 +2325,14 @@ static void CheckCmdLine()
 	}
 }
 
+
 //==========================================================================
 //
 // D_DoomMain
 //
 //==========================================================================
 
-// The command line arguments.
-FArgs *Args;
-
-void VR_DoomMain(int argc, char** argv)
-{
-	progdir = "/sdcard/QuestZDoom/";
-	Args = new FArgs(argc, argv);
-	C_InitConsole (80*8, 25*8, false);
-	D_DoomMain ();
-}
-
-void D_DoomMain ()
+static int D_DoomMain_Internal (void)
 {
 	int p;
 	const char *v;
@@ -2359,7 +2341,12 @@ void D_DoomMain ()
 	FString *args;
 	int argcount;	
 	FIWadManager *iwad_man;
+	
 	const char *batchout = Args->CheckValue("-errorlog");
+
+	C_InitConsole(80*8, 25*8, false);
+	Printf("%s version %s\n", GAMENAME, GetVersionString());
+	//I_DetectOS();
 
 	// +logfile gets checked too late to catch the full startup log in the logfile so do some extra check for it here.
 	FString logfile = Args->TakeValue("+logfile");
@@ -2450,8 +2437,10 @@ void D_DoomMain ()
 			iwad_man = new FIWadManager(basewad, optionalwad);
 		}
 		const FIWADInfo *iwad_info = iwad_man->FindIWAD(allwads, iwad, basewad, optionalwad);
+		if (!iwad_info) return 0;	// user exited the selection popup via cancel button.
 		gameinfo.gametype = iwad_info->gametype;
 		gameinfo.flags = iwad_info->flags;
+		gameinfo.nokeyboardcheats = iwad_info->nokeyboardcheats;
 		gameinfo.ConfigName = iwad_info->Configname;
 		lastIWAD = iwad;
 
@@ -2501,6 +2490,8 @@ void D_DoomMain ()
 		allwads.ShrinkToFit();
 		SetMapxxFlag();
 
+		C_GrabCVarDefaults(); //parse DEFCVARS
+
 		GameConfig->DoKeySetup(gameinfo.ConfigName);
 
 		// Now that wads are loaded, define mod-specific cvars.
@@ -2539,7 +2530,6 @@ void D_DoomMain ()
 
 		if (!batchrun) Printf ("S_Init: Setting up sound.\n");
 		S_Init ();
-		S_InitMusic();
 
 		if (!batchrun) Printf ("ST_Init: Init startup screen.\n");
 		if (!restart)
@@ -2686,7 +2676,10 @@ void D_DoomMain ()
 		{
 			if (!batchrun) Printf ("D_CheckNetGame: Checking network game status.\n");
 			StartScreen->LoadingStatus ("Checking network game status.", 0x3f);
-			D_CheckNetGame ();
+			if (!D_CheckNetGame ())
+			{
+				return 0;
+			}
 		}
 
 		// [SP] Force vanilla transparency auto-detection to re-detect our game lumps now
@@ -2705,6 +2698,10 @@ void D_DoomMain ()
 		C_RunDelayedCommands();
 		gamestate = GS_STARTUP;
 
+		// enable custom invulnerability map here
+		if (cl_customizeinvulmap)
+			R_UpdateInvulnerabilityColormap();
+
 		if (!restart)
 		{
 			// start the apropriate game based on parms
@@ -2718,11 +2715,11 @@ void D_DoomMain ()
 
 			delete StartScreen;
 			StartScreen = NULL;
-			S_Sound (CHAN_BODY, "misc/startupdone", 1, ATTN_NONE);
+			S_Sound (CHAN_BODY, 0, "misc/startupdone", 1, ATTN_NONE);
 
 			if (Args->CheckParm("-norun") || batchrun)
 			{
-				throw CNoRunExit();
+				return 1337; // special exit
 			}
 
 			V_Init2();
@@ -2783,8 +2780,6 @@ void D_DoomMain ()
 					{
 						G_BeginRecording(NULL);
 					}
-
-					atterm(D_QuitNetGame);		// killough
 				}
 			}
 		}
@@ -2810,20 +2805,91 @@ void D_DoomMain ()
 		// Clean up after a restart
 		//
 
+		D_Cleanup();
+
+		gamestate = GS_STARTUP;
+	}
+	while (1);
+}
+
+int D_DoomMain()
+{
+	int ret = 0;
+	try
+	{
+		ret = D_DoomMain_Internal();
+	}
+	catch (const CExitEvent &exit)	// This is a regular exit initiated from deeply nested code.
+	{
+		ret = exit.Reason();
+	}
+	catch (const std::exception &error)
+	{
+		ret = -1;
+	}
+	// Unless something really bad happened, the game should only exit through this single point in the code.
+	// No more 'exit', please.
+	// Todo: Move all engine cleanup here instead of using exit handlers and replace the scattered 'exit' calls with a special exception.
+	D_Cleanup();
+	CloseNetwork();
+	GC::FinalGC = true;
+	GC::FullGC();
+	GC::DelSoftRootHead();	// the soft root head will not be collected by a GC so we have to do it explicitly
+	C_DeinitConsole();
+	R_DeinitColormaps();
+	R_Shutdown();
+	I_DeleteRenderer();
+	I_ShutdownGraphics();
+	//I_ShutdownInput();
+	M_SaveDefaultsFinal();
+	DeleteStartupScreen();
+	delete Args;
+	Args = nullptr;
+	return ret;
+}
+
+// The command line arguments.
+FArgs *Args;
+
+void VR_DoomMain(int argc, char** argv)
+{
+    progdir = "/sdcard/QuestZDoom/";
+    Args = new FArgs(argc, argv);
+    D_DoomMain ();
+}
+
+//==========================================================================
+//
+// clean up the resources
+//
+//==========================================================================
+
+void D_Cleanup()
+{
+	if (demorecording)
+	{
+		G_CheckDemoStatus();
+	}
+
 		// Music and sound should be stopped first
 		S_StopMusic(true);
-		S_StopAllChannels ();
+	S_ClearSoundData();
+	S_UnloadReverbDef();
+	G_ClearMapinfo();
 
 		M_ClearMenus();					// close menu if open
 		F_EndFinale();					// If an intermission is active, end it now
 		AM_ClearColorsets();
+	DeinitSWColorMaps();
+	FreeSBarInfoScript();
+#ifdef _WIN32
+	StopFPSLimit();
+#endif
 
 		// clean up game state
 		ST_Clear();
 		D_ErrorCleanup ();
-		DThinker::DestroyThinkersInList(STAT_STATIC);
-		E_Shutdown(false);
-		P_FreeLevelData();
+	P_Shutdown();
 
 		M_SaveDefaults(NULL);			// save config before the restart
 
@@ -2834,7 +2900,6 @@ void D_DoomMain ()
 		R_DeinitTranslationTables();	// some tables are initialized from outside the translation code.
 		gameinfo.~gameinfo_t();
 		new (&gameinfo) gameinfo_t;		// Reset gameinfo
-		S_ShutdownMusic();
 		S_Shutdown();					// free all channels and delete playlist
 		C_ClearAliases();				// CCMDs won't be reinitialized so these need to be deleted here
 		DestroyCVarsFlagged(CVAR_MOD);	// Delete any cvar left by mods
@@ -2859,7 +2924,6 @@ void D_DoomMain ()
 
 		GC::DelSoftRootHead();
 
-		if (game_running)
 			PClass::StaticShutdown();
 
 		GC::FullGC();					// perform one final garbage collection after shutdown
@@ -2869,10 +2933,6 @@ void D_DoomMain ()
 		restart++;
 		PClass::bShutdown = false;
 		PClass::bVMOperational = false;
-
-		gamestate = GS_STARTUP;
-	}
-	while (game_running);
 }
 
 //==========================================================================
@@ -2953,6 +3013,24 @@ void FStartupScreen::LoadingStatus(const char *message, int colors)
 void FStartupScreen::AppendStatusLine(const char *status)
 {
 }
+
+//===========================================================================
+//
+// DeleteStartupScreen
+//
+// Makes sure the startup screen has been deleted before quitting.
+//
+//===========================================================================
+
+void DeleteStartupScreen()
+{
+	if (StartScreen != nullptr)
+	{
+		delete StartScreen;
+		StartScreen = nullptr;
+	}
+}
+
 
 
 void FStartupScreen::Progress(void) {}

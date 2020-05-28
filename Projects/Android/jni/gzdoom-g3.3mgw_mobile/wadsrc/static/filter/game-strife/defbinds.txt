@@ -1,10 +1,7 @@
 /* Default keybindings for Strife */
 
-/ +jump
-e "showpop 1"
 backspace invdrop
 z "showpop 3"
-k "showpop 2"
 q invquery
 
 ; not done

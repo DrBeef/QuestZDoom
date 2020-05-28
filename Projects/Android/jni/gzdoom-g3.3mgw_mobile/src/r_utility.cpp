@@ -40,23 +40,18 @@
 #include "m_bbox.h"
 #include "r_sky.h"
 #include "st_stuff.h"
-#include "c_cvars.h"
 #include "c_dispatch.h"
 #include "v_video.h"
 #include "stats.h"
 #include "i_video.h"
-#include "i_system.h"
 #include "a_sharedglobal.h"
-#include "r_data/r_translate.h"
 #include "p_3dmidtex.h"
 #include "r_data/r_interpolate.h"
-#include "v_palette.h"
 #include "po_man.h"
 #include "p_effect.h"
 #include "st_start.h"
 #include "v_font.h"
 #include "r_renderer.h"
-#include "r_data/colormaps.h"
 #include "serializer.h"
 #include "r_utility.h"
 #include "d_player.h"
@@ -64,11 +59,9 @@
 #include "g_levellocals.h"
 #include "p_maputl.h"
 #include "sbar.h"
-#include "math/cmath.h"
 #include "vm.h"
 #include "i_time.h"
 #include "actorinlines.h"
-#include "atterm.h"
 
 
 // EXTERNAL DATA DECLARATIONS ----------------------------------------------
@@ -161,7 +154,6 @@ DAngle viewpitch;
 DEFINE_GLOBAL(LocalViewPitch);
 
 // CODE --------------------------------------------------------------------
-static void R_Shutdown ();
 
 //==========================================================================
 //
@@ -406,8 +398,6 @@ subsector_t *R_PointInSubsector (fixed_t x, fixed_t y)
 
 void R_Init ()
 {
-	atterm (R_Shutdown);
-
 	StartScreen->Progress();
 	// Colormap init moved back to InitPalette()
 	//R_InitColormaps ();
@@ -424,10 +414,8 @@ void R_Init ()
 //
 //==========================================================================
 
-static void R_Shutdown ()
+void R_Shutdown ()
 {
-	R_DeinitTranslationTables();
-	R_DeinitColormaps ();
 	FCanvasTextureInfo::EmptyList();
 }
 

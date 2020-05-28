@@ -58,7 +58,6 @@
 #include "cmdlib.h"
 #include "g_levellocals.h"
 #include "vm.h"
-#include "atterm.h"
 
 #define ARTIFLASH_OFFSET (statusBar->invBarOffset+6)
 enum
@@ -434,7 +433,7 @@ static const char *StatusBars[] =
 	NULL
 };
 
-static void FreeSBarInfoScript()
+void FreeSBarInfoScript()
 {
 	for(int i = 0;i < 2;i++)
 	{
@@ -448,9 +447,6 @@ static void FreeSBarInfoScript()
 
 void SBarInfo::Load()
 {
-	FreeSBarInfoScript();
-	MugShotStates.Clear();
-
 	if(gameinfo.statusbar.IsNotEmpty())
 	{
 		int lump = Wads.CheckNumForFullName(gameinfo.statusbar, true);
@@ -477,7 +473,6 @@ void SBarInfo::Load()
 				SBarInfoScript[SCRIPT_CUSTOM]->ParseSBarInfo(lump);
 		}
 	}
-	atterm(FreeSBarInfoScript);
 }
 
 //SBarInfo Script Reader

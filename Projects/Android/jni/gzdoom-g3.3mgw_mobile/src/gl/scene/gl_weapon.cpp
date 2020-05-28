@@ -85,7 +85,7 @@ void GLSceneDrawer::DrawPSprite (player_t * player,DPSprite *psp, float sx, floa
 	// [BB] In the HUD model step we just render the model and break out. 
 	if ( hudModelStep )
 	{
-		gl_RenderHUDModel(psp, sx, sy, weapondynlightindex[psp]);
+		gl_RenderHUDModel(psp, sx, sy);
 		return;
 	}
 
@@ -97,7 +97,7 @@ void GLSceneDrawer::DrawPSprite (player_t * player,DPSprite *psp, float sx, floa
 	FMaterial * tex = FMaterial::ValidateTexture(lump, true, false);
 	if (!tex) return;
 
-	gl_RenderState.SetMaterial(tex, CLAMP_XY_NOMIP, 0, OverrideShader, alphatexture);
+	gl_RenderState.SetMaterial(tex, CLAMP_XY_NOMIP, psp->Flags & PSPF_PLAYERTRANSLATED ? psp->Owner->mo->Translation : 0, OverrideShader, alphatexture);
 
 	float vw = (float)viewwidth;
 	float vh = (float)viewheight;

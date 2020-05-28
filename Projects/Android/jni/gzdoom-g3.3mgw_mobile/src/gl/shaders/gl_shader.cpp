@@ -711,12 +711,19 @@ bool FShader::Load(const char * name, const char * vert_prog_lump, const char * 
 		char stringbuf[20];
 		mysnprintf(stringbuf, 20, "texture%d", i);
 		int tempindex = glGetUniformLocation(hShader, stringbuf);
+#ifdef __ANDROID__
+		if (tempindex >= 0) glUniform1i(tempindex, i - 1);
+#else
 		if (tempindex > 0) glUniform1i(tempindex, i - 1);
+#endif
 	}
 
 	int shadowmapindex = glGetUniformLocation(hShader, "ShadowMap");
-	if (shadowmapindex > 0) glUniform1i(shadowmapindex, 16);
-
+#ifdef __ANDROID__
+	if (shadowmapindex >= 0) glUniform1i(shadowmapindex, 16);
+#else
+		if (shadowmapindex > 0) glUniform1i(shadowmapindex, 16);
+#endif
 	glUseProgram(0);
 	return linked;
 }

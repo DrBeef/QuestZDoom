@@ -47,6 +47,8 @@
 #include "gl/textures/gl_material.h"
 #include "gl/dynlights/gl_lightbuffer.h"
 
+FDynLightData modellightdata;
+int modellightindex = -1;
 
 template<class T>
 T smoothstep(const T edge0, const T edge1, const T x)
@@ -140,6 +142,7 @@ void gl_SetDynSpriteLight(AActor *self, float x, float y, float z, subsector_t *
 		node = node->nextLight;
 	}
 	gl_RenderState.SetDynLight(out[0], out[1], out[2]);
+	modellightindex = -1;
 }
 
 void gl_SetDynSpriteLight(AActor *thing, particle_t *particle)
@@ -156,12 +159,11 @@ void gl_SetDynSpriteLight(AActor *thing, particle_t *particle)
 
 int gl_SetDynModelLight(AActor *self, int dynlightindex)
 {
-	static FDynLightData modellightdata;	// If this ever gets multithreaded, this variable must either be made non-static or thread_local.
-
 	// For deferred light mode this function gets called twice. First time for list upload, and second for draw.
 	if (gl.lightmethod == LM_DEFERRED && dynlightindex != -1)
 	{
 		gl_RenderState.SetDynLight(0, 0, 0);
+		modellightindex = dynlightindex;
 		return dynlightindex;
 	}
 
@@ -220,6 +222,7 @@ int gl_SetDynModelLight(AActor *self, int dynlightindex)
 	if (gl.lightmethod != LM_DEFERRED)
 	{
 		gl_RenderState.SetDynLight(0, 0, 0);
+		modellightindex = dynlightindex;
 	}
 	return dynlightindex;
 }

@@ -291,11 +291,6 @@ enum ESSType
 
 const double M_PI = 3.14159265358979323846;	// matches value in gcc v2 math.h
 
-template <typename T, size_t N>
-char ( &_ArraySizeHelper( T (&array)[N] ))[N];
-
-#define countof( array ) (sizeof( _ArraySizeHelper( array ) ))
-
 // Auto-registration sections for GCC.
 // Apparently, you cannot do string concatenation inside section attributes.
 #ifdef __MACH__

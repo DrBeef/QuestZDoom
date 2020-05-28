@@ -120,7 +120,6 @@
 #include "types.h"
 #include "i_time.h"
 #include "scripting/vm/vm.h"
-#include "atterm.h"
 #include "s_music.h"
 
 #include "fragglescript/t_fs.h"
@@ -148,8 +147,6 @@ CVAR (Bool, genblockmap, false, CVAR_SERVERINFO|CVAR_GLOBALCONFIG);
 CVAR (Bool, gennodes, false, CVAR_SERVERINFO|CVAR_GLOBALCONFIG);
 CVAR (Bool, genglnodes, false, CVAR_SERVERINFO);
 CVAR (Bool, showloadtimes, false, 0);
-
-static void P_Shutdown ();
 
 inline bool P_LoadBuildMap(uint8_t *mapdata, size_t len, FMapThing **things, int *numthings)
 {
@@ -3004,6 +3001,8 @@ static void AddToList(uint8_t *hitlist, FTextureID texid, int bitmask)
 	if (hitlist[texid.GetIndex()] & bitmask) return;	// already done, no need to process everything again.
 	hitlist[texid.GetIndex()] |= (uint8_t)bitmask;
 
+	const auto addAnimations = [hitlist, bitmask](const FTextureID texid)
+	{
 	for (auto anim : TexMan.mAnimations)
 	{
 		if (texid == anim->BasePic || (!anim->bDiscrete && anim->BasePic < texid && texid < anim->BasePic + anim->NumFrames))
@@ -3014,17 +3013,31 @@ static void AddToList(uint8_t *hitlist, FTextureID texid, int bitmask)
 			}
 		}
 	}
+	};
+
+	addAnimations(texid);
 
 	auto switchdef = TexMan.FindSwitch(texid);
 	if (switchdef)
 	{
-		for (int i = 0; i < switchdef->NumFrames; i++)
+		const FSwitchDef *const pair = switchdef->PairDef;
+		const uint16_t numFrames = switchdef->NumFrames;
+		const uint16_t pairNumFrames = pair->NumFrames;
+
+		for (int i = 0; i < numFrames; i++)
 		{
 			hitlist[switchdef->frames[i].Texture.GetIndex()] |= (uint8_t)bitmask;
 		}
-		for (int i = 0; i < switchdef->PairDef->NumFrames; i++)
+		for (int i = 0; i < pairNumFrames; i++)
 		{
-			hitlist[switchdef->PairDef->frames[i].Texture.GetIndex()] |= (uint8_t)bitmask;
+			hitlist[pair->frames[i].Texture.GetIndex()] |= (uint8_t)bitmask;
+		}
+
+		if (numFrames == 1 && pairNumFrames == 1)
+		{
+			// Switch can still be animated via BOOM binary definition from ANIMATED lump
+			addAnimations(switchdef->frames[0].Texture);
+			addAnimations(pair->frames[0].Texture);
 		}
 	}
 
@@ -3140,6 +3153,7 @@ void P_FreeLevelData ()
 	AActor::ClearTIDHashes();
 
 	interpolator.ClearInterpolations();	// [RH] Nothing to interpolate on a fresh level.
+	if (Renderer)
 	Renderer->CleanLevelData();
 	FPolyObj::ClearAllSubsectorLinks(); // can't be done as part of the polyobj deletion process.
 	SN_StopAllSequences ();
@@ -3429,7 +3443,7 @@ void P_SetupLevel(const char *lumpname, int position, bool newGame)
 			times[0].Unclock();
 		}
 
-		SetCompatibilityParams(checksum);
+		PostProcessLevel(checksum);
 
 		times[6].Clock();
 		P_LoopSidedefs(true);
@@ -3880,15 +3894,13 @@ void P_SetupLevel(const char *lumpname, int position, bool newGame)
 //
 void P_Init ()
 {
-	atterm (P_Shutdown);
-
 	P_InitEffects ();		// [RH]
 	P_InitTerrainTypes ();
 	P_InitKeyMessages ();
 	R_InitSprites ();
 }
 
-static void P_Shutdown ()
+void P_Shutdown ()
 {	
 	DThinker::DestroyThinkersInList(STAT_STATIC);	
 	P_FreeLevelData ();

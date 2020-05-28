@@ -46,6 +46,7 @@
 #include "d_player.h"
 
 #include "d_netinf.h"
+#include "serializer.h"
 
 #include "i_system.h"
 #include "v_palette.h"
@@ -54,6 +55,9 @@
 #include "menu/menu.h"
 #include "vm.h"
 #include "v_text.h"
+
+#include "w_wad.h"
+#include "version.h"
 
 struct FLatchedValue
 {
@@ -94,6 +98,7 @@ FBaseCVar::FBaseCVar (const char *var_name, uint32_t flags, void (*callback)(FBa
 	m_Callback = callback;
 	Flags = 0;
 	Name = NULL;
+	inCallback = false;
 
 	if (var_name)
 	{
@@ -1465,6 +1470,47 @@ FString C_GetMassCVarString (uint32_t filter, bool compact)
 	return dump;
 }
 
+void C_SerializeCVars(FSerializer &arc, const char *label, uint32_t filter)
+{
+	FBaseCVar* cvar;
+	FString dump;
+
+	if (arc.BeginObject(label))
+	{
+		if (arc.isWriting())
+		{
+			for (cvar = CVars; cvar != NULL; cvar = cvar->m_Next)
+			{
+				if ((cvar->Flags & filter) && !(cvar->Flags & (CVAR_NOSAVE | CVAR_IGNORE | CVAR_CONFIG_ONLY)))
+				{
+					UCVarValue val = cvar->GetGenericRep(CVAR_String);
+					char* c = const_cast<char*>(val.String);
+					arc(cvar->GetName(), c);
+				}
+			}
+		}
+		else
+		{
+			for (cvar = CVars; cvar != NULL; cvar = cvar->m_Next)
+			{
+				if ((cvar->Flags & filter) && !(cvar->Flags & (CVAR_NOSAVE | CVAR_IGNORE | CVAR_CONFIG_ONLY)))
+				{
+					UCVarValue val;
+					char *c = nullptr;
+					arc(cvar->GetName(), c);
+					if (c != nullptr)
+					{
+						val.String = c;
+						cvar->SetGenericRep(val, CVAR_String);
+						delete[] c;
+					}
+				}
+			}
+		}
+		arc.EndObject();
+	}
+}
+
 void C_ReadCVars (uint8_t **demo_p)
 {
 	char *ptr = *((char **)demo_p);
@@ -1755,7 +1801,7 @@ void C_ArchiveCVars (FConfigFile *f, uint32_t filter)
 	while (cvar)
 	{
 		if ((cvar->Flags &
-			(CVAR_GLOBALCONFIG|CVAR_ARCHIVE|CVAR_MOD|CVAR_AUTO|CVAR_USERINFO|CVAR_SERVERINFO|CVAR_NOSAVE))
+			(CVAR_GLOBALCONFIG|CVAR_ARCHIVE|CVAR_MOD|CVAR_AUTO|CVAR_USERINFO|CVAR_SERVERINFO|CVAR_NOSAVE|CVAR_CONFIG_ONLY))
 			== filter)
 		{
 			cvarlist.Push(cvar);
@@ -1948,6 +1994,62 @@ CCMD (archivecvar)
 		if (var != NULL && (var->GetFlags() & CVAR_AUTO))
 		{
 			var->SetArchiveBit ();
+		}
+	}
+}
+
+void C_GrabCVarDefaults ()
+{
+	int lump, lastlump = 0;
+	int lumpversion, gamelastrunversion;
+	gamelastrunversion = atoi(LASTRUNVERSION);
+
+	while ((lump = Wads.FindLump("DEFCVARS", &lastlump)) != -1)
+	{
+		// don't parse from wads
+		if (lastlump > Wads.GetLastLump(Wads.GetIwadNum()))
+			I_FatalError("Cannot load DEFCVARS from a wadfile!\n");
+
+		FScanner sc(lump);
+
+		sc.MustGetString();
+		if (!sc.Compare("version"))
+			sc.ScriptError("Must declare version for defcvars! (currently: %i)", gamelastrunversion);
+		sc.MustGetNumber();
+		lumpversion = sc.Number;
+		if (lumpversion > gamelastrunversion)
+			sc.ScriptError("Unsupported version %i (%i supported)", lumpversion, gamelastrunversion);
+		if (lumpversion < 219)
+			sc.ScriptError("Version must be at least 219 (current version %i)", gamelastrunversion);
+
+		FBaseCVar *var;
+
+		while (sc.GetString())
+		{
+			if (sc.Compare("set"))
+			{
+				sc.MustGetString();
+			}
+			var = FindCVar (sc.String, NULL);
+			if (var != NULL)
+			{
+				if (var->GetFlags() & CVAR_ARCHIVE)
+				{
+					UCVarValue val;
+
+					sc.MustGetString();
+					val.String = const_cast<char *>(sc.String);
+					var->SetGenericRepDefault(val, CVAR_String);
+				}
+				else
+				{
+					sc.ScriptError("Cannot set cvar default for non-config cvar '%s'", sc.String);
+				}
+			}
+			else
+			{
+				sc.ScriptError("Unknown cvar '%s'", sc.String);
+			}
 		}
 	}
 }

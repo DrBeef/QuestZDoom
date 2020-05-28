@@ -1204,7 +1204,7 @@ bool AActor::Grind(bool items)
 			SetState (state);
 			if (isgeneric)	// Not a custom crush state, so colorize it appropriately.
 			{
-				S_Sound (this, CHAN_BODY, "misc/fallingsplat", 1, ATTN_IDLE);
+				S_Sound (this, CHAN_BODY, 0, "misc/fallingsplat", 1, ATTN_IDLE);
 				Translation = BloodTranslation;
 			}
 			return false;
@@ -1248,7 +1248,7 @@ bool AActor::Grind(bool items)
 				gib->radius = 0;
 				gib->Translation = BloodTranslation;
 			}
-			S_Sound (this, CHAN_BODY, "misc/fallingsplat", 1, ATTN_IDLE);
+			S_Sound (this, CHAN_BODY, 0, "misc/fallingsplat", 1, ATTN_IDLE);
 		}
 		if (flags & MF_ICECORPSE)
 		{
@@ -1447,7 +1447,7 @@ void P_ExplodeMissile (AActor *mo, line_t *line, AActor *target, bool onsky, FNa
 	// play the sound before changing the state, so that AActor::OnDestroy can call S_RelinkSounds on it and the death state can override it.
 	if (mo->DeathSound)
 	{
-		S_Sound (mo, CHAN_VOICE, mo->DeathSound, 1,
+		S_Sound (mo, CHAN_VOICE, 0, mo->DeathSound, 1,
 			(mo->flags3 & MF3_FULLVOLDEATH) ? ATTN_NONE : ATTN_NORM);
 	}
 
@@ -1511,15 +1511,15 @@ void AActor::PlayBounceSound(bool onfloor)
 	{
 		if (BounceFlags & BOUNCE_UseSeeSound)
 		{
-			S_Sound (this, CHAN_VOICE, SeeSound, 1, ATTN_IDLE);
+			S_Sound (this, CHAN_VOICE, 0, SeeSound, 1, ATTN_IDLE);
 		}
 		else if (onfloor || WallBounceSound <= 0)
 		{
-			S_Sound (this, CHAN_VOICE, BounceSound, 1, ATTN_IDLE);
+			S_Sound (this, CHAN_VOICE, 0, BounceSound, 1, ATTN_IDLE);
 		}
 		else
 		{
-			S_Sound (this, CHAN_VOICE, WallBounceSound, 1, ATTN_IDLE);
+			S_Sound (this, CHAN_VOICE, 0, WallBounceSound, 1, ATTN_IDLE);
 		}
 	}
 }
@@ -2795,14 +2795,14 @@ static void PlayerLandedOnThing (AActor *mo, AActor *onmobj)
 		// Why should this number vary by gravity?
 		if (mo->Vel.Z < -mo->player->mo->FloatVar(NAME_GruntSpeed))
 		{
-			S_Sound (mo, CHAN_VOICE, "*grunt", 1, ATTN_NORM);
+			S_Sound (mo, CHAN_VOICE, 0, "*grunt", 1, ATTN_NORM);
 			grunted = true;
 		}
 		if (onmobj != NULL || !Terrains[P_GetThingFloorType (mo)].IsLiquid)
 		{
 			if (!grunted || !S_AreSoundsEquivalent (mo, "*grunt", "*land"))
 			{
-				S_Sound (mo, CHAN_AUTO, "*land", 1, ATTN_NORM);
+				S_Sound (mo, CHAN_AUTO, 0, "*land", 1, ATTN_NORM);
 			}
 		}
 	}
@@ -3126,7 +3126,7 @@ void AActor::Howl ()
 	FSoundID howl = SoundVar(NAME_HowlSound);
 	if (!S_IsActorPlayingSomething(this, CHAN_BODY, howl))
 	{
-		S_Sound (this, CHAN_BODY, howl, 1, ATTN_NORM);
+		S_Sound (this, CHAN_BODY, 0, howl, 1, ATTN_NORM);
 	}
 }
 
@@ -3250,14 +3250,14 @@ bool AActor::AdjustReflectionAngle (AActor *thing, DAngle &angle)
 	return false;
 }
 
-int AActor::AbsorbDamage(int damage, FName dmgtype)
+int AActor::AbsorbDamage(int damage, FName dmgtype, AActor *inflictor, AActor *source, int flags)
 {
 	for (AActor *item = Inventory; item != nullptr; item = item->Inventory)
 	{
 		IFVIRTUALPTRNAME(item, NAME_Inventory, AbsorbDamage)
 		{
-			VMValue params[4] = { item, damage, dmgtype.GetIndex(), &damage };
-			VMCall(func, params, 4, nullptr, 0);
+			VMValue params[7] = { item, damage, dmgtype.GetIndex(), &damage, inflictor, source, flags };
+			VMCall(func, params, 7, nullptr, 0);
 		}
 	}
 	return damage;
@@ -3286,7 +3286,7 @@ void AActor::PlayActiveSound ()
 {
 	if (ActiveSound && !S_IsActorPlayingSomething (this, CHAN_VOICE, -1))
 	{
-		S_Sound (this, CHAN_VOICE, ActiveSound, 1,
+		S_Sound (this, CHAN_VOICE, 0, ActiveSound, 1,
 			(flags3 & MF3_FULLVOLACTIVE) ? ATTN_NONE : ATTN_IDLE);
 	}
 }
@@ -4372,7 +4372,7 @@ bool AActor::UpdateWaterLevel(bool dosplash)
 			if (oldlevel < 3 && waterlevel == 3)
 			{ 
 				// Our head just went under.
-				S_Sound(this, CHAN_VOICE, "*dive", 1, ATTN_NORM);
+				S_Sound(this, CHAN_VOICE, 0, "*dive", 1, ATTN_NORM);
 			}
 			else if (oldlevel == 3 && waterlevel < 3)
 			{ 
@@ -4380,7 +4380,7 @@ bool AActor::UpdateWaterLevel(bool dosplash)
 				if (player->air_finished > level.time)
 				{ 
 					// We hadn't run out of air yet.
-					S_Sound(this, CHAN_VOICE, "*surface", 1, ATTN_NORM);
+					S_Sound(this, CHAN_VOICE, 0, "*surface", 1, ATTN_NORM);
 				}
 				// If we were running out of air, then ResetAirSupply() will play *gasp.
 			}
@@ -5664,11 +5664,11 @@ AActor *P_SpawnPuff (AActor *source, PClassActor *pufftype, const DVector3 &pos1
 
 		if ((flags & PF_HITTHING) && puff->SeeSound)
 		{ // Hit thing sound
-			S_Sound (puff, CHAN_BODY, puff->SeeSound, 1, ATTN_NORM);
+			S_Sound (puff, CHAN_BODY, 0, puff->SeeSound, 1, ATTN_NORM);
 		}
 		else if (puff->AttackSound)
 		{
-			S_Sound (puff, CHAN_BODY, puff->AttackSound, 1, ATTN_NORM);
+			S_Sound (puff, CHAN_BODY, 0, puff->AttackSound, 1, ATTN_NORM);
 		}
 	}
 
@@ -6046,6 +6046,13 @@ foundone:
 	if (splashnum == -1)
 		return Terrains[terrainnum].IsLiquid;
 
+	const bool dealDamageOnLand = thing->player
+		&& Terrains[terrainnum].DamageOnLand
+		&& Terrains[terrainnum].DamageAmount
+		&& (level.time & Terrains[terrainnum].DamageTimeMask);
+	if (dealDamageOnLand)
+		P_DamageMobj(thing, nullptr, nullptr, Terrains[terrainnum].DamageAmount, Terrains[terrainnum].DamageMOD);
+
 	// don't splash when touching an underwater floor
 	if (thing->waterlevel >= 1 && pos.Z <= thing->floorz) return Terrains[terrainnum].IsLiquid;
 
@@ -6098,13 +6105,13 @@ foundone:
 		}
 		if (mo)
 		{
-			S_Sound(mo, CHAN_ITEM, smallsplash ?
+			S_Sound(mo, CHAN_ITEM, 0, smallsplash ?
 				splash->SmallSplashSound : splash->NormalSplashSound,
 				1, ATTN_IDLE);
 		}
 		else
 		{
-			S_Sound(pos, CHAN_ITEM, smallsplash ?
+			S_Sound(pos, CHAN_ITEM, 0, smallsplash ?
 				splash->SmallSplashSound : splash->NormalSplashSound,
 				1, ATTN_IDLE);
 		}
@@ -6301,18 +6308,18 @@ void P_PlaySpawnSound(AActor *missile, AActor *spawner)
 	{
 		if (!(missile->flags & MF_SPAWNSOUNDSOURCE))
 		{
-			S_Sound (missile, CHAN_VOICE, missile->SeeSound, 1, ATTN_NORM);
+			S_Sound (missile, CHAN_VOICE, 0, missile->SeeSound, 1, ATTN_NORM);
 		}
 		else if (spawner != NULL)
 		{
-			S_Sound (spawner, CHAN_WEAPON, missile->SeeSound, 1, ATTN_NORM);
+			S_Sound (spawner, CHAN_WEAPON, 0, missile->SeeSound, 1, ATTN_NORM);
 		}
 		else
 		{
 			// If there is no spawner use the spawn position.
 			// But not in a silenced sector.
 			if (!(missile->Sector->Flags & SECF_SILENT))
-				S_Sound (missile->Pos(), CHAN_WEAPON, missile->SeeSound, 1, ATTN_NORM);
+				S_Sound (missile->Pos(), CHAN_WEAPON, 0, missile->SeeSound, 1, ATTN_NORM);
 		}
 	}
 }
@@ -6751,9 +6758,23 @@ AActor *P_SpawnPlayerMissile (AActor *source, double x, double y, double z,
 	if (source->player != NULL && source->player->mo->OverrideAttackPosDir)
 	{
 		pos = source->player->mo->AttackPos;
-		DVector3 dir = source->player->mo->AttackDir(source, angle, pitch);
+		DAngle p;
+		p.Degrees = 0;
+		DVector3 dir = source->player->mo->AttackDir(source, angle, p);
 		an = dir.Angle();
-		pitch = dir.Pitch();
+
+		//
+		//  FIX FOR FLAT PROJECTILE SPREAD FROM SHOTGUNS AND OTHER MULTI-PROJECTILE WEAPONS
+		//
+        //Bit of a hack as it makes the pitch a little off, but in order for weapon projectile spread
+        //to work correctly, we can't fix the pitch to that of the controller otherwise random spread
+        //turns into a flat line of projectiles. Using the difference between the previous known angles and
+        //the current angles (which were potenitally modified by A_FireProjectile) gives us the "random"
+        //difference applied to the pitch by the script
+        //
+        //A VR player is unlikely to be whipping their head up and down so fast as to make a meaningful
+        //difference to the pitch between two frames, so this is 'good enough' for now.
+		pitch = dir.Pitch() + (source->PrevAngles.Pitch - source->Angles.Pitch);
 	}
 	AActor *MissileActor = Spawn (type, pos, ALLOW_REPLACE);
 
@@ -7187,6 +7208,7 @@ void AActor::Revive()
 	flags5 = info->flags5;
 	flags6 = info->flags6;
 	flags7 = info->flags7;
+	flags8 = info->flags8; 
 	if (SpawnFlags & MTF_FRIENDLY) flags |= MF_FRIENDLY;
 	DamageType = info->DamageType;
 	health = SpawnHealth();

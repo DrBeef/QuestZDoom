@@ -213,6 +213,7 @@ protected:
 	EPlatType	m_Type;
 
 	void PlayPlatSound (const char *sound);
+	const char *GetSoundByType () const;
 	void Reactivate ();
 	void Stop ();
 

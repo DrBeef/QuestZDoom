@@ -387,6 +387,12 @@ CCMD (turn180)
 	sendturn180 = true;
 }
 
+extern bool cinemamode;
+CCMD (cinemamode)
+{
+	cinemamode = !cinemamode;
+}
+
 CCMD (weapnext)
 {
 	auto mo = players[consoleplayer].mo;
@@ -409,7 +415,7 @@ CCMD (weapnext)
 	}
 	if (SendItemUse != players[consoleplayer].ReadyWeapon)
 	{
-		S_Sound(CHAN_AUTO, "misc/weaponchange", 1.0, ATTN_NONE);
+		S_Sound(CHAN_AUTO, 0, "misc/weaponchange", 1.0, ATTN_NONE);
 	}
 }
 
@@ -435,7 +441,7 @@ CCMD (weapprev)
 	}
 	if (SendItemUse != players[consoleplayer].ReadyWeapon)
 	{
-		S_Sound(CHAN_AUTO, "misc/weaponchange", 1.0, ATTN_NONE);
+		S_Sound(CHAN_AUTO, 0, "misc/weaponchange", 1.0, ATTN_NONE);
 	}
 }
 
@@ -861,51 +867,6 @@ void G_AddViewAngle (int yaw, bool mouse)
 	{
 		LocalKeyboardTurner = (!mouse || smooth_mouse);
 	}
-}
-
-
-void G_SetViewPitch (int look)
-{
-	if (gamestate == GS_TITLELEVEL)
-	{
-		return;
-	}
-	look = LookAdjust(look);
-	if  (look > 0)
-	{
-		// Avoid overflowing
-		if (LocalViewPitch > INT_MAX - look)
-		{
-			LocalViewPitch = 0x78000000;
-		}
-		else
-		{
-			LocalViewPitch = MIN(look, 0x78000000);
-		}
-	}
-	else if (look < 0)
-	{
-		// Avoid overflowing
-		if (LocalViewPitch < INT_MIN - look)
-		{
-			LocalViewPitch = -0x78000000;
-		}
-		else
-		{
-			LocalViewPitch = MAX(look, -0x78000000);
-		}
-	}
-}
-
-void G_SetViewAngle (int yaw)
-{
-	if (gamestate == GS_TITLELEVEL)
-	{
-		return;
-
-	}
-	yaw = LookAdjust(yaw);
-	LocalViewAngle = yaw;
 }
 
 CVAR (Bool, bot_allowspy, false, 0)
@@ -2001,6 +1962,10 @@ void G_DoLoadGame ()
 		uint8_t *vars_p = (uint8_t *)cvar.GetChars();
 		C_ReadCVars(&vars_p);
 	}
+	else
+	{
+		C_SerializeCVars(arc, "servercvars", CVAR_SERVERINFO);
+	}
 
 	uint32_t time[2] = { 1,0 };
 
@@ -2308,11 +2273,7 @@ void G_DoSaveGame (bool okForQuicksave, bool forceQuicksave, FString filename, c
 
 	// Intermission stats for hubs
 	G_SerializeHub(savegameglobals);
-
-	{
-		FString vars = C_GetMassCVarString(CVAR_SERVERINFO);
-		savegameglobals.AddString("importantcvars", vars.GetChars());
-	}
+	C_SerializeCVars(savegameglobals, "servercvars", CVAR_SERVERINFO);
 
 	if (level.time != 0 || level.maptime != 0)
 	{

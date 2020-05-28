@@ -1,12 +1,11 @@
 
-LOCAL_PATH := $(call my-dir)/../gdtoa
+LOCAL_PATH := $(call my-dir)/../libraries/gdtoa
 
 
 include $(CLEAR_VARS)
 
 
 LOCAL_MODULE    := gdtoa_lz
-
 
 LOCAL_CFLAGS :=
 
@@ -57,9 +56,6 @@ LOCAL_SRC_FILES =  	\
 	sum.c \
 	ulp.c \
 
-#strtof.c \
-
-LOCAL_LDLIBS :=  -ldl -llog
 
 include $(BUILD_STATIC_LIBRARY)
 

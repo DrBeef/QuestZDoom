@@ -304,6 +304,17 @@ skill hard
 	Name = "$MNU_SMITE"
 }
 
+skill nightmare
+{
+	AmmoFactor = 1.5
+	DoubleAmmoFactor = 1.5
+	FastMonsters
+	DisableCheats
+	RespawnTime = 60
+	SpawnFilter = Nightmare
+	Name = "$MNU_BLACKPLAGUE"
+}
+
 skill extreme_lzd
 {
 	AmmoFactor = 0.5
@@ -313,18 +324,6 @@ skill extreme_lzd
 	DisableCheats
 	SpawnFilter = Hard
 	Name = "$MNU_EXTREME"
-}
-
-skill nightmare
-{
-	AmmoFactor = 1.5
-	DoubleAmmoFactor = 1.5
-	FastMonsters
-	DisableCheats
-	RespawnTime = 15
-	SpawnFilter = Nightmare
-	Name = "$MNU_BLACKPLAGUE"
-	MustConfirm
 }
 
 clearepisodes

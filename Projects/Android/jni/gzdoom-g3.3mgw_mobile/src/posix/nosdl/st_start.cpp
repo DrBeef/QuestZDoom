@@ -43,10 +43,11 @@
 #include "doomdef.h"
 #include "i_system.h"
 #include "c_cvars.h"
-#include "atterm.h"
 
 #ifdef __ANDROID__
 #include <android/log.h>
+#include <gzdoom-g3.3mgw_mobile/src/doomerrors.h>
+
 #define LOGI(...)  __android_log_print(ANDROID_LOG_INFO,"NETOWRK",__VA_ARGS__)
 #define fprintf my_fprintf
 
@@ -127,7 +128,6 @@ static const char SpinnyProgressChars[4] = { '|', '/', '-', '\\' };
 
 FStartupScreen *FStartupScreen::CreateInstance(int max_progress)
 {
-	atterm(DeleteStartupScreen);
 	return new FTTYStartupScreen(max_progress);
 }
 
@@ -139,7 +139,7 @@ FStartupScreen *FStartupScreen::CreateInstance(int max_progress)
 //
 //===========================================================================
 
-void DeleteStartupScreen()
+static void DeleteStartupScreen()
 {
 	if (StartScreen != NULL)
 	{
@@ -374,11 +374,8 @@ bool FTTYStartupScreen::NetLoop(bool (*timer_callback)(void *), void *userdata)
 	}
 }
 
-extern int game_running;
-extern bool wantToRestart;
 
 void ST_Endoom()
 {
-    game_running = false;
-    wantToRestart = true;
+    throw CExitEvent(0);
 }

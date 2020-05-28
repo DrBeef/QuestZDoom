@@ -1827,6 +1827,7 @@ CNTRLMNU_POPUPS					= "Strife Popup Screens";
 CNTRLMNU_MISSION				= "Mission objectives";
 CNTRLMNU_KEYS					= "Keys list";
 CNTRLMNU_STATS					= "Weapons/ammo/stats";
+CNTRLMNU_LAYOUT					= "Default Control Layout";
 
 // Mouse Menu
 
@@ -1914,6 +1915,9 @@ DSPLYMNU_MOVEBOB 				= "View bob amount while moving";
 DSPLYMNU_STILLBOB 				= "View bob amount while not moving";
 DSPLYMNU_BOBSPEED				= "Weapon bob speed";
 DSPLYMNU_GPUSWITCH				= "Notebook Switchable GPU";
+DSPLYMNU_CUSTOMINVERTMAP		= "Custom Inverse Map";
+DSPLYMNU_CUSTOMINVERTC1			= "Custom Inverse Color Dark";
+DSPLYMNU_CUSTOMINVERTC2			= "Custom Inverse Color Light";
 
 // HUD Options
 HUDMNU_TITLE					= "HUD Options";
@@ -2001,6 +2005,7 @@ MISCMNU_CACHETIME				= "Time threshold for node caching";
 MISCMNU_CLEARNODECACHE			= "Clear node cache";
 MISCMNU_INTERSCROLL				= "Allow skipping of intermission scrollers";
 MISCMNU_QUICKEXIT				= "Allow quick exit";
+MISCMNU_NOCHEATS				= "Disable classic keyboard cheats";
 // Automap Options
 AUTOMAPMNU_TITLE				= "AUTOMAP OPTIONS";
 AUTOMAPMNU_COLORSET				= "Map color set";
@@ -2320,7 +2325,6 @@ VIDMNU_ENTERTEXT		= "Press ENTER to set mode";
 VIDMNU_TESTTEXT1		= "T to test mode for 5 seconds";
 VIDMNU_TESTTEXT2		= "Please wait 5 seconds...";
 
-
 // Network Options
 NETMNU_TITLE					= "NETWORK OPTIONS";
 NETMNU_LOCALOPTIONS				= "Local options";
@@ -2513,6 +2517,7 @@ OPTVAL_VTAZDOOM				= "Auto (ZDoom Preferred)";
 OPTVAL_VTAVANILLA			= "Auto (Vanilla Preferred)";
 OPTVAL_SCALENEAREST			= "Scaled (Nearest)";
 OPTVAL_SCALELINEAR			= "Scaled (Linear)";
+OPTVAL_LOWEST				= "Lowest Possible Scale";
 OPTVAL_LETTERBOX			= "Letterbox";
 OPTVAL_SMALL				= "Small";
 OPTVAL_LARGE				= "Large";
@@ -2871,6 +2876,10 @@ OPTVAL_HIGH					= "High";
 OPTVAL_EXTREME				= "Extreme";
 OPTVAL_OBVERSEFIRST			= "Obverse";
 OPTVAL_REVERSEFIRST			= "Reverse";
+OPTVAL_CLASSICZ				= "Classic ZDoom";
+OPTVAL_MODERN				= "Modern (WASD)";
+OPTVAL_MODERN2				= "Modern (ESDF)";
+OPTVAL_MODERN3				= "Modern (IJKL)";
 
 // QZDoom exclusive:
 

@@ -154,7 +154,7 @@ void DLightningThinker::LightningFlash ()
 	}
 
 	level.flags |= LEVEL_SWAPSKIES;	// set alternate sky
-	S_Sound (CHAN_AUTO, "world/thunder", 1.0, ATTN_NONE);
+	S_Sound (CHAN_AUTO, 0, "world/thunder", 1.0, ATTN_NONE);
 	// [ZZ] just in case
 	E_WorldLightning();
 	// start LIGHTNING scripts

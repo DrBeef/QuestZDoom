@@ -92,6 +92,7 @@ static const FLOP FxFlops[] =
 	{ NAME_Round,	FLOP_ROUND,		[](double v) { return round(v);  } },
 };
 
+static bool AreCompatiblePointerTypes(PType* dest, PType* source, bool forcompare = false);
 
 //==========================================================================
 //
@@ -149,9 +150,12 @@ void FCompileContext::CheckReturn(PPrototype *proto, FScriptPosition &pos)
 	// A prototype that defines fewer return types can be compatible with
 	// one that defines more if the shorter one matches the initial types
 	// for the longer one.
+	bool swapped = false;
+
 	if (ReturnProto->ReturnTypes.Size() < proto->ReturnTypes.Size())
 	{ // Make proto the shorter one to avoid code duplication below.
 		swapvalues(proto, ReturnProto);
+		swapped = true;
 	}
 	// If one prototype returns nothing, they both must.
 	if (proto->ReturnTypes.Size() == 0)
@@ -165,9 +169,13 @@ void FCompileContext::CheckReturn(PPrototype *proto, FScriptPosition &pos)
 	{
 		for (unsigned i = 0; i < proto->ReturnTypes.Size(); i++)
 		{
-			if (ReturnProto->ReturnTypes[i] != proto->ReturnTypes[i])
+			PType* expected = ReturnProto->ReturnTypes[i];
+			PType* actual = proto->ReturnTypes[i];
+			if (swapped) swapvalues(expected, actual);
+
+			if (expected != actual && !AreCompatiblePointerTypes(expected, actual))
 			{ // Incompatible
-				Printf("Return type %s mismatch with %s\n", ReturnProto->ReturnTypes[i]->DescriptiveName(), proto->ReturnTypes[i]->DescriptiveName());
+				Printf("Return type %s mismatch with %s\n", expected->DescriptiveName(), actual->DescriptiveName());
 				fail = true;
 				break;
 			}
@@ -280,7 +288,7 @@ static PFunction *FindBuiltinFunction(FName funcname)
 //
 //==========================================================================
 
-static bool AreCompatiblePointerTypes(PType *dest, PType *source, bool forcompare = false)
+static bool AreCompatiblePointerTypes(PType *dest, PType *source, bool forcompare)
 {
 	if (dest->isPointer() && source->isPointer())
 	{
@@ -1241,7 +1249,7 @@ FxExpression *FxStringCast::Resolve(FCompileContext &ctx)
 		if (basex->isConstant())
 		{
 			ExpVal constval = static_cast<FxConstant *>(basex)->GetValue();
-			FxExpression *x = new FxConstant(S_sfx[constval.GetInt()].name, ScriptPosition);
+			FxExpression *x = new FxConstant(S_GetSoundName(constval.GetInt()), ScriptPosition);
 			delete this;
 			return x;
 		}
@@ -6823,7 +6831,7 @@ FxExpression *FxCVar::Resolve(FCompileContext &ctx)
 
 ExpEmit FxCVar::Emit(VMFunctionBuilder *build)
 {
-	ExpEmit dest(build, ValueType->GetRegType());
+	ExpEmit dest(build, CVar->GetRealType() == CVAR_String ? REGT_STRING : ValueType->GetRegType());
 	ExpEmit addr(build, REGT_POINTER);
 	int nul = build->GetConstantInt(0);
 	switch (CVar->GetRealType())
@@ -10274,6 +10282,7 @@ ExpEmit FxIfStatement::Emit(VMFunctionBuilder *build)
 {
 	ExpEmit v;
 	size_t jumpspot = ~0u;
+	bool whenTrueReturns = false;
 
 	TArray<size_t> yes, no;
 	Condition->EmitCompare(build, WhenTrue == nullptr, yes, no);
@@ -10281,13 +10290,14 @@ ExpEmit FxIfStatement::Emit(VMFunctionBuilder *build)
 	if (WhenTrue != nullptr)
 	{
 		build->BackpatchListToHere(yes);
+		whenTrueReturns = WhenTrue->CheckReturn();
 		WhenTrue->EmitStatement(build);
 	}
 	if (WhenFalse != nullptr)
 	{
 		if (WhenTrue != nullptr)
 		{
-			if (!WhenTrue->CheckReturn()) jumpspot = build->Emit(OP_JMP, 0);	// no need to emit a jump if the block returns.
+			if (!whenTrueReturns) jumpspot = build->Emit(OP_JMP, 0);	// no need to emit a jump if the block returns.
 			build->BackpatchListToHere(no);
 		}
 		WhenFalse->EmitStatement(build);
@@ -10712,27 +10722,44 @@ FxExpression *FxReturnStatement::Resolve(FCompileContext &ctx)
 
 	PPrototype *retproto;
 
-	if (ctx.ReturnProto != nullptr && ctx.ReturnProto->ReturnTypes.Size() == 0 && ctx.ReturnProto->ReturnTypes.Size() != Args.Size())
+	const bool hasProto = ctx.ReturnProto != nullptr;
+	const unsigned protoRetCount = hasProto ? ctx.ReturnProto->ReturnTypes.Size() : 0;
+	const unsigned retCount = Args.Size();
+	int mismatchSeverity = -1;
+
+	if (hasProto)
 	{
-		int severity = ctx.Version >= MakeVersion(3, 7) ? MSG_ERROR : MSG_WARNING;
-		ScriptPosition.Message(severity, "Incorrect number of return values. Got %u, but expected %u", Args.Size(), ctx.ReturnProto->ReturnTypes.Size());
-		if (severity == MSG_ERROR)
+		if (protoRetCount == 0 && retCount == 1)
+		{
+			// Handle the case with void function returning something, but only for one value
+			// It was accepted in previous versions, do not abort with fatal error when compiling old scripts
+			mismatchSeverity = ctx.Version >= MakeVersion(3, 7) ? MSG_ERROR : MSG_WARNING;
+		}
+		else if (protoRetCount < retCount)
+		{
+			mismatchSeverity = MSG_ERROR;
+		}
+	}
+
+	if (mismatchSeverity != -1)
+	{
+		ScriptPosition.Message(mismatchSeverity, "Incorrect number of return values. Got %u, but expected %u", Args.Size(), ctx.ReturnProto->ReturnTypes.Size());
+		if (mismatchSeverity == MSG_ERROR)
 		{
 			delete this;
 			return nullptr;
 		}
-		// For older script versions this must fall through.
 	}
 	
-	if (Args.Size() == 0)
+	if (retCount == 0)
 	{
 		TArray<PType *> none(0);
 		retproto = NewPrototype(none, none);
 	}
-	else if (Args.Size() == 1)
+	else if (retCount == 1)
 	{
 		// If we already know the real return type we need at least try to cast the value to its proper type (unless in an anonymous function.)
-		if (ctx.ReturnProto != nullptr && ctx.ReturnProto->ReturnTypes.Size() > 0 && ctx.Function->SymbolName != NAME_None)
+		if (hasProto && protoRetCount > 0 && ctx.Function->SymbolName != NAME_None)
 		{
 			Args[0] = new FxTypeCast(Args[0], ctx.ReturnProto->ReturnTypes[0], false, false);
 			Args[0] = Args[0]->Resolve(ctx);
@@ -10742,7 +10769,7 @@ FxExpression *FxReturnStatement::Resolve(FCompileContext &ctx)
 	}
 	else
 	{
-		for (unsigned i = 0; i < Args.Size(); i++)
+		for (unsigned i = 0; i < retCount; i++)
 		{
 			Args[i] = new FxTypeCast(Args[i], ctx.ReturnProto->ReturnTypes[i], false, false);
 			Args[i] = Args[i]->Resolve(ctx);

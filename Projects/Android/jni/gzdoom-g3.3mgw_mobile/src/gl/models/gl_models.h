@@ -32,10 +32,7 @@ class GLSprite;
 
 class FGLModelRenderer : public FModelRenderer
 {
-	int modellightindex = -1;
 public:
-	FGLModelRenderer(int mli) : modellightindex(mli)
-	{}
 	ModelRendererType GetType() const override { return GLModelRendererType; }
 	void BeginDrawModel(AActor *actor, FSpriteModelFrame *smf, const VSMatrix &objectToWorldMatrix, bool mirrored) override;
 	void EndDrawModel(AActor *actor, FSpriteModelFrame *smf) override;
@@ -51,5 +48,5 @@ public:
 	void DrawElements(int numIndices, size_t offset) override;
 };
 
-void gl_RenderModel(GLSprite * spr, int mli);
-void gl_RenderHUDModel(DPSprite *psp, float ofsx, float ofsy, int mli);
+void gl_RenderModel(GLSprite * spr);
+void gl_RenderHUDModel(DPSprite *psp, float ofsx, float ofsy);

@@ -1,0 +1,6 @@
+/* Default keybindings for Strife */
+
+a +jump
+w "showpop 1"
+k "showpop 2"
+

@@ -88,7 +88,6 @@
 #include "r_videoscale.h"
 #include "i_time.h"
 #include "version.h"
-#include "atterm.h"
 
 EXTERN_CVAR(Bool, r_blendmethod)
 
@@ -903,7 +902,7 @@ void DFrameBuffer::DrawRateStuff ()
 	if (vid_fps)
 	{
 		uint64_t ms = screen->FrameTime;
-        uint32_t howlong = ms - LastMS;
+		uint64_t howlong = ms - LastMS;
         if ((signed)howlong >= 0)
         {
             char fpsbuff[40];
@@ -912,7 +911,7 @@ void DFrameBuffer::DrawRateStuff ()
 
             int textScale = active_con_scale();
 
-            chars = mysnprintf (fpsbuff, countof(fpsbuff), "%2u ms (%3u fps)", howlong, LastCount);
+			chars = mysnprintf (fpsbuff, countof(fpsbuff), "%2" PRIu64 " ms (%3" PRIu64 " fps)", howlong, LastCount);
             rate_x = Width / textScale - ConFont->StringWidth(&fpsbuff[0]);
             Clear (rate_x * textScale, 0, Width, ConFont->GetHeight() * textScale, GPalette.BlackIndex, 0);
             DrawText (ConFont, CR_WHITE, rate_x, 0, (char *)&fpsbuff[0],
@@ -920,7 +919,7 @@ void DFrameBuffer::DrawRateStuff ()
                       DTA_VirtualHeight, screen->GetHeight() / textScale,
                       DTA_KeepRatio, true, TAG_DONE);
 
-            uint32_t thisSec = ms/1000;
+			uint32_t thisSec = (uint32_t)(ms/1000);
             if (LastSec < thisSec)
             {
                 LastCount = FrameCount / (thisSec - LastSec);
@@ -1465,7 +1464,6 @@ bool IVideo::SetResolution (int width, int height, int bits)
 		oldbits = bits;
 	}
 
-
 	I_ClosestResolution (&width, &height, bits);
 	if (!I_CheckResolution (width, height, bits))
 	{ // Try specified resolution
@@ -1480,8 +1478,6 @@ bool IVideo::SetResolution (int width, int height, int bits)
 			bits = oldbits;
 		}
 	}
-
-
 	return V_DoModeSetup (width, height, bits);
 }
 
@@ -1536,8 +1532,6 @@ void V_Init (bool restart)
 { 
 	const char *i;
 	int width, height, bits;
-
-	atterm (V_Shutdown);
 
 	// [RH] Initialize palette management
 	InitPalette ();
@@ -1619,17 +1613,6 @@ void V_Init2()
 	M_InitVideoModesMenu();
 	V_SetBorderNeedRefresh();
 	setsizeneeded = true;
-}
-
-void V_Shutdown()
-{
-	if (screen)
-	{
-		DFrameBuffer *s = screen;
-		screen = NULL;
-		delete s;
-	}
-	V_ClearFonts();
 }
 
 CUSTOM_CVAR (Int, vid_aspect, 0, CVAR_GLOBALCONFIG|CVAR_ARCHIVE)

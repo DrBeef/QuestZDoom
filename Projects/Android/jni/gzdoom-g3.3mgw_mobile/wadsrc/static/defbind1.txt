@@ -1,0 +1,10 @@
+/* Default keybindings for all games */
+
+w +forward
+s +back
+a +moveleft
+d +moveright
+e +jump
+x crouch
+mouse2 +altattack
+mouse3 +speed

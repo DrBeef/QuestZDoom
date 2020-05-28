@@ -602,10 +602,9 @@ inline int GLDrawList::CompareSprites(SortNode * a,SortNode * b)
 	GLSprite * s1=&sprites[drawitems[a->itemindex].index];
 	GLSprite * s2=&sprites[drawitems[b->itemindex].index];
 
-	int res = s1->depth - s2->depth;
-
-	if (res != 0) return -res;
-	else return (i_compatflags & COMPATF_SPRITESORT)? s2->index-s1->index : s1->index-s2->index;
+	if (s1->depth < s2->depth) return 1;
+	if (s1->depth > s2->depth) return -1;
+	return (i_compatflags & COMPATF_SPRITESORT)? s2->index-s1->index : s1->index-s2->index;
 }
 
 //==========================================================================

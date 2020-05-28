@@ -43,6 +43,8 @@ CUSTOM_CVAR(Bool, joy_background, false, CVAR_GLOBALCONFIG|CVAR_ARCHIVE|CVAR_NOI
 	Printf("This won't take effect until " GAMENAME " is restarted.\n");
 }
 
+CVAR (Bool, use_mouse,				false, CVAR_ARCHIVE|CVAR_GLOBALCONFIG) // not used, present for scripts only
+
 class NoSDLInputJoystickManager
 {
 public:

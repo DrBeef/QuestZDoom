@@ -45,7 +45,6 @@
 #include "a_weapons.h"
 #include "d_player.h"
 #include "p_setup.h"
-#include "i_music.h"
 #include "fontinternals.h"
 
 #include <time.h>
@@ -2463,7 +2462,7 @@ DEFINE_ACTION_FUNCTION_NATIVE(DBaseStatusBar, DrawImage, SBar_DrawImage)
 	return 0;
 }
 
-void SBar_DrawString(DBaseStatusBar *self, DHUDFont *font, const FString &string, double x, double y, int flags, int trans, double alpha, int wrapwidth, int linespacing);
+void SBar_DrawString(DBaseStatusBar *self, DHUDFont *font, const FString &string, double x, double y, int flags, int trans, double alpha, int wrapwidth, int linespacing, double scaleX, double scaleY);
 
 DEFINE_ACTION_FUNCTION_NATIVE(DBaseStatusBar, DrawString, SBar_DrawString)
 {
@@ -2477,7 +2476,9 @@ DEFINE_ACTION_FUNCTION_NATIVE(DBaseStatusBar, DrawString, SBar_DrawString)
 	PARAM_FLOAT(alpha);
 	PARAM_INT(wrapwidth);
 	PARAM_INT(linespacing);
-	SBar_DrawString(self, font, string, x, y, flags, trans, alpha, wrapwidth, linespacing);
+	PARAM_FLOAT(scaleX);
+	PARAM_FLOAT(scaleY);
+	SBar_DrawString(self, font, string, x, y, flags, trans, alpha, wrapwidth, linespacing, scaleX, scaleY);
 	return 0;
 }
 
@@ -2939,6 +2940,7 @@ DEFINE_FIELD(FLevelLocals, fogdensity)
 DEFINE_FIELD(FLevelLocals, outsidefogdensity)
 DEFINE_FIELD(FLevelLocals, skyfog)
 DEFINE_FIELD(FLevelLocals, pixelstretch)
+DEFINE_FIELD(FLevelLocals, MusicVolume)
 DEFINE_FIELD(FLevelLocals, deathsequence)
 DEFINE_FIELD_NAMED(FLevelLocals, li_compatflags, compatflags)
 DEFINE_FIELD_NAMED(FLevelLocals, li_compatflags2, compatflags2)

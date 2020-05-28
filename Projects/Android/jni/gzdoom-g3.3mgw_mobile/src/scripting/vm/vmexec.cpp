@@ -149,11 +149,7 @@ VMExec_Checked::Exec
 // Note: If the VM is being used in multiple threads, this should be declared as thread_local.
 // ZDoom doesn't need this at the moment so this is disabled.
 
-#ifndef __MINGW32__
 thread_local VMFrameStack GlobalVMStack;
-#else
-VMFrameStack GlobalVMStack;
-#endif
 
 
 //===========================================================================

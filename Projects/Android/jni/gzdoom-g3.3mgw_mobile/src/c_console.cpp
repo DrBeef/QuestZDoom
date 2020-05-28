@@ -1946,10 +1946,7 @@ struct TabData
 	{
 	}
 
-	TabData(const TabData &other)
-	: UseCount(other.UseCount), TabName(other.TabName)
-	{
-	}
+	TabData(const TabData &other) = default;
 };
 
 static TArray<TabData> TabCommands (TArray<TabData>::NoInit);

@@ -80,6 +80,11 @@ void DPlat::PlayPlatSound (const char *sound)
 	}
 }
 
+const char *DPlat::GetSoundByType () const
+{
+	return m_Type == platDownWaitUpStayStone ? "Floor" : "Platform";
+}
+
 //
 // Move a plat up and down
 //
@@ -96,7 +101,7 @@ void DPlat::Tick ()
 		{
 			m_Count = m_Wait;
 			m_Status = down;
-			PlayPlatSound ("Platform");
+			PlayPlatSound (GetSoundByType ());
 		}
 		else if (res == EMoveResult::pastdest)
 		{
@@ -167,7 +172,7 @@ void DPlat::Tick ()
 		{
 			m_Status = up;
 			m_Count = m_Wait;
-			PlayPlatSound ("Platform");
+			PlayPlatSound (GetSoundByType ());
 		}
 
 		//jff 1/26/98 remove the plat if it bounced so it can be tried again
@@ -197,7 +202,7 @@ void DPlat::Tick ()
 			if (m_Type == platToggle)
 				SN_StartSequence (m_Sector, CHAN_FLOOR, "Silence", 0);
 			else
-				PlayPlatSound ("Platform");
+				PlayPlatSound (GetSoundByType ());
 		}
 		break;
 
@@ -316,7 +321,7 @@ bool EV_DoPlat (int tag, line_t *line, DPlat::EPlatType type, double height,
 
 			plat->m_High = sec->floorplane.fD();
 			plat->m_Status = DPlat::down;
-			plat->PlayPlatSound (type == DPlat::platDownWaitUpStay ? "Platform" : "Floor");
+			plat->PlayPlatSound (plat->GetSoundByType ());
 			break;
 		
 		case DPlat::platUpNearestWaitDownStay:

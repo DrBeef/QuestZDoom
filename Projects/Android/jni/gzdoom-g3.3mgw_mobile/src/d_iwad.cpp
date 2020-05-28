@@ -129,6 +129,10 @@ void FIWadManager::ParseIWadInfo(const char *fn, const char *data, int datasize,
 					sc.MustGetString();
 					iwad->MapInfo = sc.String;
 				}
+				else if (sc.Compare("NoKeyboardCheats"))
+				{
+					iwad->nokeyboardcheats = true;
+				}
 				else if (sc.Compare("Compatibility"))
 				{
 					sc.MustGetStringName("=");
@@ -718,7 +722,7 @@ int FIWadManager::IdentifyVersion (TArray<FString> &wadfiles, const char *iwad, 
 				}
 				else
 				{
-					exit(0);
+					return -1;
 				}
 				havepicked = true;
 			}
@@ -773,6 +777,7 @@ int FIWadManager::IdentifyVersion (TArray<FString> &wadfiles, const char *iwad, 
 const FIWADInfo *FIWadManager::FindIWAD(TArray<FString> &wadfiles, const char *iwad, const char *basewad, const char *optionalwad)
 {
 	int iwadType = IdentifyVersion(wadfiles, iwad, basewad, optionalwad);
+	if (iwadType == -1) return nullptr;
 	//gameiwad = iwadType;
 	const FIWADInfo *iwad_info = &mIWadInfos[iwadType];
 	if (DoomStartupInfo.Name.IsEmpty())

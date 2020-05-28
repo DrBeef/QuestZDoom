@@ -1,5 +1,5 @@
 
-LOCAL_PATH := $(call my-dir)/../lzma
+LOCAL_PATH := $(call my-dir)/../libraries/lzma
 
 
 include $(CLEAR_VARS)
@@ -34,7 +34,6 @@ LOCAL_SRC_FILES =  \
 	C/LzmaDec.c \
 	C/LzmaEnc.c \ 
 
-LOCAL_LDLIBS :=  -ldl -llog
 
 include $(BUILD_STATIC_LIBRARY)
 

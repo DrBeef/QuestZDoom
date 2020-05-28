@@ -121,10 +121,10 @@ void R_InitSkyMap ()
 	//                  of the texture is at the top of the screen when looking fully up.
 	skyheight = skytex1->GetScaledHeight();
 	skystretch = (r_skymode == 1
-				  && skyheight >= 128 && skyheight < 310
+				  && skyheight >= 128 && skyheight <= 256
 				  && level.IsFreelookAllowed()
 				  && !(level.flags & LEVEL_FORCETILEDSKY)) ? 1 : 0;
-	sskyoffset = cl_oldfreelooklimit? 0 : skyheight >= 200? 110 : 138;
+	sskyoffset = cl_oldfreelooklimit? 0 : skyheight == 256? 166 : skyheight >= 240? 150 : skyheight >= 200? 110 : 138;
 	skytexturemid = 0;
 	if (skyheight >= 128 && skyheight < 200)
 	{

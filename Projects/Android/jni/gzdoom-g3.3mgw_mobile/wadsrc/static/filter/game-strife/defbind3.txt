@@ -1,0 +1,5 @@
+/* Default keybindings for Strife */
+
+w "showpop 1"
+u "showpop 2"
+

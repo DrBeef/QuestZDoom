@@ -37,6 +37,6 @@ extern TMap<FMD5Holder, FCompatValues, FMD5HashTraits> BCompatMap;
 
 void ParseCompatibility();
 FName CheckCompatibility(MapData *map);
-void SetCompatibilityParams(FName);
+void PostProcessLevel(FName checksum);
 
 #endif

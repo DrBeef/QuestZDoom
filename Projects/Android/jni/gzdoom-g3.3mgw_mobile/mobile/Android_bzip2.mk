@@ -1,5 +1,5 @@
 
-LOCAL_PATH := $(call my-dir)/../bzip2
+LOCAL_PATH := $(call my-dir)/../libraries/bzip2
 
 
 include $(CLEAR_VARS)
@@ -24,7 +24,7 @@ LOCAL_SRC_FILES =  	\
     huffman.c \
     randtable.c \
 
-LOCAL_LDLIBS :=  -ldl -llog
+
 
 include $(BUILD_STATIC_LIBRARY)
 

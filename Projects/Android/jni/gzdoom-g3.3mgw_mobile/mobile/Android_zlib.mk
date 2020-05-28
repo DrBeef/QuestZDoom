@@ -1,5 +1,5 @@
 
-LOCAL_PATH := $(call my-dir)/../zlib
+LOCAL_PATH := $(call my-dir)/../libraries/zlib
 
 
 include $(CLEAR_VARS)
@@ -28,7 +28,6 @@ LOCAL_SRC_FILES =  \
     uncompr.c \
     zutil.c \
 
-LOCAL_LDLIBS :=  -ldl -llog
 
 include $(BUILD_STATIC_LIBRARY)
 

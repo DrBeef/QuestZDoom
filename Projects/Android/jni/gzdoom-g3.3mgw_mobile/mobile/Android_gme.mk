@@ -1,5 +1,5 @@
 
-LOCAL_PATH := $(call my-dir)/../game-music-emu
+LOCAL_PATH := $(call my-dir)/../libraries/game-music-emu
 
 
 include $(CLEAR_VARS)
@@ -63,9 +63,7 @@ LOCAL_SRC_FILES =  	\
     gme/Ym2413_Emu.cpp \
     gme/Ym2612_GENS.cpp \
 
-#strtof.c \
 
-LOCAL_LDLIBS :=  -ldl -llog
 
 include $(BUILD_STATIC_LIBRARY)
 

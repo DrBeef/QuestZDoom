@@ -47,7 +47,7 @@
 #include "a_keys.h"
 #include "p_enemy.h"
 #include "gstrings.h"
-#include "sound/i_music.h"
+#include "i_music.h"
 #include "p_setup.h"
 #include "d_net.h"
 #include "g_level.h"
@@ -869,7 +869,7 @@ void P_StartConversation (AActor *npc, AActor *pc, bool facetalker, bool saveang
 
 	if (pc->player == &players[consoleplayer])
 	{
-		S_Sound (CHAN_VOICE | CHAN_UI, gameinfo.chatSound, 1, ATTN_NONE);
+		S_Sound (CHAN_VOICE, CHANF_UI, gameinfo.chatSound, 1, ATTN_NONE);
 	}
 
 	npc->reactiontime = 2;
@@ -920,7 +920,7 @@ void P_StartConversation (AActor *npc, AActor *pc, bool facetalker, bool saveang
 		if (CurNode->SpeakerVoice != 0)
 		{
 			I_SetMusicVolume (dlg_musicvolume);
-			S_Sound (npc, CHAN_VOICE|CHAN_NOPAUSE, CurNode->SpeakerVoice, 1, ATTN_NORM);
+			S_Sound (npc, CHAN_VOICE, CHANF_NOPAUSE, CurNode->SpeakerVoice, 1, ATTN_NORM);
 		}
 
 		// Create the menu. This may be a user-defined class so check if it is good to use.

@@ -56,9 +56,9 @@
 #include "gameconfigfile.h"
 #include "m_argv.h"
 #include "i_soundfont.h"
-#include "atterm.h"
 #include "teaminfo.h"
 #include "r_data/sprites.h"
+#include "zmusic/zmusic.h"
 
 
 
@@ -1017,9 +1017,6 @@ void M_ParseMenuDefs()
 	DefaultOptionMenuSettings = Create<DOptionMenuDescriptor>();
 	DefaultListMenuSettings->Reset();
 	DefaultOptionMenuSettings->Reset();
-
-	atterm(	DeinitMenus);
-	DeinitMenus();
 
 	int IWADMenu = Wads.CheckNumForName("MENUDEF", ns_global, Wads.GetIwadNum());
 

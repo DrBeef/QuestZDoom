@@ -54,7 +54,6 @@
 #include "g_game.h"
 #include "i_system.h"
 #include "c_dispatch.h"
-#include "atterm.h"
 #include "templates.h"
 #include "v_palette.h"
 #include "textures.h"
@@ -110,7 +109,6 @@ void I_Init (void)
 	CheckCPUID (&CPU);
 	DumpCPUInfo (&CPU);
 
-	atterm (I_ShutdownSound);
 	I_InitSound ();
 }
 

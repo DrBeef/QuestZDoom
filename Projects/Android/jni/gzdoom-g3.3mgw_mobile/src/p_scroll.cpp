@@ -563,11 +563,18 @@ void P_SpawnScrollers(void)
 		// (same direction and speed as scrolling floors)
 		case Scroll_Texture_Model:
 		{
+			if (l->args[0] != 0)
+			{
 			FLineIdIterator itr(l->args[0]);
 			while ((s = itr.Next()) >= 0)
 			{
 				if (s != (int)i)
 					Create<DScroller>(dx, dy, &level.lines[s], control, accel);
+				}
+			}
+			else
+			{
+				Create<DScroller>(dx, dy, l, control, accel);
 			}
 			break;
 		}

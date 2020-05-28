@@ -82,6 +82,7 @@ EXTERN_CVAR (Bool, r_debug_disable_vis_filter)
 extern TArray<spritedef_t> sprites;
 extern TArray<spriteframe_t> SpriteFrames;
 extern uint32_t r_renderercaps;
+extern int modellightindex;
 
 enum HWRenderStyle
 {
@@ -482,7 +483,7 @@ void GLSprite::Draw(int pass)
 		}
 		else
 		{
-			gl_RenderModel(this, dynlightindex);
+			gl_RenderModel(this);
 		}
 	}
 
@@ -754,8 +755,8 @@ void GLSprite::Process(AActor* thing, sector_t * sector, int thruportal)
 	if (thruportal == 1) thingpos += Displacements.getOffset(thing->Sector->PortalGroup, sector->PortalGroup);
 
 	// Some added checks if the camera actor is not supposed to be seen. It can happen that some portal setup has this actor in view in which case it may not be skipped here
-	if (thing == camera) {
-
+	if (thing == camera && !r_viewpoint.showviewer)
+	{
         DVector3 thingorigin = thing->Pos();
 
         //If we get here, then we want to override the location of the camera actor
@@ -978,7 +979,7 @@ void GLSprite::Process(AActor* thing, sector_t * sector, int thruportal)
 		gltexture = NULL;
 	}
 
-	depth = FloatToFixed((x - r_viewpoint.CenterEyePos.X) * r_viewpoint.TanCos + (y - r_viewpoint.CenterEyePos.Y) * r_viewpoint.TanSin);
+	depth = (float)((x - r_viewpoint.CenterEyePos.X) * r_viewpoint.TanCos + (y - r_viewpoint.CenterEyePos.Y) * r_viewpoint.TanSin);
 
 	// light calculation
 
@@ -1047,7 +1048,7 @@ void GLSprite::Process(AActor* thing, sector_t * sector, int thruportal)
 	translation = thing->Translation;
 
 	OverrideShader = -1;
-	trans = (float)thing->Alpha;
+	trans = thing->Alpha;
 	hw_styleflags = STYLEHW_Normal;
 
 	if (RenderStyle.BlendOp >= STYLEOP_Fuzz && RenderStyle.BlendOp <= STYLEOP_FuzzOrRevSub)

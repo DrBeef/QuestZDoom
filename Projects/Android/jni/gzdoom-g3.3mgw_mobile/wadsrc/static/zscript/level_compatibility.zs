@@ -1,5 +1,5 @@
 
-class LevelCompatibility native play
+class LevelCompatibility : LevelPostProcessor
 {
 	protected void Apply(Name checksum, String mapname)
 	{
@@ -316,6 +316,70 @@ class LevelCompatibility native play
 					SetWallTextureID(569+i, Line.front, Side.top, MOSROK);
 				}
 				SetWallTexture(805, Line.front, Side.top, "A-BRICK3");
+				break;
+			}
+
+			case '3B68019EE3154C284B90F0CAEDBD8D8A': // Plutonia 2 MAP05
+			{
+				// Missing texture
+				TextureID step1 = TexMan.CheckForTexture("STEP1", TexMan.Type_Wall);
+				SetWallTextureID(1525, Line.front, Side.bottom, step1);
+				break;
+			}
+
+			case 'FB613B36589FFB09AA2C03633A7D13F4': // Plutonia 2 MAP20
+			{
+				// Remove the pain elementals stuck in the closet boxes that cannot teleport.
+				SetThingFlags(758,0);
+				SetThingFlags(759,0);
+				SetThingFlags(764,0);
+				SetThingFlags(765,0);
+				break;
+			}
+
+			case 'A3165C53F9BF0B7D80CDB14665A349EB': // Plutonia 2 MAP23
+			{
+				// Arch-vile in outdoor secret area sometimes don't spawn if revenants
+				// block its one-time teleport. Make this teleport repeatable to ensure
+				// maxkills are always possible.
+				SetLineFlags(756, Line.ML_REPEAT_SPECIAL);
+				break;
+			}
+
+			case '9191658A6705B131AB005948E2FDFCE1': // Plutonia 2 MAP24
+			{
+				// Fix improperly pegged blue door
+				for(int i = 957; i <= 958; i++)
+				{
+					SetLineFlags(i, 0, Line.ML_DONTPEGTOP);
+					level.lines[i].sidedef[0].SetTextureYOffset(Side.top,-24);
+				}
+				break;
+			}
+
+			case 'EF251B8F36DE709901B0D32A97F341D7': // Plutonia 2 MAP27
+			{
+				// Remove the monsters stuck in the closet boxes that cannot teleport.
+
+				// Top row, 2nd from left
+				SetThingFlags(156,0);
+				SetThingFlags(210,0);
+				SetThingFlags(211,0);
+
+				// 2nd row, 2nd-5th from left
+				for(int i = 242; i <= 249; i++)
+					SetThingFlags(i,0);
+
+				// 3rd row, rightmost box
+				SetThingFlags(260,0);
+				SetThingFlags(261,0);
+				SetThingFlags(266,0);
+				SetThingFlags(271,0);
+				SetThingFlags(272,0);
+				SetThingFlags(277,0);
+				SetThingFlags(278,0);
+				SetThingFlags(283,0);
+
 				break;
 			}
 
@@ -1377,6 +1441,7 @@ class LevelCompatibility native play
 			{
 				// Wall behind start creates HOM in software renderer due to weird sector
 				OffsetSectorPlane(236, Sector.Floor, -40);
+				break;
 			}
 
 			case '1C795660D2BA9FC93DA584C593FD1DA3': // Scythe 2 MAP17
@@ -1432,90 +1497,276 @@ class LevelCompatibility native play
 				break;
 			}
 
+			case '6B9D31106CE290205A724FA61C165A80': // Restoring Deimos MAP07
+			{
+				// Missing map spots on easy skill
+				SetThingSkills(507, 31);
+				SetThingSkills(509, 31);
+				break;
+			}
+
 			case '17314071AB76F4789763428FA2E8DA4C': // Skulldash Expanded Edition MAP04
 			{
 				// Missing teleport destination on easy skill
 				SetThingSkills(164, 31);
 				break;
 			}
+			
+			case '1B27E04F707E7988800582F387F609CD': // One against hell (ONE1.wad)
+			{
+				//Turn map spots into teleport destinations so that teleports work
+				SetThingEdNum(19, 14);
+				SetThingEdNum(20, 14);
+				SetThingEdNum(22, 14);
+				SetThingEdNum(23, 14);
+				SetThingEdNum(34, 14);
+				SetThingEdNum(35, 14);
+				SetThingEdNum(36, 14);
+				SetThingEdNum(39, 14);
+				SetThingEdNum(40, 14);
+				SetThingEdNum(172, 14);
+				SetThingEdNum(173, 14);
+				SetThingEdNum(225, 14);
+				SetThingEdNum(226, 14);
+				SetThingEdNum(247, 14);
+				break;
+			}
+			
+			case '25E178C981BAC28BA586B3B0A2A0FD72': // swan fox doom v2.4.wad map13
+			{
+				//Actors with no game mode will now appear
+				SetThingFlags(0, MTF_SINGLE|MTF_COOPERATIVE|MTF_DEATHMATCH);
+				for(int i = 2; i < 452; i++)
+					SetThingFlags(i, MTF_SINGLE|MTF_COOPERATIVE|MTF_DEATHMATCH);
+				//Awaken monsters with Thing_Hate, since NoiseAlert is unreliable
+				SetThingID(465, 9);
+				SetLineSpecial(1648, 177, 9);
+				for(int i = 1650; i <= 1653; i++)
+					SetLineSpecial(i, 177, 9);
+				SetLineSpecial(1655, 177, 9);
+				break;
+			}
+		
+			case 'FDFB3D209CC0F3706AAF3E51646003D5': // swan fox doom v2.4.wad map23
+			{
+				//Missing Teleport Destination on Easy/Normal difficulty
+				SetThingSkills(650, SKILLS_ALL);
+				//Fix the exit portal to allow walking into it instead of shooting it
+				SetLineSpecial(1970, Exit_Normal, 0);
+				SetLineActivation(1970, SPAC_Cross);
+				ClearLineSpecial(2010);
+				SetWallTexture(1966, Line.back, Side.mid, "TELR1");
+				OffsetSectorPlane(170, Sector.floor, -120);
+				break;
+			}
+
+			case 'BC969ED0191CCD9B69B316864362B0D7': // swan fox doom v2.4.wad map24
+			{
+				//Actors with no game mode will now appear
+				for(int i = 1; i < 88; i++)
+					SetThingFlags(i, MTF_SINGLE|MTF_COOPERATIVE|MTF_DEATHMATCH);
+				break;
+			}
+
+			case 'ED740248422026326650F6A4BC1C0A5A': // swan fox doom v2.4.wad map25
+			{
+				//Actors with no game mode will now appear
+				for(int i = 0; i < 8; i++)
+					SetThingFlags(i, MTF_SINGLE|MTF_COOPERATIVE|MTF_DEATHMATCH);
+				for(int i = 9; i < 26; i++)
+					SetThingFlags(i, MTF_SINGLE|MTF_COOPERATIVE|MTF_DEATHMATCH);
+				break;
+			}
+			
+			case '52F532F95E2D5862E56F7214FA5C5C59': // Toon Doom II (toon2b.wad) map10
+			{
+				//This lift needs to be repeatable to prevent trapping the player
+				SetLineSpecial(224, Plat_DownWaitUpStayLip, 5, 32, 105);
+				SetLineActivation(224, SPAC_Use);
+				SetLineFlags(224, Line.ML_REPEAT_SPECIAL);
+				break;
+			}
+			
+			case '3345D12AD97F20EDCA5E27BA4288F758': // Toon Doom II (toon2b.wad) map30
+			{
+				//These doors need to be repeatable to prevent trapping the player
+				SetLineSpecial(417, Door_Raise, 17, 16, 150);
+				SetLineActivation(417, SPAC_Use);
+				SetLineFlags(417, Line.ML_REPEAT_SPECIAL);
+				SetLineSpecial(425, Door_Raise, 15, 16, 150);
+				SetLineActivation(425, SPAC_Use);
+				SetLineFlags(425, Line.ML_REPEAT_SPECIAL);
+				SetLineSpecial(430, Door_Raise, 16, 16, 150);
+				SetLineActivation(430, SPAC_Use);
+				SetLineFlags(430, Line.ML_REPEAT_SPECIAL);
+				break;
+			}
+			
+			case 'BA1288DF7A7AD637948825EA87E18728': // Valletta's Doom Nightmare (vltnight.wad) map02
+			{
+				//This door's backside had a backwards linedef so it wouldn't work
+				FlipLineCompletely(306);
+				//Set the exit to point to Position 0, since that's the only one on the next map
+				SetLineSpecial(564, Exit_Normal, 0);
+				break;
+			}
+			
+			case '9B966DA88265AC8972B7E15C86928AFB': // Clavicula Nox: Revised Edition map01
+			{
+				// All swimmable water in Clavicula Nox is Vavoom-style, and doesn't work.
+				// Change it to ZDoom-style and extend the control sector heights to fill.
+				// Lava also sometimes needs the damage effect added manually.
+				SetLineSpecial(698, 160, 4, 2, 0, 128);
+				OffsetSectorPlane(121, Sector.floor, -32);
+				break;
+			}
+			
+			case '9FD0C47C2E132F64B48CA5BFBDE47F1D': // clavnoxr map02
+			{
+				SetLineSpecial(953, 160, 12, 2, 0, 128);
+				OffsetSectorPlane(139, Sector.floor, -24);
+				SetLineSpecial(989, 160, 13, 2, 0, 128);
+				OffsetSectorPlane(143, Sector.floor, -24);
+				SetLineSpecial(1601, 160, 19, 2, 0, 128);
+				SetLineSpecial(1640, 160, 20, 2, 0, 128);
+				SetLineSpecial(1641, 160, 21, 2, 0, 128);
+				OffsetSectorPlane(236, Sector.floor, -96);
+				break;
+			}
+			
+			case '969B9691007490CF022B632B2729CA49': // clavnoxr map03
+			{
+				SetLineSpecial(96, 160, 1, 2, 0, 128);
+				OffsetSectorPlane(11, Sector.floor, -80);
+				SetLineSpecial(955, 160, 13, 2, 0, 128);
+				OffsetSectorPlane(173, Sector.floor, -16);
+				SetLineSpecial(1082, 160, 14, 2, 0, 128);
+				OffsetSectorPlane(195, Sector.floor, -16);
+				SetLineSpecial(1111, 160, 15, 2, 0, 128);
+				OffsetSectorPlane(203, Sector.floor, -16);
+				SetLineSpecial(1115, 160, 16, 2, 0, 128);
+				OffsetSectorPlane(204, Sector.floor, -16);
+				SetLineSpecial(1163, 160, 17, 2, 0, 128);
+				OffsetSectorPlane(216, Sector.floor, -56);
+				SetLineSpecial(1169, 160, 18, 2, 0, 128);
+				OffsetSectorPlane(217, Sector.floor, -16);
+				break;
+			}
+			
+			case '748EDAEB3990F13B22C13C593631B2E6': // clavnoxr map04
+			{
+				SetLineSpecial(859, 160, 22, 2, 0, 128);
+				SetLineSpecial(861, 160, 23, 2, 0, 128);
+				OffsetSectorPlane(172, Sector.floor, -168);
+				break;
+			}
+			
+			case 'A066B0B432FAE8ED20B83383F9E03E12': // clavnoxr map05
+			{
+				SetLineSpecial(1020, 160, 2, 2, 0, 128);
+				SetSectorSpecial(190, 69);
+				OffsetSectorPlane(190, Sector.floor, -24);
+				break;
+			}
+			
+			case '5F36D758ED26CAE907FA79902330877D': // clavnoxr map06
+			{
+				SetLineSpecial(1086, 160, 1, 2, 0, 128);
+				SetLineSpecial(60, 160, 4, 2, 0, 128);
+				SetLineSpecial(561, 160, 2, 2, 0, 128);
+				SetLineSpecial(280, 160, 3, 2, 0, 128);
+				SetLineSpecial(692, 160, 5, 2, 0, 128);
+				SetLineSpecial(1090, 160, 7, 2, 0, 128);
+				SetLineSpecial(1091, 160, 8, 2, 0, 128);
+				SetLineSpecial(1094, 160, 9, 2, 0, 128);
+				SetLineSpecial(1139, 160, 12, 2, 0, 128);
+				SetLineSpecial(1595, 160, 16, 2, 0, 128);
+				SetLineSpecial(1681, 160, 17, 2, 0, 128);
+				SetLineSpecial(1878, 160, 20, 2, 0, 128);
+				SetLineSpecial(1882, 160, 22, 2, 0, 128);
+				OffsetSectorPlane(8, Sector.floor, -64);
+				OffsetSectorPlane(34, Sector.floor, -24);
+				OffsetSectorPlane(64, Sector.floor, -16);
+				OffsetSectorPlane(102, Sector.floor, -16);
+				OffsetSectorPlane(170, Sector.floor, -64);
+				OffsetSectorPlane(171, Sector.floor, -64);
+				OffsetSectorPlane(178, Sector.floor, -16);
+				OffsetSectorPlane(236, Sector.floor, -16);
+				OffsetSectorPlane(250, Sector.floor, -16);
+				OffsetSectorPlane(283, Sector.floor, -64);
+				OffsetSectorPlane(284, Sector.floor, -56);
+				break;
+			}
+			
+			case 'B7E98C1EA1B38B707ADA8097C25CFA75': // clavnoxr map07
+			{
+				SetLineSpecial(1307, 160, 22, 2, 0, 128);
+				SetLineSpecial(1305, 160, 23, 2, 0, 128);
+				OffsetSectorPlane(218, Sector.floor, -64);
+				break;
+			}
+			
+			case '7DAB2E8BB5759D742211505A3E5054D1': // clavnoxr map08
+			{
+				SetLineSpecial(185, 160, 1, 2, 0, 128);
+				SetLineSpecial(735, 160, 13, 2, 0, 128);
+				OffsetSectorPlane(20, Sector.floor, -16);
+				SetSectorSpecial(20, 69);
+				OffsetSectorPlane(102, Sector.floor, -64);
+				break;
+			}
+			
+			case 'C17A9D1350399E251C70711EB22856AE': // clavnoxr map09
+			{
+				SetLineSpecial(63, 160, 1, 2, 0, 128);
+				SetLineSpecial(84, 160, 2, 2, 0, 128);
+				SetLineSpecial(208, 160, 4, 2, 0, 128);
+				SetLineSpecial(326, 160, 6, 2, 0, 128);
+				SetLineSpecial(433, 160, 10, 2, 0, 128);
+				OffsetSectorPlane(6, Sector.floor, -64);
+				OffsetSectorPlane(9, Sector.floor, -64);
+				OffsetSectorPlane(34, Sector.floor, -64);
+				OffsetSectorPlane(59, Sector.floor, -64);
+				SetSectorSpecial(75, 69);
+				OffsetSectorPlane(75, Sector.floor, -64);
+				break;
+			}
+			
+			case 'B6BB8A1792FE51C773E6770CD91DB618': // clavnoxr map11
+			{
+				SetLineSpecial(1235, 160, 23, 2, 0, 128);
+				SetLineSpecial(1238, 160, 24, 2, 0, 128);
+				OffsetSectorPlane(240, Sector.floor, -80);
+				break;
+			}
+			
+			case 'ADDF57B80E389F86D324571D43F3CAB7': // clavnoxr map12
+			{
+				SetLineSpecial(1619, 160, 19, 2, 0, 128);
+				SetLineSpecial(1658, 160, 20, 2, 0, 128);
+				SetLineSpecial(1659, 160, 21, 2, 0, 128);
+				OffsetSectorPlane(254, Sector.floor, -160);				
+				// Raising platforms in MAP12 didn't work, so this will redo them.
+				SetLineSpecial(1469, 160, 6, 1, 0, 255);
+				OffsetSectorPlane(65, Sector.floor, -8);
+				OffsetSectorPlane(65, Sector.ceiling, 8);
+				break;
+			}
+
+			case '75E2685CA8AB29108DBF1AC98C5450AC': // Ancient Beliefs (beliefs.wad) map01
+			{
+				//Actors with no game mode will now appear
+				SetThingFlags(0, MTF_SINGLE|MTF_COOPERATIVE|MTF_DEATHMATCH);
+				for(int i = 2; i < 7; i++)
+					SetThingFlags(i, MTF_SINGLE|MTF_COOPERATIVE|MTF_DEATHMATCH);
+				break;
+			}
+
+			case 'C4850382A78BF637AC9FC58153E03C87': // sapphire.wad map01
+			{
+				SetLineSpecial(11518, 9, 0, 0, 0, 0);
+				break;
+			}
 		}
-	}
-
-	protected native void ClearSectorTags(int sector);
-	protected native void AddSectorTag(int sector, int tag);
-	protected native void ClearLineIDs(int line);
-	protected native void AddLineID(int line, int tag);
-	protected native void OffsetSectorPlane(int sector, int plane, double offset);
-	protected native void SetThingSkills(int thing, int skills);
-	protected native void SetThingXY(int thing, double x, double y);
-	protected native void SetThingZ(int thing, double z);
-	protected native void SetThingFlags(int thing, int flags);
-	protected native void SetVertex(uint vertex, double x, double y);
-	protected native void SetLineSectorRef(uint line, uint side, uint sector);
-	protected native void FlipLine(uint Line);
-	protected native Actor GetDefaultActor(Name actorclass);
-	protected native int GetNumMapThings();
-	protected native Vector3 GetMapThingPos(int thing);
-	protected native int GetMapThingAngle(int thing);
-	protected native void SetMapThingAngle(int thing, int angle);
-	
-	protected void SetWallTexture(int line, int side, int texpart, String texture)
-	{
-		SetWallTextureID(line, side, texpart, TexMan.CheckForTexture(texture, TexMan.Type_Wall));
-	}
-
-	protected void SetWallTextureID(int line, int side, int texpart, TextureID texture)
-	{
-		level.Lines[line].sidedef[side].SetTexture(texpart, texture);
-	}
-	
-	protected void SetLineFlags(int line, int setflags, int clearflags = 0)
-	{
-		level.Lines[line].flags = (level.Lines[line].flags & ~clearflags) | setflags;
-	}
-	
-	protected void SetLineActivation(int line, int acttype)
-	{
-		level.Lines[line].activation = acttype;
-	}
-	
-	protected void ClearLineSpecial(int line)
-	{
-		level.Lines[line].special = 0;
-	}
-	
-	protected void SetLineSpecial(int line, int special, int arg1 = 0, int arg2 = 0, int arg3 = 0, int arg4 = 0, int arg5 = 0)
-	{
-		level.Lines[line].special = special;
-		level.Lines[line].args[0] = arg1;
-		level.Lines[line].args[1] = arg2;
-		level.Lines[line].args[2] = arg3;
-		level.Lines[line].args[3] = arg4;
-		level.Lines[line].args[4] = arg5;
-	}
-	
-	protected void SetSectorSpecial(int sectornum, int special)
-	{
-		level.sectors[sectornum].special = special;
-	}
-
-	protected void SetSectorTextureID(int sectornum, int plane, TextureID texture)
-	{
-		level.sectors[sectornum].SetTexture(plane, texture);
-	}
-
-	protected void SetSectorTexture(int sectornum, int plane, String texture)
-	{
-		SetSectorTextureID(sectornum, plane, TexMan.CheckForTexture(texture, TexMan.Type_Flat));
-	}
-
-	protected void SetSectorLight(int sectornum, int newval)
-	{
-		level.sectors[sectornum].SetLightLevel(newval);
-	}
-
-	protected void SetWallYScale(int line, int side, int texpart, double scale)
-	{
-		level.lines[line].sidedef[side].SetTextureYScale(texpart, scale);
 	}
 }

@@ -374,7 +374,7 @@ public:
 
 	int translation;
 	int index;
-	int depth;
+	float depth;
 
 	float topclip;
 	float bottomclip;
@@ -385,15 +385,15 @@ public:
 	float vt,vb;
 	float x1,y1,z1;
 	float x2,y2,z2;
+	float trans;
+	int dynlightindex;
 
 	FMaterial *gltexture;
-	float trans;
 	AActor * actor;
 	particle_t * particle;
 	TArray<lightlist_t> *lightlist;
 	DRotator Angles;
 
-	int dynlightindex;
 
 	void SplitSprite(sector_t * frontsector, bool translucent);
 	void SetLowerParam();

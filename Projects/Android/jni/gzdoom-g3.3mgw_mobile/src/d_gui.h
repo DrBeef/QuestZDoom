@@ -107,10 +107,9 @@ enum ESpecialGUIKeys
 	GK_DEL		= 26,
 	GK_ESCAPE	= 27,		// ASCII
 	GK_FREE1	= 28,
-	GK_FREE2	= 29,
+	GK_SYSRQ	= 29,		// PrtSc
 	GK_BACK		= 30,		// browser back key
-	GK_CESCAPE	= 31,		// color escape
-	GK_SYSRQ	= 32		// PrtSc
+	GK_CESCAPE	= 31		// color escape
 };
 
 #endif //__D_GUI_H__

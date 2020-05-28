@@ -89,7 +89,7 @@ public:
 	FXInputController(int index);
 	~FXInputController();
 
-	void ProcessInput();
+	void ProcessInput(unsigned int joynum);
 	void AddAxes(float axes[NUM_JOYAXIS]);
 	bool IsConnected() { return Connected; }
 
@@ -258,7 +258,7 @@ FXInputController::~FXInputController()
 //
 //==========================================================================
 
-void FXInputController::ProcessInput()
+void FXInputController::ProcessInput(unsigned int joynum)
 {
 	DWORD res;
 	XINPUT_STATE state;
@@ -293,15 +293,54 @@ void FXInputController::ProcessInput()
 
 	// Convert axes to floating point and cancel out deadzones.
 	// XInput's Y axes are reversed compared to DirectInput.
-	ProcessThumbstick(state.Gamepad.sThumbLX, &Axes[AXIS_ThumbLX],
-					 -state.Gamepad.sThumbLY, &Axes[AXIS_ThumbLY], KEY_PAD_LTHUMB_RIGHT);
-	ProcessThumbstick(state.Gamepad.sThumbRX, &Axes[AXIS_ThumbRX],
-					 -state.Gamepad.sThumbRY, &Axes[AXIS_ThumbRY], KEY_PAD_RTHUMB_RIGHT);
-	ProcessTrigger(state.Gamepad.bLeftTrigger, &Axes[AXIS_LeftTrigger], KEY_PAD_LTRIGGER);
-	ProcessTrigger(state.Gamepad.bRightTrigger, &Axes[AXIS_RightTrigger], KEY_PAD_RTRIGGER);
+	switch (joynum)
+	{
+	case 0:
+	default:
+		ProcessThumbstick(state.Gamepad.sThumbLX, &Axes[AXIS_ThumbLX],
+						-state.Gamepad.sThumbLY, &Axes[AXIS_ThumbLY], KEY_PAD_LTHUMB_RIGHT);
+		ProcessThumbstick(state.Gamepad.sThumbRX, &Axes[AXIS_ThumbRX],
+						-state.Gamepad.sThumbRY, &Axes[AXIS_ThumbRY], KEY_PAD_RTHUMB_RIGHT);
+		ProcessTrigger(state.Gamepad.bLeftTrigger, &Axes[AXIS_LeftTrigger], KEY_PAD_LTRIGGER);
+		ProcessTrigger(state.Gamepad.bRightTrigger, &Axes[AXIS_RightTrigger], KEY_PAD_RTRIGGER);
 
-	// Generate events for buttons that have changed.
-	Joy_GenerateButtonEvents(LastButtons, state.Gamepad.wButtons, 16, KEY_PAD_DPAD_UP);
+		// Generate events for buttons that have changed.
+		Joy_GenerateButtonEvents(LastButtons, state.Gamepad.wButtons, 16, KEY_PAD_DPAD_UP);
+		break;
+	case 1:
+		ProcessThumbstick(state.Gamepad.sThumbLX, &Axes[AXIS_ThumbLX],
+						-state.Gamepad.sThumbLY, &Axes[AXIS_ThumbLY], KEY_PAD2_LTHUMB_RIGHT);
+		ProcessThumbstick(state.Gamepad.sThumbRX, &Axes[AXIS_ThumbRX],
+						-state.Gamepad.sThumbRY, &Axes[AXIS_ThumbRY], KEY_PAD2_RTHUMB_RIGHT);
+		ProcessTrigger(state.Gamepad.bLeftTrigger, &Axes[AXIS_LeftTrigger], KEY_PAD2_LTRIGGER);
+		ProcessTrigger(state.Gamepad.bRightTrigger, &Axes[AXIS_RightTrigger], KEY_PAD2_RTRIGGER);
+
+		// Generate events for buttons that have changed.
+		Joy_GenerateButtonEvents(LastButtons, state.Gamepad.wButtons, 16, KEY_PAD2_DPAD_UP);
+		break;
+	case 2:
+		ProcessThumbstick(state.Gamepad.sThumbLX, &Axes[AXIS_ThumbLX],
+						-state.Gamepad.sThumbLY, &Axes[AXIS_ThumbLY], KEY_PAD3_LTHUMB_RIGHT);
+		ProcessThumbstick(state.Gamepad.sThumbRX, &Axes[AXIS_ThumbRX],
+						-state.Gamepad.sThumbRY, &Axes[AXIS_ThumbRY], KEY_PAD3_RTHUMB_RIGHT);
+		ProcessTrigger(state.Gamepad.bLeftTrigger, &Axes[AXIS_LeftTrigger], KEY_PAD3_LTRIGGER);
+		ProcessTrigger(state.Gamepad.bRightTrigger, &Axes[AXIS_RightTrigger], KEY_PAD3_RTRIGGER);
+
+		// Generate events for buttons that have changed.
+		Joy_GenerateButtonEvents(LastButtons, state.Gamepad.wButtons, 16, KEY_PAD3_DPAD_UP);
+		break;
+	case 3:
+		ProcessThumbstick(state.Gamepad.sThumbLX, &Axes[AXIS_ThumbLX],
+						-state.Gamepad.sThumbLY, &Axes[AXIS_ThumbLY], KEY_PAD4_LTHUMB_RIGHT);
+		ProcessThumbstick(state.Gamepad.sThumbRX, &Axes[AXIS_ThumbRX],
+						-state.Gamepad.sThumbRY, &Axes[AXIS_ThumbRY], KEY_PAD4_RTHUMB_RIGHT);
+		ProcessTrigger(state.Gamepad.bLeftTrigger, &Axes[AXIS_LeftTrigger], KEY_PAD4_LTRIGGER);
+		ProcessTrigger(state.Gamepad.bRightTrigger, &Axes[AXIS_RightTrigger], KEY_PAD4_RTRIGGER);
+
+		// Generate events for buttons that have changed.
+		Joy_GenerateButtonEvents(LastButtons, state.Gamepad.wButtons, 16, KEY_PAD4_DPAD_UP);
+		break;
+	}
 
 	LastPacketNumber = state.dwPacketNumber;
 	LastButtons = state.Gamepad.wButtons;
@@ -730,7 +769,7 @@ void FXInputManager::ProcessInput()
 {
 	for (int i = 0; i < XUSER_MAX_COUNT; ++i)
 	{
-		Devices[i]->ProcessInput();
+		Devices[i]->ProcessInput(i);
 	}
 }
 

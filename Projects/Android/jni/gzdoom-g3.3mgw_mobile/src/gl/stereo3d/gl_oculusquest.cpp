@@ -300,9 +300,6 @@ namespace s3d
         player_t* player = r_viewpoint.camera ? r_viewpoint.camera->player : nullptr;
         if (player)
         {
-            AActor* playermo = player->mo;
-            DVector3 pos = playermo->InterpolatedPosition(r_viewpoint.TicFrac);
-
             mat->loadIdentity();
 
             //We want to offset the weapon exactly from where we are seeing from
@@ -380,10 +377,6 @@ namespace s3d
         }
 
         yaw -= actor->Angles.Yaw;
-
-        //ignore specified pitch (would need to compensate for auto aim and no (vanilla) Doom weapon varies this)
-        //pitch -= actor->Angles.Pitch;
-        pitch.Degrees = 0;
 
         double pc = pitch.Cos();
 
@@ -622,7 +615,7 @@ namespace s3d
 /* virtual */
     void OculusQuestMode::TearDown() const
     {
-        if (gamestate == GS_LEVEL && cachedScreenBlocks != 0) {
+        if (gamestate == GS_LEVEL && cachedScreenBlocks != 0 && !getMenuState()) {
             screenblocks = cachedScreenBlocks;
         }
         super::TearDown();

@@ -437,11 +437,7 @@ void VMFillParams(VMValue *params, VMFrame *callee, int numparam);
 void VMDumpConstants(FILE *out, const VMScriptFunction *func);
 void VMDisasm(FILE *out, const VMOP *code, int codesize, const VMScriptFunction *func);
 
-#ifndef __MINGW32__
 extern thread_local VMFrameStack GlobalVMStack;
-#else
-extern VMFrameStack GlobalVMStack;
-#endif
 
 typedef std::pair<const class PType *, unsigned> FTypeAndOffset;
 

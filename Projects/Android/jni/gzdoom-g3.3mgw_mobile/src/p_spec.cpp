@@ -626,7 +626,7 @@ void P_GiveSecret(AActor *actor, bool printmessage, bool playsound, int sectornu
 					C_MidPrint(SmallFont, s);
 				}
 			}
-			if (playsound) S_Sound (CHAN_AUTO | CHAN_UI, "misc/secret", 1, ATTN_NORM);
+			if (playsound) S_Sound (CHAN_AUTO, CHANF_UI, "misc/secret", 1, ATTN_NORM);
 		}
 	}
 	level.found_secrets++;
@@ -673,7 +673,7 @@ void P_PlayerOnSpecialFlat (player_t *player, int floorType)
 		}
 		if (damage > 0 && Terrains[floorType].Splash != -1)
 		{
-			S_Sound (player->mo, CHAN_AUTO,
+			S_Sound (player->mo, CHAN_AUTO, 0,
 				Splashes[Terrains[floorType].Splash].NormalSplashSound, 1,
 				ATTN_IDLE);
 		}

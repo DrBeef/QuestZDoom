@@ -47,7 +47,7 @@ struct CRestartException
 
 
 extern "C" void VR_DoomMain(int argc, char** argv);
-void D_DoomMain (void);
+int D_DoomMain (void);
 
 
 void D_Display ();
@@ -109,6 +109,7 @@ struct FIWADInfo
 	EGameType gametype = GAME_Doom;		// which game are we playing?
 	int StartupType = FStartupInfo::DefaultStartup;		// alternate startup type
 	FString MapInfo;		// Base mapinfo to load
+	bool nokeyboardcheats = false;		// disable keyboard cheats
 	TArray<FString> Load;	// Wads to be loaded with this one.
 	TArray<FString> Lumps;	// Lump names for identification
 	int flags = 0;
