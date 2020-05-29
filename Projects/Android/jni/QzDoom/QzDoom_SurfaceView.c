@@ -103,6 +103,7 @@ PFNEGLGETSYNCATTRIBKHRPROC		eglGetSyncAttribKHR;
 int CPU_LEVEL			= 4;
 int GPU_LEVEL			= 4;
 int NUM_MULTI_SAMPLES	= 1;
+int FFR					= 0;
 float SS_MULTIPLIER    = 1.0f;
 int DISPLAY_REFRESH		= 72;
 
@@ -121,6 +122,7 @@ struct arg_dbl *ss;
 struct arg_int *cpu;
 struct arg_int *gpu;
 struct arg_int *msaa;
+struct arg_int *ffr;
 struct arg_int *refresh;
 struct arg_end *end;
 
@@ -1445,6 +1447,9 @@ void * AppThreadFunction(void * parm ) {
 	// This app will handle android gamepad events itself.
 	vrapi_SetPropertyInt(&gAppState.Java, VRAPI_EAT_NATIVE_GAMEPAD_EVENTS, 0);
 
+	//Set FFR property
+	vrapi_SetPropertyInt( &gAppState.Java, VRAPI_FOVEATION_LEVEL, FFR );
+
 	//Using a symmetrical render target
 	m_height = m_width = (int)(vrapi_GetSystemPropertyInt(&java, VRAPI_SYS_PROP_SUGGESTED_EYE_TEXTURE_WIDTH) *  SS_MULTIPLIER);
 
@@ -1786,6 +1791,7 @@ JNIEXPORT jlong JNICALL Java_com_drbeef_questzdoom_GLES3JNILib_onCreate( JNIEnv 
             cpu   = arg_int0("c", "cpu", "<int>", "CPU perf index 1-4 (default: 2)"),
             gpu   = arg_int0("g", "gpu", "<int>", "GPU perf index 1-4 (default: 3)"),
             msaa   = arg_int0("m", "msaa", "<int>", "MSAA 1-4 (default: 1)"),
+            ffr   = arg_int0("f", "ffr", "<int>", "FFR 0-4 (default: 0)"),
             refresh   = arg_int0("r", "refresh", "<int>", "Display Refresh 60 or 72 (default: 72)"),
 			end     = arg_end(20)
 	};
@@ -1831,6 +1837,11 @@ JNIEXPORT jlong JNICALL Java_com_drbeef_questzdoom_GLES3JNILib_onCreate( JNIEnv 
         if (msaa->count > 0 && msaa->ival[0] > 0 && msaa->ival[0] < 5)
         {
 			NUM_MULTI_SAMPLES = msaa->ival[0];
+        }
+
+        if (ffr->count > 0 && ffr->ival[0] >= 0 && ffr->ival[0] <= 4)
+        {
+			FFR = ffr->ival[0];
         }
 
         if (refresh->count > 0 && (refresh->ival[0] == 60 || refresh->ival[0] == 72))

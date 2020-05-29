@@ -46,7 +46,8 @@ CVAR(Bool, vr_swap_eyes, false, CVAR_GLOBALCONFIG)
 // but makes it possible for subsequent "vr_mode 7" to invoke quad-buffered stereo
 CUSTOM_CVAR(Bool, vr_enable_quadbuffered, false, CVAR_ARCHIVE | CVAR_GLOBALCONFIG | CVAR_NOINITCALL)
 {
-	Printf("You must restart " GAMENAME " to switch quad stereo mode\n");
+    //Does nothing
+	//Printf("You must restart " GAMENAME " to switch quad stereo mode\n");
 }
 
 // intraocular distance in meters
@@ -107,7 +108,7 @@ const Stereo3DMode& Stereo3DMode::getCurrentMode()
 	//if (gl.legacyMode) vr_mode = 0;	// GL 2 does not support this feature.
 
 	// NOTE: Ensure that these vr_mode values correspond to the ones in wadsrc/static/menudef.z
-	switch (vr_mode)
+/*	switch (vr_mode)
 	{
 	case 1:
 		setCurrentMode(GreenMagenta::getInstance(vr_ipd));
@@ -159,7 +160,9 @@ const Stereo3DMode& Stereo3DMode::getCurrentMode()
 	default:
 		setCurrentMode(MonoView::getInstance());
 		break;
-	}
+	}*/
+
+	setCurrentMode(OculusQuestMode::getInstance());
 	return *currentStereo3DMode;
 }
 
