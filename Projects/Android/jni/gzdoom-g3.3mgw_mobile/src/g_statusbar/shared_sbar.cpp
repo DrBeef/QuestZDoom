@@ -132,7 +132,7 @@ CUSTOM_CVAR(Bool, hud_aspectscale, false, CVAR_ARCHIVE)
 	}
 }
 
-CVAR (Bool, crosshairon, true, CVAR_ARCHIVE);
+CVAR (Bool, crosshairon, false, CVAR_ARCHIVE);
 CVAR (Int, crosshair, 0, CVAR_ARCHIVE)
 CVAR (Bool, crosshairforce, false, CVAR_ARCHIVE)
 CVAR (Color, crosshaircolor, 0xff0000, CVAR_ARCHIVE);
@@ -898,7 +898,8 @@ void DBaseStatusBar::DrawCrosshair ()
 	double size;
 	int w, h;
 
-	if (!crosshairon)
+	//Never draw the crosshair in VR - it doesn't make sense!
+	//if (!crosshairon)
 	{
 		return;
 	}
