@@ -480,8 +480,8 @@ namespace s3d
 
                     player->mo->AttackPos.X = player->mo->X() - (weaponoffset[0] * vr_vunits_per_meter);
                     player->mo->AttackPos.Y = player->mo->Y() - (weaponoffset[2] * vr_vunits_per_meter);
-                    player->mo->AttackPos.Z = player->mo->Z() + (((hmdPosition[1] + weaponoffset[1] + vr_height_adjust) * vr_vunits_per_meter) / pixelstretch) + (player->viewheight -
-                            getDoomPlayerHeightWithoutCrouch(player));
+                    player->mo->AttackPos.Z = r_viewpoint.CenterEyePos.Z + (((hmdPosition[1] + weaponoffset[1] + vr_height_adjust) * vr_vunits_per_meter) / pixelstretch) -
+                            getDoomPlayerHeightWithoutCrouch(player); // Fixes wrong shot height when in water
 
                     player->mo->AttackDir = MapAttackDir;
                 }
