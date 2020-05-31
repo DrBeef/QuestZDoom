@@ -4548,11 +4548,13 @@ AActor *P_LineAttack(AActor *t1, DAngle angle, double distance,
 		//Include pitch delta here
 		DAngle pitchDelta;
         pitchDelta = (t1->Angles.Pitch - pitch);
-        if (damage == 0 ||
-        		//This is the catch the scenario is vanilla Doom (or suchlike) where a.BulletSlope is calculating a completely
-        		//different pitch, if we are outside a tolerance of +/- 5 degrees, then just use the pitch of the
-        		//controller as we did before. This still allows a nice random scattering of projectiles from a shell
-                fabs(pitchDelta.Degrees) > 5.f)
+        if (damage == 0 // Laser sight or other non-damage inflicting thing
+			||
+			//This is to catch the scenario in vanilla Doom (or suchlike) where a.BulletSlope is calculating a completely
+			//different pitch, if delta is outside a tolerance of +/- 5 degrees, then just use the pitch of the
+			//controller as we did before.
+			//Otherwise, pitch can vary +/- 5 degrees for a random scatter
+			fabs(pitchDelta.Degrees) > 5.f)
         {
             pitchDelta.Degrees = 0;
         }
