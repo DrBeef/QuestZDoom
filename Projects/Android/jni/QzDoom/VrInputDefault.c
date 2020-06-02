@@ -46,10 +46,10 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
     }
 
     //Dominant Grip works like a shift key
-    bool dominantGripPushedOld =
-            (pDominantTrackedRemoteOld->Buttons & ovrButton_GripTrigger) != 0;
-    bool dominantGripPushedNew =
-            (pDominantTrackedRemoteNew->Buttons & ovrButton_GripTrigger) != 0;
+    bool dominantGripPushedOld = vr_secondarybuttonmappings ?
+            (pDominantTrackedRemoteOld->Buttons & ovrButton_GripTrigger) != 0 : false;
+    bool dominantGripPushedNew = vr_secondarybuttonmappings ?
+            (pDominantTrackedRemoteNew->Buttons & ovrButton_GripTrigger) != 0 : false;
 
     ovrInputStateTrackedRemote *pPrimaryTrackedRemoteNew, *pPrimaryTrackedRemoteOld,  *pSecondaryTrackedRemoteNew, *pSecondaryTrackedRemoteOld;
     if (vr_switchsticks)
@@ -363,10 +363,8 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                 //Use grip as an extra button
                 //Alt-Fire
                 Joy_GenerateButtonEvents(
-                        ((pDominantTrackedRemoteOld->Buttons & ovrButton_GripTrigger) != 0) &&
-                        dominantGripPushedOld ? 1 : 0,
-                        ((pDominantTrackedRemoteNew->Buttons & ovrButton_GripTrigger) != 0) &&
-                        dominantGripPushedNew ? 1 : 0,
+                        ((pDominantTrackedRemoteOld->Buttons & ovrButton_GripTrigger) != 0) ? 1 : 0,
+                        ((pDominantTrackedRemoteNew->Buttons & ovrButton_GripTrigger) != 0) ? 1 : 0,
                         1, KEY_PAD_LTRIGGER);
             }
 
