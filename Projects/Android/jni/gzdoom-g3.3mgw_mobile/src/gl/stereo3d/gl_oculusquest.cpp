@@ -595,20 +595,23 @@ namespace s3d
             previousPitch = pitch;
         }
 
-        if (gamestate == GS_LEVEL && !getMenuState())
+        if (!cinemamode)
         {
-            doomYaw += hmdYawDeltaDegrees;
-            GLRenderer->mAngles.Roll = roll;
-            GLRenderer->mAngles.Pitch = pitch;
-        }
+            if (gamestate == GS_LEVEL && !getMenuState())
+            {
+                doomYaw += hmdYawDeltaDegrees;
+                GLRenderer->mAngles.Roll = roll;
+                GLRenderer->mAngles.Pitch = pitch;
+            }
 
-        {
-            double viewYaw = doomYaw;
-            while (viewYaw <= -180.0)
-                viewYaw += 360.0;
-            while (viewYaw > 180.0)
-                viewYaw -= 360.0;
-            r_viewpoint.Angles.Yaw.Degrees = viewYaw;
+            {
+                double viewYaw = doomYaw;
+                while (viewYaw <= -180.0)
+                    viewYaw += 360.0;
+                while (viewYaw > 180.0)
+                    viewYaw -= 360.0;
+                r_viewpoint.Angles.Yaw.Degrees = viewYaw;
+            }
         }
     }
 

@@ -67,6 +67,24 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
         pSecondaryTrackedRemoteOld = pOffTrackedRemoteOld;
     }
 
+    //In cinema mode, right-stick controls mouse
+    const float mouseSpeed = 2.5f;
+    if (cinemamode)
+    {
+        if (pPrimaryTrackedRemoteNew->Joystick.x > 0.6f) {
+            mouseX -= mouseSpeed;
+        }
+        if (pPrimaryTrackedRemoteNew->Joystick.x < -0.6f) {
+            mouseX += mouseSpeed;
+        }
+        if (pPrimaryTrackedRemoteNew->Joystick.y > 0.6f) {
+            mouseY -= mouseSpeed;
+        }
+        if (pPrimaryTrackedRemoteNew->Joystick.y < -0.6f) {
+            mouseY += mouseSpeed;
+        }
+    }
+
     // Only do the following if we are definitely not in the menu
     if (getMenuState() == 0)
     {
@@ -210,97 +228,104 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                   remote_movementSideways,
                   remote_movementForward);
 
-            // Turning logic
-            static int increaseSnap = true;
-            if (pPrimaryTrackedRemoteNew->Joystick.x > 0.6f) {
-                if (increaseSnap) {
-                    resetDoomYaw = true;
-                    snapTurn -= vr_snapturn_angle;
-                    if (vr_snapturn_angle > 10.0f) {
-                        increaseSnap = false;
-                    }
 
-                    if (snapTurn < -180.0f) {
-                        snapTurn += 360.f;
+            if (!cinemamode)
+            {
+                // Turning logic
+                static int increaseSnap = true;
+                if (pPrimaryTrackedRemoteNew->Joystick.x > 0.6f) {
+                    if (increaseSnap) {
+                        resetDoomYaw = true;
+                        snapTurn -= vr_snapturn_angle;
+                        if (vr_snapturn_angle > 10.0f) {
+                            increaseSnap = false;
+                        }
+
+                        if (snapTurn < -180.0f) {
+                            snapTurn += 360.f;
+                        }
                     }
+                } else if (pPrimaryTrackedRemoteNew->Joystick.x < 0.4f) {
+                    increaseSnap = true;
                 }
-            } else if (pPrimaryTrackedRemoteNew->Joystick.x < 0.4f) {
-                increaseSnap = true;
-            }
 
-            static int decreaseSnap = true;
-            if (pPrimaryTrackedRemoteNew->Joystick.x < -0.6f) {
-                if (decreaseSnap) {
-                    resetDoomYaw = true;
-                    snapTurn += vr_snapturn_angle;
+                static int decreaseSnap = true;
+                if (pPrimaryTrackedRemoteNew->Joystick.x < -0.6f) {
+                    if (decreaseSnap) {
+                        resetDoomYaw = true;
+                        snapTurn += vr_snapturn_angle;
 
-                    //If snap turn configured for less than 10 degrees
-                    if (vr_snapturn_angle > 10.0f) {
-                        decreaseSnap = false;
+                        //If snap turn configured for less than 10 degrees
+                        if (vr_snapturn_angle > 10.0f) {
+                            decreaseSnap = false;
+                        }
+
+                        if (snapTurn > 180.0f) {
+                            snapTurn -= 360.f;
+                        }
                     }
-
-                    if (snapTurn > 180.0f) {
-                        snapTurn -= 360.f;
-                    }
+                } else if (pPrimaryTrackedRemoteNew->Joystick.x > -0.4f) {
+                    decreaseSnap = true;
                 }
-            } else if (pPrimaryTrackedRemoteNew->Joystick.x > -0.4f) {
-                decreaseSnap = true;
             }
         }
     }
 
-    //Now handle all the buttons - irrespective of menu state - we might be trying to remap stuff
     {
-        {
-            //Default this is Weapon Chooser - This _could_ be remapped
-            static int itemSwitched = 0;
-            if (between(-0.2f, pPrimaryTrackedRemoteNew->Joystick.x, 0.2f) &&
-                (between(0.8f, pPrimaryTrackedRemoteNew->Joystick.y, 1.0f) ||
-                 between(-1.0f, pPrimaryTrackedRemoteNew->Joystick.y, -0.8f))) {
-                if (itemSwitched == 0) {
-                    if (between(0.8f, pPrimaryTrackedRemoteNew->Joystick.y, 1.0f)) {
-                        Joy_GenerateButtonEvents(0, 1, 1, KEY_MWHEELDOWN);
-                        itemSwitched = 1;
+        //if in cinema mode, then the dominant joystick is used differently
+        if (!cinemamode) {
+            //Now handle all the buttons - irrespective of menu state - we might be trying to remap stuff
+            {
+                {
+                    //Default this is Weapon Chooser - This _could_ be remapped
+                    static int itemSwitched = 0;
+                    if (between(-0.2f, pPrimaryTrackedRemoteNew->Joystick.x, 0.2f) &&
+                        (between(0.8f, pPrimaryTrackedRemoteNew->Joystick.y, 1.0f) ||
+                         between(-1.0f, pPrimaryTrackedRemoteNew->Joystick.y, -0.8f))) {
+                        if (itemSwitched == 0) {
+                            if (between(0.8f, pPrimaryTrackedRemoteNew->Joystick.y, 1.0f)) {
+                                Joy_GenerateButtonEvents(0, 1, 1, KEY_MWHEELDOWN);
+                                itemSwitched = 1;
+                            } else {
+                                Joy_GenerateButtonEvents(0, 1, 1, KEY_MWHEELUP);
+                                itemSwitched = 2;
+                            }
+                        }
                     } else {
-                        Joy_GenerateButtonEvents(0, 1, 1, KEY_MWHEELUP);
-                        itemSwitched = 2;
+                        if (itemSwitched == 1) {
+                            Joy_GenerateButtonEvents(1, 0, 1, KEY_MWHEELDOWN);
+                        } else if (itemSwitched == 2) {
+                            Joy_GenerateButtonEvents(1, 0, 1, KEY_MWHEELUP);
+                        }
+                        itemSwitched = 0;
                     }
                 }
-            } else {
-                if (itemSwitched == 1) {
-                    Joy_GenerateButtonEvents(1, 0, 1, KEY_MWHEELDOWN);
-                } else if (itemSwitched == 2) {
-                    Joy_GenerateButtonEvents(1, 0, 1, KEY_MWHEELUP);
-                }
-                itemSwitched = 0;
-            }
-        }
 
-        //If snap turn set to 0, then we can use left/right on the stick as mappable functions
-        if (vr_snapturn_angle == 0.0)
-        {
-            static int invSwitched = 0;
-            if (between(-0.2f, pPrimaryTrackedRemoteNew->Joystick.y, 0.2f) &&
-                (between(0.8f, pPrimaryTrackedRemoteNew->Joystick.x, 1.0f) ||
-                 between(-1.0f, pPrimaryTrackedRemoteNew->Joystick.x, -0.8f))) {
-                if (invSwitched == 0) {
-                    if (between(0.8f, pPrimaryTrackedRemoteNew->Joystick.x, 1.0f)) {
-                        Joy_GenerateButtonEvents(0, 1, 1, KEY_MWHEELLEFT);
-                        invSwitched = 1;
+                //If snap turn set to 0, then we can use left/right on the stick as mappable functions
+                if (vr_snapturn_angle == 0.0) {
+                    static int invSwitched = 0;
+                    if (between(-0.2f, pPrimaryTrackedRemoteNew->Joystick.y, 0.2f) &&
+                        (between(0.8f, pPrimaryTrackedRemoteNew->Joystick.x, 1.0f) ||
+                         between(-1.0f, pPrimaryTrackedRemoteNew->Joystick.x, -0.8f))) {
+                        if (invSwitched == 0) {
+                            if (between(0.8f, pPrimaryTrackedRemoteNew->Joystick.x, 1.0f)) {
+                                Joy_GenerateButtonEvents(0, 1, 1, KEY_MWHEELLEFT);
+                                invSwitched = 1;
+                            } else {
+                                Joy_GenerateButtonEvents(0, 1, 1, KEY_MWHEELRIGHT);
+                                invSwitched = 2;
+                            }
+                        }
                     } else {
-                        Joy_GenerateButtonEvents(0, 1, 1, KEY_MWHEELRIGHT);
-                        invSwitched = 2;
+                        if (invSwitched == 1) {
+                            Joy_GenerateButtonEvents(1, 0, 1, KEY_MWHEELLEFT);
+                        } else if (invSwitched == 2) {
+                            Joy_GenerateButtonEvents(1, 0, 1, KEY_MWHEELRIGHT);
+                        }
+                        invSwitched = 0;
                     }
                 }
-            } else {
-                if (invSwitched == 1) {
-                    Joy_GenerateButtonEvents(1, 0, 1, KEY_MWHEELLEFT);
-                } else if (invSwitched == 2) {
-                    Joy_GenerateButtonEvents(1, 0, 1, KEY_MWHEELRIGHT);
-                }
-                invSwitched = 0;
             }
-
         }
 
         {

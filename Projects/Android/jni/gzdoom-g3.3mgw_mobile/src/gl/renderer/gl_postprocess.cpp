@@ -66,6 +66,8 @@
 #include "gl/stereo3d/gl_stereo3d.h"
 #include "r_videoscale.h"
 
+#include <QzDoom/VrCommon.h>
+
 extern bool vid_hdr_active;
 
 //==========================================================================
@@ -794,7 +796,7 @@ void FGLRenderer::Flush()
 	}
 	else
 	{
-		const bool is2D = (gamestate != GS_LEVEL);
+		const bool is2D = (gamestate != GS_LEVEL) || cinemamode;
 		if (is2D) stereo3dMode.SetUp();
 
 		// Render 2D to eye textures

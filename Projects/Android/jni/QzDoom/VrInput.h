@@ -21,6 +21,9 @@ float positional_movementSideways;
 float positional_movementForward;
 float snapTurn;
 
+float mouseX;
+float mouseY;
+
 void acquireTrackedRemotesData(const ovrMobile *Ovr, double displayTime);
 
 void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew, ovrInputStateTrackedRemote *pDominantTrackedRemoteOld, ovrTracking* pDominantTracking,

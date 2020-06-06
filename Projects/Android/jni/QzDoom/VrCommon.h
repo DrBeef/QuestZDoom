@@ -29,7 +29,9 @@ extern "C"
 
 extern bool qzdoom_initialised;
 
-extern long long global_time;
+extern bool cinemamode;
+extern float mouseX;
+extern float mouseY;
 
 extern float playerHeight;
 extern float playerYaw;

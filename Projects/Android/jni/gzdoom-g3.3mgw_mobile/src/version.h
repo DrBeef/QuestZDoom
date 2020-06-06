@@ -41,7 +41,7 @@ const char *GetVersionString();
 
 /** Lots of different version numbers **/
 
-#define VERSIONSTR "DrBeef's QuestZDoom-1.1.1 (LZDoom 3.85)"
+#define VERSIONSTR "DrBeef's QuestZDoom-1.1.2 (LZDoom 3.85)"
 
 // The version as seen in the Windows resource
 #define RC_FILEVERSION 3,85,0
