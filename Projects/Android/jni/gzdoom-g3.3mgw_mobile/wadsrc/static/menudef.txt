@@ -620,6 +620,7 @@ OptionMenu "OtherControlsMenu" protected
 	StaticTextSwitchable "$CNTRLMNU_SWITCHTEXT1", "$CNTRLMNU_SWITCHTEXT2", "ControlMessage"
 
 	StaticText ""
+	Control    "Toggle Cinema Mode"        , "cinemamode"
 	Control    "$CNTRLMNU_AUTOMAP"         , "togglemap"
 
 	StaticText ""
@@ -2323,22 +2324,21 @@ OptionMenu VROptionsMenu protected
 
 	StaticText ""
 	StaticText "VR Controls"
-	Control    "Toggle Cinema Mode",    "cinemamode"
 	Option "Control Scheme",		    "vr_control_scheme", "ControlScheme"
 	Option "Switch Thumsticks",		    "vr_switch_sticks", "OnOff"
-	Option "Use Secondary Button Mappings",	"vr_secondary_button_mappings", "OnOff"
+	Option "Allow Secondary Button Mappings",	"vr_secondary_button_mappings", "OnOff"
 	Option "Two Handed Weapons",	    "vr_two_handed_weapons", "OnOff"
-	Option "Off-hand Move Direction",	"vr_move_use_offhand", "OffOn"
-	StaticText ""
-	StaticText "Set Snap-Turn to <= 10 degrees for \"Smooth\" Turn"
-	Slider "Snap-turn Angle",		    "vr_snapTurn", 0.0, 90.0, 1.0, 2
 
 	StaticText ""
 	StaticText "Locomotion"
+	Option "Off-hand Move Direction",	"vr_move_use_offhand", "OffOn"
 	Option "Use Teleport",		        "vr_teleport", "OnOff"
 	Option "Allow slidey movement (Momentum)",	    "vr_momentum", "OnOff"
 	Slider "Walking Speed",		        "vr_move_speed", 5, 50, 1, 2
 	Slider "Run Multiplier",	        "vr_run_multiplier", 0.0, 5.0, 0.1, 2
+	StaticText ""
+	StaticText "Set Snap-Turn to <= 10 degrees for \"Smooth\" Turn"
+	Slider "Snap-turn Angle",		    "vr_snapTurn", 0.0, 90.0, 1.0, 2
 
 	StaticText ""
 	StaticText "Haptics"
@@ -2347,20 +2347,20 @@ OptionMenu VROptionsMenu protected
 
 	StaticText ""
 	StaticText "Weapon"
+	Option "Weapon Recoil",		        "vr_recoil", "OnOff"
 	Slider "Weapon Pitch Adjust",		"vr_weaponRotate", -45, 45, 5, 2
-	Slider "Weapon Scale",		        "vr_weaponScale", 0.1, 1.0, 0.01, 2
+	Slider "Weapon Sprite Scale",		"vr_weaponScale", 0.1, 1.0, 0.01, 2
 	Option "Weapon Sprite 3D",			"r_PlayerSprites3DMode", "Sprites3DMode"
 	Slider "Weapon Fat Item Width",		"gl_fatItemWidth", 0.1, 1.0, 0.1, 2
-	Option "Weapon Recoil",		        "vr_recoil", "OnOff"
 
 	StaticText ""
     Submenu "VR HUD/Automap Options",	"VRHUDOptions"
 
 	StaticText ""
 	StaticText "Display"
-	Option "Lock FrameRate (IF LOW PERF.)",        "cl_capfps", "OnOff"
-	Option "Show VR HUD FPS",		    "vid_fps", "OnOff"
-	Option "Dynamic Lights (CAUTION)",	"vr_dynlights", "OnOff"
+	Option "Lock FrameRate (IF LOW PERF.)",         "cl_capfps", "OnOff"
+	Option "Show FPS on HUD",		                "vid_fps", "OnOff"
+	Option "Dynamic Lights (CAUTION)",	            "vr_dynlights", "OnOff"
 }
 
 /*=======================================

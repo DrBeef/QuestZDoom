@@ -44,7 +44,6 @@ Copyright	:	Copyright 2015 Oculus VR, LLC. All Rights reserved.
 //Define all variables here that were externs in the VrCommon.h
 bool qzdoom_initialised;
 long long global_time;
-float playerHeight;
 float playerYaw;
 bool resetDoomYaw;
 bool resetPreviousPitch;
@@ -855,17 +854,7 @@ void setWorldPosition( float x, float y, float z )
 
 void setHMDPosition( float x, float y, float z, float yaw )
 {
-	static bool s_useScreen = false;
-
 	VectorSet(hmdPosition, x, y, z);
-
-    if (s_useScreen != QzDoom_useScreenLayer())
-    {
-		s_useScreen = QzDoom_useScreenLayer();
-
-		//Record player height on transition
-        playerHeight = y;
-    }
 
 	if (!QzDoom_useScreenLayer())
     {
@@ -905,8 +894,8 @@ void VR_GetMove( float *joy_forward, float *joy_side, float *hmd_forward, float 
     *up = remote_movementUp;
     *joy_side = remote_movementSideways;
     *hmd_side = positional_movementSideways;
-	*yaw = cinemamode ? mouseX : hmdorientation[YAW] + snapTurn;
-	*pitch = cinemamode ? mouseY : hmdorientation[PITCH];
+	*yaw = cinemamode ? cinemamodeYaw : hmdorientation[YAW] + snapTurn;
+	*pitch = cinemamode ? cinemamodePitch : hmdorientation[PITCH];
 	*roll = cinemamode ? 0.0f : hmdorientation[ROLL];
 }
 
@@ -1296,8 +1285,8 @@ void VR_Init()
 	positional_movementSideways = 0.0f;
 	positional_movementForward = 0.0f;
 	snapTurn = 0.0f;
-	mouseX = 0.0f;
-	mouseY = 0.0f;
+	cinemamodeYaw = 0.0f;
+	cinemamodePitch = 0.0f;
 
 	//init randomiser
 	srand(time(NULL));

@@ -21,8 +21,8 @@ float positional_movementSideways;
 float positional_movementForward;
 float snapTurn;
 
-float mouseX;
-float mouseY;
+float cinemamodeYaw;
+float cinemamodePitch;
 
 void acquireTrackedRemotesData(const ovrMobile *Ovr, double displayTime);
 

@@ -105,6 +105,16 @@ float getDoomPlayerHeightWithoutCrouch(const player_t *player)
     return height;
 }
 
+extern "C" float getViewpointYaw()
+{
+    if (cinemamode)
+    {
+        return r_viewpoint.Angles.Yaw.Degrees;
+    }
+
+    return doomYaw;
+}
+
 namespace s3d
 {
     static DVector3 oculusquest_origin(0, 0, 0);
@@ -128,7 +138,7 @@ namespace s3d
         outViewShift[0] = outViewShift[1] = outViewShift[2] = 0;
 
         vec3_t angles;
-        VectorSet(angles, -GLRenderer->mAngles.Pitch.Degrees,  doomYaw, GLRenderer->mAngles.Roll.Degrees);
+        VectorSet(angles, -GLRenderer->mAngles.Pitch.Degrees,  getViewpointYaw(), GLRenderer->mAngles.Roll.Degrees);
 
         vec3_t v_forward, v_right, v_up;
         AngleVectors(angles, v_forward, v_right, v_up);
@@ -313,8 +323,14 @@ namespace s3d
 
                 mat->scale(1, 1 / pixelstretch, 1);
 
-                mat->rotate(-90 + (doomYaw - hmdorientation[YAW]) + weaponangles[YAW], 0, 1, 0);
-                mat->rotate(-weaponangles[PITCH], 1, 0, 0);
+                if (cinemamode)
+                {
+                    mat->rotate(-90 + r_viewpoint.Angles.Yaw.Degrees  + (weaponangles[YAW]- hmdorientation[YAW]), 0, 1, 0);
+                    mat->rotate(-weaponangles[PITCH] - r_viewpoint.Angles.Pitch.Degrees, 1, 0, 0);
+                } else {
+                    mat->rotate(-90 + doomYaw + (weaponangles[YAW]- hmdorientation[YAW]), 0, 1, 0);
+                    mat->rotate(-weaponangles[PITCH], 1, 0, 0);
+                }
                 mat->rotate(-weaponangles[ROLL], 0, 0, 1);
             }
             else
@@ -323,8 +339,14 @@ namespace s3d
 
                 mat->scale(1, 1 / pixelstretch, 1);
 
-                mat->rotate(-90 + (doomYaw - hmdorientation[YAW]) + offhandangles[YAW], 0, 1, 0);
-                mat->rotate(-offhandangles[PITCH], 1, 0, 0);
+                if (cinemamode)
+                {
+                    mat->rotate(-90 + r_viewpoint.Angles.Yaw.Degrees  + (offhandangles[YAW]- hmdorientation[YAW]), 0, 1, 0);
+                    mat->rotate(-offhandangles[PITCH] - r_viewpoint.Angles.Pitch.Degrees, 1, 0, 0);
+                } else {
+                    mat->rotate(-90 + doomYaw + (offhandangles[YAW]- hmdorientation[YAW]), 0, 1, 0);
+                    mat->rotate(-offhandangles[PITCH], 1, 0, 0);
+                }
                 mat->rotate(-offhandangles[ROLL], 0, 0, 1);
             }
 
@@ -475,8 +497,10 @@ namespace s3d
                 {
                     player->mo->OverrideAttackPosDir = true;
 
-                    player->mo->AttackPitch = -weaponangles[PITCH];
-                    player->mo->AttackAngle = -90 + (doomYaw - hmdorientation[YAW]) + weaponangles[YAW];
+                    player->mo->AttackPitch = cinemamode ? -weaponangles[PITCH] - r_viewpoint.Angles.Pitch.Degrees
+                            : -weaponangles[PITCH];
+
+                    player->mo->AttackAngle = -90 + getViewpointYaw() + (weaponangles[YAW]- hmdorientation[YAW]);
 
                     player->mo->AttackPos.X = player->mo->X() - (weaponoffset[0] * vr_vunits_per_meter);
                     player->mo->AttackPos.Y = player->mo->Y() - (weaponoffset[2] * vr_vunits_per_meter);

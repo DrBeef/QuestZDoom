@@ -30,10 +30,9 @@ extern "C"
 extern bool qzdoom_initialised;
 
 extern bool cinemamode;
-extern float mouseX;
-extern float mouseY;
+extern float cinemamodeYaw;
+extern float cinemamodePitch;
 
-extern float playerHeight;
 extern float playerYaw;
 extern bool resetDoomYaw;
 extern float doomYaw;

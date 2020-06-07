@@ -388,8 +388,8 @@ CCMD (turn180)
 }
 
 extern bool cinemamode;
-extern float mouseX;
-extern float mouseY;
+extern float cinemamodeYaw;
+extern float cinemamodePitch;
 extern vec3_t hmdorientation;
 extern float snapturn;
 CCMD (cinemamode)
@@ -397,8 +397,8 @@ CCMD (cinemamode)
 	cinemamode = !cinemamode;
 
 	//Store these
-	mouseX = hmdorientation[YAW] + snapTurn;
-	mouseY = hmdorientation[PITCH];
+	cinemamodeYaw = hmdorientation[YAW] + snapTurn;
+	cinemamodePitch = hmdorientation[PITCH];
 
 	//Reset angles back to normal view
 	if (!cinemamode)

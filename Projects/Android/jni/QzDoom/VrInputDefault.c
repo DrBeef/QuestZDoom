@@ -21,6 +21,7 @@ Authors		:	Simon Brown
 int getGameState();
 int getMenuState();
 void Joy_GenerateButtonEvents(int oldbuttons, int newbuttons, int numbuttons, int base);
+float getViewpointYaw();
 
 void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew, ovrInputStateTrackedRemote *pDominantTrackedRemoteOld, ovrTracking* pDominantTracking,
                           ovrInputStateTrackedRemote *pOffTrackedRemoteNew, ovrInputStateTrackedRemote *pOffTrackedRemoteOld, ovrTracking* pOffTracking,
@@ -68,20 +69,20 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
     }
 
     //In cinema mode, right-stick controls mouse
-    const float mouseSpeed = 2.5f;
+    const float mouseSpeed = 2.0f;
     if (cinemamode)
     {
         if (pPrimaryTrackedRemoteNew->Joystick.x > 0.6f) {
-            mouseX -= mouseSpeed;
+            cinemamodeYaw -= mouseSpeed;
         }
         if (pPrimaryTrackedRemoteNew->Joystick.x < -0.6f) {
-            mouseX += mouseSpeed;
+            cinemamodeYaw += mouseSpeed;
         }
         if (pPrimaryTrackedRemoteNew->Joystick.y > 0.6f) {
-            mouseY -= mouseSpeed;
+            cinemamodePitch -= mouseSpeed;
         }
         if (pPrimaryTrackedRemoteNew->Joystick.y < -0.6f) {
-            mouseY += mouseSpeed;
+            cinemamodePitch += mouseSpeed;
         }
     }
 
@@ -118,8 +119,10 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 
             {
                 vec2_t v;
+                float yawRotation = cinemamode ? getViewpointYaw() - hmdorientation[YAW] :
+                        doomYaw - hmdorientation[YAW];
                 rotateAboutOrigin(weaponoffset[0], weaponoffset[2],
-                                  -(doomYaw - hmdorientation[YAW]), v);
+                                  -yawRotation, v);
                 weaponoffset[0] = v[1];
                 weaponoffset[2] = v[0];
             }
