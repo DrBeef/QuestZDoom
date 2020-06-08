@@ -2349,7 +2349,7 @@ OptionMenu VROptionsMenu protected
 	StaticText "Weapon"
 	Option "Weapon Recoil",		        "vr_recoil", "OnOff"
 	Slider "Weapon Pitch Adjust",		"vr_weaponRotate", -45, 45, 5, 2
-	Slider "Weapon Sprite Scale",		"vr_weaponScale", 0.1, 1.0, 0.01, 2
+	Slider "Weapon Sprite/Model Scale",	"vr_weaponScale", 0.1, 3.0, 0.1, 2
 	Option "Weapon Sprite 3D",			"r_PlayerSprites3DMode", "Sprites3DMode"
 	Slider "Weapon Fat Item Width",		"gl_fatItemWidth", 0.1, 1.0, 0.1, 2
 

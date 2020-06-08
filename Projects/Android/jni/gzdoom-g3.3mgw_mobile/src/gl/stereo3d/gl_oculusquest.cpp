@@ -325,7 +325,7 @@ namespace s3d
 
                 if (cinemamode)
                 {
-                    mat->rotate(-90 + r_viewpoint.Angles.Yaw.Degrees  + (weaponangles[YAW]- hmdorientation[YAW]), 0, 1, 0);
+                    mat->rotate(-90 + r_viewpoint.Angles.Yaw.Degrees  + (weaponangles[YAW]- playerYaw), 0, 1, 0);
                     mat->rotate(-weaponangles[PITCH] - r_viewpoint.Angles.Pitch.Degrees, 1, 0, 0);
                 } else {
                     mat->rotate(-90 + doomYaw + (weaponangles[YAW]- hmdorientation[YAW]), 0, 1, 0);
@@ -341,7 +341,7 @@ namespace s3d
 
                 if (cinemamode)
                 {
-                    mat->rotate(-90 + r_viewpoint.Angles.Yaw.Degrees  + (offhandangles[YAW]- hmdorientation[YAW]), 0, 1, 0);
+                    mat->rotate(-90 + r_viewpoint.Angles.Yaw.Degrees  + (offhandangles[YAW]- playerYaw), 0, 1, 0);
                     mat->rotate(-offhandangles[PITCH] - r_viewpoint.Angles.Pitch.Degrees, 1, 0, 0);
                 } else {
                     mat->rotate(-90 + doomYaw + (offhandangles[YAW]- hmdorientation[YAW]), 0, 1, 0);
@@ -500,7 +500,7 @@ namespace s3d
                     player->mo->AttackPitch = cinemamode ? -weaponangles[PITCH] - r_viewpoint.Angles.Pitch.Degrees
                             : -weaponangles[PITCH];
 
-                    player->mo->AttackAngle = -90 + getViewpointYaw() + (weaponangles[YAW]- hmdorientation[YAW]);
+                    player->mo->AttackAngle = -90 + getViewpointYaw() + (weaponangles[YAW]- playerYaw);
 
                     player->mo->AttackPos.X = player->mo->X() - (weaponoffset[0] * vr_vunits_per_meter);
                     player->mo->AttackPos.Y = player->mo->Y() - (weaponoffset[2] * vr_vunits_per_meter);

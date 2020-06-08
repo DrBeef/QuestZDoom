@@ -52,6 +52,7 @@
 CVAR(Bool, gl_interpolate_model_frames, true, CVAR_ARCHIVE)
 EXTERN_CVAR(Bool, r_drawvoxels)
 EXTERN_CVAR(Int, vr_control_scheme)
+EXTERN_CVAR(Float, vr_weaponScale)
 
 extern TDeletingArray<FVoxel *> Voxels;
 extern TDeletingArray<FVoxelDef *> VoxelDefs;
@@ -226,6 +227,9 @@ void FModelRenderer::RenderHUDModel(DPSprite *psp, float ofsX, float ofsY)
 	objectToWorldMatrix.rotate(-smf->angleoffset, 0, 1, 0);
 	objectToWorldMatrix.rotate(smf->pitchoffset, 0, 0, 1);
 	objectToWorldMatrix.rotate(-smf->rolloffset, 1, 0, 0);
+
+	//Scale weapon
+	objectToWorldMatrix.scale(vr_weaponScale, vr_weaponScale, vr_weaponScale);
 
 	float orientation = smf->xscale * smf->yscale * smf->zscale;
 

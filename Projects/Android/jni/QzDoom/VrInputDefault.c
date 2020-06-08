@@ -69,20 +69,14 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
     }
 
     //In cinema mode, right-stick controls mouse
-    const float mouseSpeed = 2.0f;
+    const float mouseSpeed = 3.0f;
     if (cinemamode)
     {
-        if (pPrimaryTrackedRemoteNew->Joystick.x > 0.6f) {
-            cinemamodeYaw -= mouseSpeed;
+        if (fabs(pPrimaryTrackedRemoteNew->Joystick.x) > 0.1f) {
+            cinemamodeYaw -= mouseSpeed * pPrimaryTrackedRemoteNew->Joystick.x;
         }
-        if (pPrimaryTrackedRemoteNew->Joystick.x < -0.6f) {
-            cinemamodeYaw += mouseSpeed;
-        }
-        if (pPrimaryTrackedRemoteNew->Joystick.y > 0.6f) {
-            cinemamodePitch -= mouseSpeed;
-        }
-        if (pPrimaryTrackedRemoteNew->Joystick.y < -0.6f) {
-            cinemamodePitch += mouseSpeed;
+        if (fabs(pPrimaryTrackedRemoteNew->Joystick.y) > 0.1f) {
+            cinemamodePitch -= mouseSpeed * pPrimaryTrackedRemoteNew->Joystick.y;
         }
     }
 
