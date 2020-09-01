@@ -946,8 +946,8 @@ static void ovrApp_Clear( ovrApp * app )
 	app->FrameIndex = 1;
 	app->DisplayTime = 0;
 	app->SwapInterval = 1;
-	app->CpuLevel = 2;
-	app->GpuLevel = 2;
+	app->CpuLevel = 3;
+	app->GpuLevel = 3;
 	app->MainThreadTid = 0;
 	app->RenderThreadTid = 0;
 
