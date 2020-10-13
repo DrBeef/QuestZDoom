@@ -199,7 +199,7 @@ namespace swrenderer
 		FocalLengthY = FocalLengthX * YaspectMul;
 
 		// This is 1/FocalTangent before the widescreen extension of FOV.
-		viewingrangerecip = FLOAT2FIXED(1. / tan(viewpoint.FieldOfView.Radians() / 2));
+		viewingrangerecip = FLOAT2FIXED(1. / tan(viewpoint.FieldOfView().Radians() / 2));
 
 		// Now generate xtoviewangle for sky texture mapping.
 		// [RH] Do not generate viewangletox, because texture mapping is no

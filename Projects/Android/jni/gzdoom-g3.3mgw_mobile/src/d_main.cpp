@@ -679,6 +679,8 @@ CVAR(Bool, vid_activeinbackground, false, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 //
 //==========================================================================
 
+extern "C" float QzDoom_GetFOV();
+
 void D_Display ()
 {
 	bool wipe;
@@ -707,7 +709,7 @@ void D_Display ()
 
 	if (viewactive)
 	{
-		DAngle fov = 104.f;
+		DAngle fov = QzDoom_GetFOV();
 		AActor *cam = players[consoleplayer].camera;
 		if (cam)
 		{

@@ -995,7 +995,7 @@ void FGLRenderer::RenderView (player_t* player)
 	mLightCount = !!level.lights;
 
 	mShadowMap.Update();
-	sector_t * viewsector = drawer.RenderViewpoint(player->camera, NULL, r_viewpoint.FieldOfView.Degrees, ratio, fovratio, true, true);
+	sector_t * viewsector = drawer.RenderViewpoint(player->camera, NULL, r_viewpoint.FieldOfView().Degrees, ratio, fovratio, true, true);
 
 	All.Unclock();
 }
@@ -1026,7 +1026,7 @@ void GLSceneDrawer::WriteSavePic (player_t *player, FileWriter *file, int width,
 	GLRenderer->mLightCount = !!level.lights;
 
 	sector_t *viewsector = RenderViewpoint(players[consoleplayer].camera, &bounds,
-								r_viewpoint.FieldOfView.Degrees, 1.6f, 1.6f, true, false);
+								r_viewpoint.FieldOfView().Degrees, 1.6f, 1.6f, true, false);
 	glDisable(GL_STENCIL_TEST);
 	gl_RenderState.SetFixedColormap(CM_DEFAULT);
 	gl_RenderState.SetSoftLightLevel(-1);

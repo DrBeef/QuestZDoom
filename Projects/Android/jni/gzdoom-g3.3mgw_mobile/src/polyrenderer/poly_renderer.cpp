@@ -236,7 +236,7 @@ PolyPortalViewpoint PolyRenderer::SetupPerspectiveMatrix(bool mirror)
 	float ratio = Viewwindow.WidescreenRatio;
 	float fovratio = (Viewwindow.WidescreenRatio >= 1.3f) ? 1.333333f : ratio;
 
-	float fovy = (float)(2 * DAngle::ToDegrees(atan(tan(Viewpoint.FieldOfView.Radians() / 2) / fovratio)).Degrees);
+	float fovy = (float)(2 * DAngle::ToDegrees(atan(tan(Viewpoint.FieldOfView().Radians() / 2) / fovratio)).Degrees);
 
 	PolyPortalViewpoint portalViewpoint;
 

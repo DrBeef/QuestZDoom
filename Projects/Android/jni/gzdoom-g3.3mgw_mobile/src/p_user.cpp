@@ -125,13 +125,6 @@ CUSTOM_CVAR(Float, cl_predict_lerpthreshold, 2.00f, CVAR_ARCHIVE | CVAR_GLOBALCO
 ColorSetList ColorSets;
 PainFlashList PainFlashes;
 
-// [Nash] FOV cvar setting
-CUSTOM_CVAR(Float, fov, 104.f, CVAR_ARCHIVE | CVAR_USERINFO | CVAR_NOINITCALL)
-{
-	player_t *p = &players[consoleplayer];
-	p->SetFOV(fov);
-}
-
 struct PredictPos
 {
 	int gametic;

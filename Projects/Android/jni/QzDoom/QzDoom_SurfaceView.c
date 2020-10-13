@@ -698,13 +698,14 @@ void ovrRenderer_Clear( ovrRenderer * renderer )
 	renderer->NumBuffers = VRAPI_FRAME_LAYER_EYE_MAX;
 }
 
+float QzDoom_GetFOV();
 
 void ovrRenderer_Create( int width, int height, ovrRenderer * renderer, const ovrJava * java )
 {
 	renderer->NumBuffers = VRAPI_FRAME_LAYER_EYE_MAX;
 
 	//Now using a symmetrical render target, based on the horizontal FOV
-    vrFOV = vrapi_GetSystemPropertyInt( java, VRAPI_SYS_PROP_SUGGESTED_EYE_FOV_DEGREES_X);
+	QzDoom_GetFOV();
 
 	// Create the render Textures.
 	for ( int eye = 0; eye < VRAPI_FRAME_LAYER_EYE_MAX; eye++ )
@@ -1305,6 +1306,16 @@ static ovrAppThread * gAppThread = NULL;
 static ovrApp gAppState;
 static ovrJava java;
 static bool destroyed = false;
+
+
+float QzDoom_GetFOV()
+{
+	if (vrFOV == 0.0f) {
+		vrFOV = vrapi_GetSystemPropertyInt(&gAppState.Java, VRAPI_SYS_PROP_SUGGESTED_EYE_FOV_DEGREES_X);
+	}
+
+	return vrFOV;
+}
 
 void QzDoom_prepareEyeBuffer(int eye )
 {

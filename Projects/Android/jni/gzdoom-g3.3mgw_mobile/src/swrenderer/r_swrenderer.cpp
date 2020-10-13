@@ -288,7 +288,7 @@ void FSoftwareRenderer::RenderTextureView (FCanvasTexture *tex, AActor *viewpoin
 	// These get clobbered by rendering to a camera texture but they need to be preserved so the final rendering can be done with the correct palette.
 	CameraLight savedCameraLight = *CameraLight::Instance();
 
-	DAngle savedfov = cameraViewpoint.FieldOfView;
+	DAngle savedfov = cameraViewpoint.FieldOfView();
 	R_SetFOV (cameraViewpoint, fov);
 
 	if (r_polyrenderer)

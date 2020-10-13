@@ -4926,7 +4926,8 @@ DEFINE_ACTION_FUNCTION(AActor, AdjustFloorClip)
 //
 EXTERN_CVAR (Bool, chasedemo)
 EXTERN_CVAR(Bool, sv_singleplayerrespawn)
-EXTERN_CVAR(Float, fov)
+
+extern "C" float QzDoom_GetFOV();
 
 extern bool demonew;
 
@@ -5068,7 +5069,7 @@ AActor *P_SpawnPlayer (FPlayerStart *mthing, int playernum, int flags)
 		mobj->sprite = Skins[p->userinfo.GetSkin()].sprite;
 	}
 
-	p->DesiredFOV = p->FOV = fov;
+	p->DesiredFOV = p->FOV = QzDoom_GetFOV();
 	p->camera = p->mo;
 	p->playerstate = PST_LIVE;
 	p->refire = 0;
