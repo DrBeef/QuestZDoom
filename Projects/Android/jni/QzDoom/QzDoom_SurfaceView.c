@@ -1310,10 +1310,7 @@ static bool destroyed = false;
 
 float QzDoom_GetFOV()
 {
-	if (vrFOV == 0.0f) {
-		vrFOV = vrapi_GetSystemPropertyInt(&gAppState.Java, VRAPI_SYS_PROP_SUGGESTED_EYE_FOV_DEGREES_X);
-	}
-
+	vrFOV = vrapi_GetSystemPropertyInt(&gAppState.Java, VRAPI_SYS_PROP_SUGGESTED_EYE_FOV_DEGREES_Y);
 	return vrFOV;
 }
 

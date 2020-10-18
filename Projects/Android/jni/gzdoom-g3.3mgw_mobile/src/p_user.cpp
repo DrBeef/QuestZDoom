@@ -125,6 +125,9 @@ CUSTOM_CVAR(Float, cl_predict_lerpthreshold, 2.00f, CVAR_ARCHIVE | CVAR_GLOBALCO
 ColorSetList ColorSets;
 PainFlashList PainFlashes;
 
+// FOV cvar - This is not really used, is only here in case a mod needs to call it
+CVAR(Float, fov, 90.f, CVAR_ARCHIVE | CVAR_USERINFO | CVAR_NOINITCALL)
+
 struct PredictPos
 {
 	int gametic;
