@@ -55,6 +55,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdexcept>
 #ifdef _WIN32
 #include <io.h>
 #include "musicformats/win32/i_cd.h"

@@ -95,7 +95,7 @@ inline double AActor::AttackOffset(double offset)
 
 }
 
-inline bool AActor::isFrozen()
+inline bool AActor::isFrozen() const
 {
 	if (!(flags5 & MF5_NOTIMEFREEZE))
 	{

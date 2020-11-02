@@ -1056,7 +1056,7 @@ float FTexCoordInfo::TextureAdjustWidth() const
 	{
 		float tscale = fabs(mTempScale.X);
 		if (tscale == 1.f) return (float)mRenderWidth;
-		else return mWidth / fabs(tscale);
+		else return mWidth / fabsf(tscale);
 	}
 	else return (float)mWidth;
 }

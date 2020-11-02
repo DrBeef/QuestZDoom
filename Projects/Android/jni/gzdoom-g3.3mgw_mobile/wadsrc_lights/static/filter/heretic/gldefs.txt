@@ -1663,7 +1663,7 @@ object VolcanoBlast
 }
 
 // Small volcano fireball
-flickerlight VOLCANOBALL1
+flickerlight VOLCANOBALL2
 {
     color 1.0 0.5 0.0
     size 60
@@ -1674,7 +1674,7 @@ flickerlight VOLCANOBALL1
 
 object VolcanoTBlast
 {
-    frame VTFB { light VOLCANOBALL1 }
+    frame VTFB { light VOLCANOBALL2 }
 }
 
 // Blue Key Statue

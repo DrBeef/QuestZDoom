@@ -1244,6 +1244,57 @@ static bool CanAttackHurt(AActor *victim, AActor *shooter)
 
 //==========================================================================
 //
+// P_DoMissileDamage
+// Handle damaging/poisoning enemies from missiles.
+// target is the target to be dealt damage to.
+// inflictor is the actor dealing the damage.
+//
+//==========================================================================
+
+void P_DoMissileDamage(AActor* inflictor, AActor* target)
+{
+	// Do poisoning (if using new style poison)
+	if (inflictor->PoisonDamage > 0 && inflictor->PoisonDuration != INT_MIN)
+	{
+		P_PoisonMobj(target, inflictor, inflictor->target, inflictor->PoisonDamage, inflictor->PoisonDuration, inflictor->PoisonPeriod, inflictor->PoisonDamageType);
+	}
+
+	// Do damage
+	int damage = inflictor->GetMissileDamage((inflictor->flags4 & MF4_STRIFEDAMAGE) ? 3 : 7, 1);
+	if ((damage > 0) || (inflictor->flags6 & MF6_FORCEPAIN) || (inflictor->flags7 & MF7_CAUSEPAIN))
+	{
+		int newdam = P_DamageMobj(target, inflictor, inflictor->target, damage, inflictor->DamageType);
+		if (damage > 0)
+		{
+			if ((inflictor->flags5 & MF5_BLOODSPLATTER) &&
+				!(target->flags & MF_NOBLOOD) &&
+				!(target->flags2 & MF2_REFLECTIVE) &&
+				!(target->flags2 & (MF2_INVULNERABLE | MF2_DORMANT)) &&
+				!(inflictor->flags3 & MF3_BLOODLESSIMPACT) &&
+				(pr_checkthing() < 192))
+			{
+				P_BloodSplatter(inflictor->Pos(), target, inflictor->AngleTo(target));
+			}
+			if (!(inflictor->flags3 & MF3_BLOODLESSIMPACT))
+			{
+				P_TraceBleed(newdam > 0 ? newdam : damage, target, inflictor);
+			}
+		}
+	}
+	else
+	{
+		P_GiveBody(target, -damage);
+	}
+}
+DEFINE_ACTION_FUNCTION(AActor, DoMissileDamage)
+{
+	PARAM_SELF_PROLOGUE(AActor);
+	PARAM_OBJECT_NOT_NULL(target, AActor);
+	P_DoMissileDamage(self, target);
+	return 0;
+}
+//==========================================================================
+//
 // PIT_CheckThing
 //
 //==========================================================================
@@ -1567,38 +1618,7 @@ bool PIT_CheckThing(FMultiBlockThingsIterator &it, FMultiBlockThingsIterator::Ch
 			}
 		}
 
-		// Do poisoning (if using new style poison)
-		if (tm.thing->PoisonDamage > 0 && tm.thing->PoisonDuration != INT_MIN)
-		{
-			P_PoisonMobj(thing, tm.thing, tm.thing->target, tm.thing->PoisonDamage, tm.thing->PoisonDuration, tm.thing->PoisonPeriod, tm.thing->PoisonDamageType);
-		}
-
-		// Do damage
-		damage = tm.thing->GetMissileDamage((tm.thing->flags4 & MF4_STRIFEDAMAGE) ? 3 : 7, 1);
-		if ((damage > 0) || (tm.thing->flags6 & MF6_FORCEPAIN) || (tm.thing->flags7 & MF7_CAUSEPAIN))
-		{
-			int newdam = P_DamageMobj(thing, tm.thing, tm.thing->target, damage, tm.thing->DamageType);
-			if (damage > 0)
-			{
-				if ((tm.thing->flags5 & MF5_BLOODSPLATTER) &&
-					!(thing->flags & MF_NOBLOOD) &&
-					!(thing->flags2 & MF2_REFLECTIVE) &&
-					!(thing->flags2 & (MF2_INVULNERABLE | MF2_DORMANT)) &&
-					!(tm.thing->flags3 & MF3_BLOODLESSIMPACT) &&
-					(pr_checkthing() < 192))
-				{
-					P_BloodSplatter(tm.thing->Pos(), thing, tm.thing->AngleTo(thing));
-				}
-				if (!(tm.thing->flags3 & MF3_BLOODLESSIMPACT))
-				{
-					P_TraceBleed(newdam > 0 ? newdam : damage, thing, tm.thing);
-				}
-			}
-		}
-		else
-		{
-			P_GiveBody(thing, -damage);
-		}
+		P_DoMissileDamage(tm.thing, thing);
 
 		if ((thing->flags7 & MF7_THRUREFLECT) && (thing->flags2 & MF2_REFLECTIVE) && (tm.thing->flags & MF_MISSILE))
 		{
@@ -4916,7 +4936,8 @@ int P_LineTrace(AActor *t1, DAngle angle, double distance,
 		outdata->HitLocation = trace.HitPos;
 		outdata->HitDir = trace.HitVector;
 		outdata->Distance = trace.Distance;
-		outdata->NumPortals = TData.NumPortals;
+		// [MK] Subtract two "bogus" portal crossings used internally by trace code
+		outdata->NumPortals = TData.NumPortals-2;
 		outdata->HitType = trace.HitType;
 	}
 	return ret;
@@ -5037,8 +5058,10 @@ void P_TraceBleed(int damage, const DVector3 &pos, AActor *actor, DAngle angle, 
 					bloodcolor.a = 1;
 				}
 
+				uint32_t bloodTrans = (bloodcolor != 0 ? actor->BloodTranslation : 0);
+
 				DImpactDecal::StaticCreate(bloodType, bleedtrace.HitPos,
-					bleedtrace.Line->sidedef[bleedtrace.Side], bleedtrace.ffloor, bloodcolor);
+					bleedtrace.Line->sidedef[bleedtrace.Side], bleedtrace.ffloor, bloodcolor, bloodTrans);
 			}
 		}
 	}

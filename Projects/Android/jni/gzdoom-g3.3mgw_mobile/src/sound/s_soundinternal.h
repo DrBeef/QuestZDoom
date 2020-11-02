@@ -18,9 +18,6 @@ struct sfxinfo_t
 	// Next field is for use by the system sound interface.
 	// A non-null data means the sound has been loaded.
 	SoundHandle	data;
-    // Also for the sound interface. Used for 3D positional
-    // sounds, may be the same as data.
-    SoundHandle data3d;
 
 	FString		name;					// [RH] Sound name defined in SNDINFO
 	int 		lumpnum;				// lump number of sfx
@@ -59,7 +56,6 @@ struct sfxinfo_t
 	void Clear()
 	{
 		data.Clear();
-		data3d.Clear();
 		lumpnum = -1;				// lump number of sfx
 		next = -1;
 		index = 0;			// [RH] For hashing
@@ -250,9 +246,9 @@ protected:
 	TArray<uint8_t> S_SoundCurve;
 	TMap<int, int> ResIdMap;
 	TArray<FRandomSoundList> S_rnd;
+	bool blockNewSounds = false;
 
 private:
-	void LoadSound3D(sfxinfo_t* sfx, FSoundLoadBuffer* pBuffer);
 	void LinkChannel(FSoundChan* chan, FSoundChan** head);
 	void UnlinkChannel(FSoundChan* chan);
 	void ReturnChannel(FSoundChan* chan);
@@ -278,8 +274,13 @@ public:
 	virtual ~SoundEngine() = default;
 	void EvictAllChannels();
 
+	void BlockNewSounds(bool on)
+	{
+		blockNewSounds = on;
+	}
+
 	void StopChannel(FSoundChan* chan);
-	sfxinfo_t* LoadSound(sfxinfo_t* sfx, FSoundLoadBuffer* pBuffer);
+	sfxinfo_t* LoadSound(sfxinfo_t* sfx);
 
 	// Initializes sound stuff, including volume
 	// Sets channels, SFX and music volume,
@@ -306,12 +307,13 @@ public:
 	void UpdateSounds(int time);
 
 	FSoundChan* StartSound(int sourcetype, const void* source,
-		const FVector3* pt, int channel, EChanFlags flags, FSoundID sound_id, float volume, float attenuation, FRolloffInfo* rolloff = nullptr, float spitch = 0.0f);
+		const FVector3* pt, int channel, EChanFlags flags, FSoundID sound_id, float volume, float attenuation, FRolloffInfo* rolloff = nullptr, float spitch = 0.0f, float startTime = 0.0f);
 
 	// Stops an origin-less sound from playing from this channel.
 	void StopSoundID(int sound_id);
 	void StopSound(int channel, int sound_id = -1);
 	void StopSound(int sourcetype, const void* actor, int channel, int sound_id = -1);
+	void StopActorSounds(int sourcetype, const void* actor, int chanmin, int chanmax);
 
 	void RelinkSound(int sourcetype, const void* from, const void* to, const FVector3* optpos);
 	void ChangeSoundVolume(int sourcetype, const void* source, int channel, double dvolume);

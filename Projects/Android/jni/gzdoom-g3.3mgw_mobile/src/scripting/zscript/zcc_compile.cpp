@@ -1563,9 +1563,7 @@ bool ZCCCompiler::CompileFields(PContainerType *type, TArray<ZCC_VarDeclarator *
 					f = type->AddField(name->Name, thisfieldtype, varflags);
 				}
 
-				assert(f != nullptr);
-
-				if (field->Flags & (ZCC_Version | ZCC_Deprecated))
+				if ((field->Flags & (ZCC_Version | ZCC_Deprecated)) && f != nullptr)
 				{
 					f->mVersion = field->Version;
 
@@ -3411,7 +3409,6 @@ void ZCCCompiler::CompileStates()
 					if (!statedef.SetWait())
 					{
 						Error(st, "%s before first state", st->NodeType == AST_StateFail ? "Fail" : "Wait");
-						continue;
 					}
 					break;
 
@@ -3419,7 +3416,6 @@ void ZCCCompiler::CompileStates()
 					if (!statedef.SetLoop())
 					{
 						Error(st, "LOOP before first state");
-						continue;
 					}
 					break;
 

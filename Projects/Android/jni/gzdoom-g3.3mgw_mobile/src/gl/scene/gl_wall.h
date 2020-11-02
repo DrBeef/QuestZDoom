@@ -120,6 +120,8 @@ public:
 		GLWF_NOSPLITUPPER=16,
 		GLWF_NOSPLITLOWER=32,
 		GLWF_NOSPLIT=64,
+		GLWF_TRANSLUCENT = 128, // unused
+		GLWF_NOSLICE = 256
 	};
 
 	enum
@@ -155,9 +157,9 @@ public:
 	float ViewDistance;
 
 	TArray<lightlist_t> *lightlist;
-	int lightlevel;
+	short lightlevel;
+	uint16_t flags;
 	uint8_t type;
-	uint8_t flags;
 	short rellight;
 
 	float topglowcolor[4];

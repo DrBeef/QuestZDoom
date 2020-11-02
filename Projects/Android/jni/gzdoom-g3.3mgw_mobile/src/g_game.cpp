@@ -359,6 +359,14 @@ CCMD (slot)
 				VMCall(func, param, 3, &ret, 1);
 			}
 		}
+
+		// [Nash] Option to display the name of the weapon being switched to.
+		if (players[consoleplayer].playerstate != PST_LIVE) return;
+		if (SendItemUse != players[consoleplayer].ReadyWeapon && (displaynametags & 2) && StatusBar && SmallFont && SendItemUse)
+		{
+			StatusBar->AttachMessage(Create<DHUDMessageFadeOut>(SmallFont, SendItemUse->GetTag(),
+				1.5f, 0.90f, 0, 0, (EColorRange)*nametagcolor, 2.f, 0.35f), MAKE_ID('W', 'E', 'P', 'N'));
+		}
 	}
 }
 
@@ -423,6 +431,7 @@ CCMD (weapnext)
 	}
 
 	// [BC] Option to display the name of the weapon being cycled to.
+	if (players[consoleplayer].playerstate != PST_LIVE) return;
 	if ((displaynametags & 2) && StatusBar && SmallFont && SendItemUse)
 	{
 		StatusBar->AttachMessage(Create<DHUDMessageFadeOut>(SmallFont, SendItemUse->GetTag(),
@@ -449,6 +458,7 @@ CCMD (weapprev)
 	}
 
 	// [BC] Option to display the name of the weapon being cycled to.
+	if (players[consoleplayer].playerstate != PST_LIVE) return;
 	if ((displaynametags & 2) && StatusBar && SmallFont && SendItemUse)
 	{
 		StatusBar->AttachMessage(Create<DHUDMessageFadeOut>(SmallFont, SendItemUse->GetTag(),
@@ -1699,7 +1709,24 @@ void G_DoReborn (int playernum, bool freshbot)
 	}
 	else
 	{
-		bool isUnfriendly = players[playernum].mo && !(players[playernum].mo->flags & MF_FRIENDLY);
+		bool isUnfriendly;
+
+		PlayerSpawnPickClass(playernum);
+
+		// this condition should never be false
+		assert(players[playernum].cls != NULL);
+
+		if (players[playernum].cls != NULL)
+		{
+			isUnfriendly = !(GetDefaultByType(players[playernum].cls)->flags & MF_FRIENDLY);
+			DPrintf(DMSG_NOTIFY, "Player class IS defined: unfriendly is %i\n", isUnfriendly);
+		}
+		else
+		{
+			// we shouldn't be here, but if we are, get the player's current status
+			isUnfriendly = players[playernum].mo && !(players[playernum].mo->flags & MF_FRIENDLY);
+			DPrintf(DMSG_NOTIFY, "Player class NOT defined: unfriendly is %i\n", isUnfriendly);
+		}
 
 		// respawn at the start
 		// first disassociate the corpse

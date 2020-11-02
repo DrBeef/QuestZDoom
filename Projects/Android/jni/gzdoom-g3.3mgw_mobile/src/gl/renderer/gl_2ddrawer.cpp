@@ -101,10 +101,10 @@ void F2DDrawer::AddTexture(FTexture *img, DrawParms &parms)
 				if (pal) dg.mTranslation = -pal->GetIndex();
 			}
 		}
-		u1 = gltex->GetUL();
-		v1 = gltex->GetVT();
-		u2 = gltex->GetUR();
-		v2 = gltex->GetVB();
+		u1 = parms.srcx;
+		v1 = parms.srcy;
+		u2 = parms.srcx + parms.srcwidth;
+		v2 = parms.srcy + parms.srcheight;
 
 	}
 	else
@@ -119,6 +119,8 @@ void F2DDrawer::AddTexture(FTexture *img, DrawParms &parms)
 	if (parms.flipX) 
 		std::swap(u1, u2);
 
+	if (parms.flipY)
+		std::swap(v1, v2);
 
 	if (parms.windowleft > 0 || parms.windowright < parms.texwidth)
 	{

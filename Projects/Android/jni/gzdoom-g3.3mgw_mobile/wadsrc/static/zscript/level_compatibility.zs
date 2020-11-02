@@ -1014,6 +1014,12 @@ class LevelCompatibility : LevelPostProcessor
 				break;
 			}
 
+			case '775CBC35C0A58326FE87AAD638FF9E2A': // Strife1.wad map29
+			case 'A75099ACB622C7013EE737480FCB0D67': // SVE.wad map29
+				// disable teleporter that would always teleport into a blocking position.
+				ClearLineSpecial(271);
+				break;
+
 			case 'DB31D71B11E3E4393B9C0CCB44A8639F': // rop_2015.wad e1m5
 			{
 				// Lower floor a bit so secret switch becomes accessible
@@ -1042,6 +1048,20 @@ class LevelCompatibility : LevelPostProcessor
 				ClearSectorTags(212);
 				ClearSectorTags(213);
 				ClearSectorTags(214);
+				break;
+			}
+			case '9A4615498C3451413F1CD3D15099ACC7': // Eternal Doom map05
+			{
+				// an imp and two cyberdemons are located at the softlock area
+				SetThingFlags(272, GetThingFlags (272) | MTF_NOCOUNT);
+				SetThingFlags(273, GetThingFlags (273) | MTF_NOCOUNT);
+				SetThingFlags(274, GetThingFlags (274) | MTF_NOCOUNT);
+				break;
+			}
+			case '8B55842D5A509902738040AF10B4E787': // Eternal Doom map10
+			{
+				// soulsphere at the end of the level is there merely to replicate the start of the next map
+				SetThingFlags(548, GetThingFlags (548) | MTF_NOCOUNT);
 				break;
 			}
 		
@@ -1469,6 +1489,16 @@ class LevelCompatibility : LevelPostProcessor
 				SetLineFlags(2040, Line.ML_REPEAT_SPECIAL);
 				break;
 			}
+			case '145C4DFCF843F2B92C73036BA0E1D98A': // Hell Revealed MAP26
+			{
+				// The 4 archviles that produce the ghost monsters cannot be killed
+				// Make them not count so they still produce ghosts while allowing 100% kills.
+				SetThingFlags(320, GetThingFlags (320) | MTF_NOCOUNT);
+				SetThingFlags(347, GetThingFlags (347) | MTF_NOCOUNT);
+				SetThingFlags(495, GetThingFlags (495) | MTF_NOCOUNT);
+				SetThingFlags(496, GetThingFlags (496) | MTF_NOCOUNT);
+				break;
+			}
 
 			case '0E379EEBEB189F294ED122BC60D10A68': // Hellbound MAP29
 			{
@@ -1765,6 +1795,305 @@ class LevelCompatibility : LevelPostProcessor
 			case 'C4850382A78BF637AC9FC58153E03C87': // sapphire.wad map01
 			{
 				SetLineSpecial(11518, 9, 0, 0, 0, 0);
+				break;
+			}
+			
+			case 'BA530202AF0BA0C6CBAE6A0C7076FB72': // Requiem MAP04
+			{
+				// Flag deathmatch berserk for 100% items in single-player
+				SetThingFlags(284, 17);
+				// Make Hell Knight trap switch repeatable to prevent softlock
+				SetLineFlags(823, Line.ML_REPEAT_SPECIAL);
+				break;
+			}
+			
+			case '104415DDEBCAFB9783CA60807C46B57D': // Requiem MAP05
+			{
+				// Raise spectre pit near soulsphere if player drops into it
+				for(int i = 0; i < 4; i++)
+				{
+					SetLineSpecial(2130+i, Floor_LowerToHighest, 28, 8, 128);
+					SetLineActivation(2130+i, SPAC_Cross);
+				}
+				break;
+			}
+			
+			case '1B0AF5286D4E914C5E903BC505E6A844': // Requiem MAP06
+			{
+				// Flag deathmatch berserks for 100% items in single-player
+				SetThingFlags(103, 17);
+				SetThingFlags(109, 17);
+				// Shooting the cross before all Imps spawn in can make 100%
+				// kills impossible, add line actions and change sector tag
+				for(int i = 0; i < 7; i++)
+				{
+					SetLineSpecial(1788+i, Floor_RaiseToNearest, 100, 32);
+					SetLineActivation(1788+i, SPAC_Cross);
+				}
+				SetLineSpecial(1796, Floor_RaiseToNearest, 100, 32);
+				SetLineActivation(1796, SPAC_Cross);
+				SetLineSpecial(1800, Floor_RaiseToNearest, 100, 32);
+				SetLineActivation(1800, SPAC_Cross);
+				SetLineSpecial(1802, Floor_RaiseToNearest, 100, 32);
+				SetLineActivation(1802, SPAC_Cross);
+				ClearSectorTags(412);
+				AddSectorTag(412, 100);
+				// Shootable cross at demon-faced floor changed to repeatable
+				// action to prevent softlock if "spikes" are raised again
+				SetLineFlags(2600, Line.ML_REPEAT_SPECIAL);
+				break;
+			}
+			
+			case '3C10B1B017E902BE7CDBF2436DF56973': // Requiem MAP08
+			{
+				// Flag deathmatch soulsphere for 100% items in single-player
+				SetThingFlags(48, 17);
+				// Allow player to leave inescapable lift using the walls
+				for(int i = 0; i < 3; i++)
+				{
+					SetLineSpecial(2485+i, Plat_DownWaitUpStayLip, 68, 64, 105, 0);
+					SetLineActivation(2485+i, SPAC_Use);
+					SetLineFlags(2485+i, Line.ML_REPEAT_SPECIAL);
+				}
+				SetLineSpecial(848, Plat_DownWaitUpStayLip, 68, 64, 105, 0);
+				SetLineActivation(848, SPAC_UseBack);
+				SetLineFlags(848, Line.ML_REPEAT_SPECIAL);
+				SetLineSpecial(895, Plat_DownWaitUpStayLip, 68, 64, 105, 0);
+				SetLineActivation(895, SPAC_UseBack);
+				SetLineFlags(895, Line.ML_REPEAT_SPECIAL);
+				break;
+			}
+			
+			case '14FE46ED0458979118007E1906A0C9BC': // Requiem MAP09
+			{
+				// Flag deathmatch items for 100% items in single-player
+				for(int i = 0; i < 6; i++)
+					SetThingFlags(371+i, 17);
+				
+				for(int i = 0; i < 19; i++)
+					SetThingFlags(402+i, 17);
+				
+				SetThingFlags(359, 17);
+				SetThingFlags(389, 17);
+				SetThingFlags(390, 17);
+				// Change sides of blue skull platform to be repeatable
+				for(int i = 0; i < 4; i++)
+					SetLineFlags(873+i, Line.ML_REPEAT_SPECIAL);
+				// Make switch that raises bars near yellow skull repeatable
+				SetLineFlags(2719, Line.ML_REPEAT_SPECIAL);
+				break;
+			}
+			
+			case '53A6369C3C8DA4E7AC443A8F8684E38E': // Requiem MAP12
+			{
+				// Remove unreachable secrets
+				SetSectorSpecial(352, 0);
+				SetSectorSpecial(503, 0);
+				// Change action of eastern switch at pool of water so that it
+				// lowers the floor properly, making the secret accessible
+				SetLineSpecial(4873, Floor_LowerToLowest, 62, 8);
+				break;
+			}
+			
+			case '2DAB6E4B19B4F2763695267D39CD0275': // Requiem MAP13
+			{
+				// Fix missing nukage at starting bridge on hardware renderer
+				for(int i = 0; i < 4; i++)
+					SetLineSectorRef(2152+i, Line.back, 8);
+				break;
+			}
+			
+			case 'F55FB2A8DC68CFC75E4340EF4ED7A8BF': // Requiem MAP21
+			{
+				// Fix self-referencing floor hack
+				for(int i = 0; i < 4; i++)
+					SetLineSectorRef(3+i, Line.back, 219);
+					
+				SetLineSpecial(8, Transfer_Heights, 80);
+				// Fix south side of pit hack so textures don't bleed through
+				// the fake floor on hardware renderer
+				SetLineSectorRef(267, Line.back, 63);
+				SetLineSectorRef(268, Line.back, 63);
+				SetLineSectorRef(270, Line.back, 63);
+				SetLineSectorRef(271, Line.back, 63);
+				SetLineSectorRef(274, Line.back, 63);
+				SetLineSectorRef(275, Line.back, 63);
+				SetLineSectorRef(3989, Line.back, 63);
+				SetLineSectorRef(3994, Line.back, 63);
+				// Fix fake 3D bridge on hardware renderer
+				SetLineSectorRef(506, Line.back, 841);
+				SetLineSectorRef(507, Line.back, 841);
+				SetLineSectorRef(536, Line.back, 841);
+				SetLineSectorRef(537, Line.back, 841);
+				SetLineSectorRef(541, Line.back, 841);
+				SetLineSectorRef(547, Line.back, 841);
+				AddSectorTag(90, 1000);
+				AddSectorTag(91, 1000);
+				SetSectorTexture(90, Sector.floor, "MFLR8_4");
+				SetSectorTexture(91, Sector.floor, "MFLR8_4");
+				
+				SetLineSectorRef(553, Line.back, 841);
+				SetLineSectorRef(554, Line.back, 841);
+				SetLineSectorRef(559, Line.back, 841);
+				SetLineSectorRef(560, Line.back, 841);
+				SetLineSectorRef(562, Line.back, 841);
+				SetLineSectorRef(568, Line.back, 841);
+				AddSectorTag(96, 1000);
+				AddSectorTag(97, 1000);
+				SetSectorTexture(96, Sector.floor, "MFLR8_4");
+				SetSectorTexture(97, Sector.floor, "MFLR8_4");
+				SetLineSpecial(505, Transfer_Heights, 1000);
+				// Fix randomly appearing ceiling at deep water
+				SetLineSectorRef(1219, Line.front, 233);
+				SetLineSectorRef(1222, Line.front, 233);
+				SetLineSectorRef(1223, Line.front, 233);
+				SetLineSectorRef(1228, Line.front, 233);
+				// Make switch in sky room repeatable so player does not get
+				// trapped at red cross if returning a second time
+				SetLineFlags(3870, Line.ML_REPEAT_SPECIAL);
+				// Move unreachable item bonuses
+				SetThingXY(412, -112, 6768);
+				SetThingXY(413, -112, 6928);
+				SetThingXY(414, -96, 6928);
+				SetThingXY(415, -96, 6768);
+				// Remove unreachable secret at exit megasphere
+				SetSectorSpecial(123, 0);
+				break;
+			}
+			
+			case '2499CF9A9351BE9BC4E9C66FC9F291A7': // Requiem MAP23
+			{
+				// Have arch-vile who creates ghost monsters not count as a kill
+				SetThingFlags(0, GetThingFlags(0) | MTF_NOCOUNT);
+				// Remove secret at switch that can only be scored by crouching
+				SetSectorSpecial(240, 0);
+				break;
+			}
+
+			case '1497894956B3C8EBE8A240B7FDD99C6A': // Memento Mori 2 MAP25
+			{
+				// an imp is used for the lift activation and cannot be killed
+				SetThingFlags(51, GetThingFlags (51) | MTF_NOCOUNT);
+				break;
+			}
+
+			case '51960F3E9D46449E98DBC7D97F49DB23': // Shotgun Symphony E1M1
+			{
+				// harmless cyberdemon included for the 'story' sake
+				SetThingFlags(158, GetThingFlags (158) | MTF_NOCOUNT);
+				break;
+			}
+
+			case '60D362BAE16B4C10A1DCEE442C878CAE': // 50 Shades of Graytall MAP06
+			{
+				// there are four invisibility spheres used for decoration
+				SetThingFlags(144, GetThingFlags (144) | MTF_NOCOUNT);
+				SetThingFlags(145, GetThingFlags (145) | MTF_NOCOUNT);
+				SetThingFlags(194, GetThingFlags (194) | MTF_NOCOUNT);
+				SetThingFlags(195, GetThingFlags (195) | MTF_NOCOUNT);
+				break;
+			}
+
+			case 'C104E740CC3F70BCFD5D2EA8E833318D': // 50 Monsters MAP29
+			{
+				// there are two invisibility spheres used for decoration
+				SetThingFlags(111, GetThingFlags (111) | MTF_NOCOUNT);
+				SetThingFlags(112, GetThingFlags (112) | MTF_NOCOUNT);
+				break;
+			}
+
+			case '76393C84102480A4C75A4674C9C3217A': // Deadly Standards 2 E2M8
+			{
+				// 923 lost souls are used as environmental hazard
+				for (int i = 267; i < 275; i++)
+					SetThingFlags (i, GetThingFlags (i) | MTF_NOCOUNT);
+				for (int i = 482; i < 491; i++)
+					SetThingFlags (i, GetThingFlags (i) | MTF_NOCOUNT);
+				for (int i = 510; i < 522; i++)
+					SetThingFlags (i, GetThingFlags (i) | MTF_NOCOUNT);
+				for (int i = 880; i < 1510; i++)
+					SetThingFlags (i, GetThingFlags (i) | MTF_NOCOUNT);
+				for (int i = 1622; i < 1660; i++)
+					SetThingFlags (i, GetThingFlags (i) | MTF_NOCOUNT);
+
+				for (int i = 1682; i < 1820; i++)
+					SetThingFlags (i, GetThingFlags (i) | MTF_NOCOUNT);
+				for (int i = 1847; i < 1875; i++)
+					SetThingFlags (i, GetThingFlags (i) | MTF_NOCOUNT);
+				for (int i = 2110; i < 2114; i++)
+					SetThingFlags (i, GetThingFlags (i) | MTF_NOCOUNT);
+				for (int i = 2243; i < 2293; i++)
+					SetThingFlags (i, GetThingFlags (i) | MTF_NOCOUNT);
+
+				SetThingFlags(493,  GetThingFlags (493)  | MTF_NOCOUNT);
+				SetThingFlags(573,  GetThingFlags (573)  | MTF_NOCOUNT);
+				SetThingFlags(613,  GetThingFlags (613)  | MTF_NOCOUNT);
+				SetThingFlags(614,  GetThingFlags (614)  | MTF_NOCOUNT);
+				SetThingFlags(1679, GetThingFlags (1679) | MTF_NOCOUNT);
+				SetThingFlags(1680, GetThingFlags (1680) | MTF_NOCOUNT);
+				break;
+			}
+
+			case '42B4D294A60BE4E3500AF150291CF6D4': // Hell Ground MAP05
+			{
+				// 5 cyberdemons are located at the 'pain end' sector
+				for (int i = 523; i < 528; i++)
+					SetThingFlags (i, GetThingFlags (i) | MTF_NOCOUNT);
+				break;
+			}
+
+			case '0C0513A9821F26F3D7997E3B0359A318': // Mayhem 1500 MAP06
+			{
+				// there's an archvile behind the bossbrain at the very end that can't be killed
+				SetThingFlags(61, GetThingFlags (61) | MTF_NOCOUNT);
+				break;
+			}
+
+			case '00641DA23DDE998F6725BC5896A0DBC2': // 20 Years of Doom E1M8
+			{
+				// 32 lost souls are located at the 'pain end' sector
+				for (int i = 1965; i < 1975; i++)
+					SetThingFlags (i, GetThingFlags (i) | MTF_NOCOUNT);
+				for (int i = 2189; i < 2202; i++)
+					SetThingFlags (i, GetThingFlags (i) | MTF_NOCOUNT);
+				for (int i = 2311; i < 2320; i++)
+					SetThingFlags (i, GetThingFlags (i) | MTF_NOCOUNT);
+				break;
+			}
+
+			case 'EEBDD9CA280F6FF06C30AF2BEE85BF5F': // 2002ad10.wad E3M3
+			{
+				// swarm of cacodemons at the end meant to be pseudo-endless and not killed
+				for (int i = 467; i < 547; i++)
+					SetThingFlags (i, GetThingFlags (i) | MTF_NOCOUNT);
+				break;
+			}
+
+			case '988DFF5BB7073B857DEE3957A91C8518': // Speed of Doom MAP14
+			{
+				// you can get only one of the soulspheres, the other, depending on your choice, becomes unavailable
+				SetThingFlags(1044, GetThingFlags (1044) | MTF_NOCOUNT);			
+				SetThingFlags(1045, GetThingFlags (1045) | MTF_NOCOUNT);
+				break;
+			}
+
+			case '361734AC5D78E872A05335C83E4F6DB8': // inf-lutz.wad E3M8
+			{
+				// there is a trap with 10 cyberdemons at the end of the map, you are not meant to kill them
+				for (int i = 541; i < 546; i++)
+					SetThingFlags (i, GetThingFlags (i) | MTF_NOCOUNT);
+				for (int i = 638; i < 643; i++)
+					SetThingFlags (i, GetThingFlags (i) | MTF_NOCOUNT);
+				break;
+			}
+
+			case '8F844B272E7235E82EA78AD2A2EB2D4A': // Serenity E3M7
+			{
+				// two spheres can't be obtained and thus should not count towards 100% items
+				SetThingFlags(443, GetThingFlags (443) | MTF_NOCOUNT);
+				SetThingFlags(444, GetThingFlags (444) | MTF_NOCOUNT);
+				// one secret is unobtainable
+				SetSectorSpecial (97, 0);
 				break;
 			}
 		}

@@ -865,6 +865,7 @@ DEFINE_ACTION_FUNCTION(AActor, A_RadiusDamageSelf)
 	int 				actualDamage;
 	double 				actualDistance;
 
+	if (self->target == nullptr) return 0;
 	actualDistance = self->Distance3D(self->target);
 	if (actualDistance < distance)
 	{
@@ -4958,7 +4959,13 @@ DEFINE_ACTION_FUNCTION(AActor, A_SprayDecal)
 	PARAM_SELF_PROLOGUE(AActor);
 	PARAM_STRING(name);
 	PARAM_FLOAT(dist);
-	SprayDecal(self, name, dist);
+	PARAM_FLOAT(offset_x);
+	PARAM_FLOAT(offset_y);
+	PARAM_FLOAT(offset_z);
+	PARAM_FLOAT(direction_x);
+	PARAM_FLOAT(direction_y);
+	PARAM_FLOAT(direction_z);
+	SprayDecal(self, name, dist, DVector3(offset_x, offset_y, offset_z), DVector3(direction_x, direction_y, direction_z) );
 	return 0;
 }
 

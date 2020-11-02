@@ -275,7 +275,7 @@ void S_InitData()
 //
 //==========================================================================
 
-void S_SoundPitch(int channel, EChanFlags flags, FSoundID sound_id, float volume, float attenuation, float pitch)
+void S_SoundPitch(int channel, EChanFlags flags, FSoundID sound_id, float volume, float attenuation, float pitch, float startTime)
 {
 	soundEngine->StartSound(SOURCE_None, nullptr, nullptr, channel, flags, sound_id, volume, attenuation, 0, pitch);
 }
@@ -293,7 +293,8 @@ DEFINE_ACTION_FUNCTION(DObject, S_Sound)
 	PARAM_FLOAT(volume);
 	PARAM_FLOAT(attn);
 	PARAM_FLOAT(pitch);
-	S_SoundPitch(channel & 7, EChanFlags::FromInt(channel & ~7), id, static_cast<float>(volume), static_cast<float>(attn), static_cast<float>(pitch));
+	PARAM_FLOAT(startTime);
+	S_SoundPitch(channel & 7, EChanFlags::FromInt(channel & ~7), id, static_cast<float>(volume), static_cast<float>(attn), static_cast<float>(pitch), static_cast<float>(startTime));
 	return 0;
 }
 
@@ -306,7 +307,8 @@ DEFINE_ACTION_FUNCTION(DObject, S_StartSound)
 	PARAM_FLOAT(volume);
 	PARAM_FLOAT(attn);
 	PARAM_FLOAT(pitch);
-	S_SoundPitch(channel, EChanFlags::FromInt(flags), id, static_cast<float>(volume), static_cast<float>(attn), static_cast<float>(pitch));
+	PARAM_FLOAT(startTime);
+	S_SoundPitch(channel, EChanFlags::FromInt(flags), id, static_cast<float>(volume), static_cast<float>(attn), static_cast<float>(pitch), static_cast<float>(startTime));
 	return 0;
 }
 
@@ -362,10 +364,10 @@ static bool VerifyActorSound(AActor* ent, FSoundID& sound_id, int& channel, ECha
 //
 //==========================================================================
 
-void S_SoundPitchActor(AActor *ent, int channel, EChanFlags flags, FSoundID sound_id, float volume, float attenuation, float pitch)
+void S_SoundPitchActor(AActor *ent, int channel, EChanFlags flags, FSoundID sound_id, float volume, float attenuation, float pitch, float startTime)
 {
 	if (VerifyActorSound(ent, sound_id, channel, flags))
-		soundEngine->StartSound (SOURCE_Actor, ent, nullptr, channel, flags, sound_id, volume, attenuation, 0, pitch);
+		soundEngine->StartSound (SOURCE_Actor, ent, nullptr, channel, flags, sound_id, volume, attenuation, 0, pitch, startTime);
 }
 
 void S_Sound(AActor *ent, int channel, EChanFlags flags, FSoundID sound_id, float volume, float attenuation)
@@ -437,7 +439,7 @@ void S_Sound (const sector_t *sec, int channel, EChanFlags flags, FSoundID sfxid
 //
 //==========================================================================
 
-void S_PlaySoundPitch(AActor *a, int chan, EChanFlags flags, FSoundID sid, float vol, float atten, float pitch)
+void S_PlaySoundPitch(AActor *a, int chan, EChanFlags flags, FSoundID sid, float vol, float atten, float pitch, float startTime = 0.f)
 {
 	if (a == nullptr || a->Sector->Flags & SECF_SILENT)
 		return;
@@ -446,7 +448,7 @@ void S_PlaySoundPitch(AActor *a, int chan, EChanFlags flags, FSoundID sid, float
 	{
 		if (!(flags & CHANF_NOSTOP) || !S_IsActorPlayingSomething(a, chan, sid))
 		{
-			S_SoundPitchActor(a, chan, flags, sid, vol, atten, pitch);
+			S_SoundPitchActor(a, chan, flags, sid, vol, atten, pitch, startTime);
 		}
 	}
 	else
@@ -455,7 +457,7 @@ void S_PlaySoundPitch(AActor *a, int chan, EChanFlags flags, FSoundID sid, float
 		{
 			if (!(flags & CHANF_NOSTOP) || !soundEngine->IsSourcePlayingSomething(SOURCE_None, nullptr, chan, sid))
 			{
-				S_SoundPitch(chan, flags, sid, vol, ATTN_NONE, pitch);
+				S_SoundPitch(chan, flags, sid, vol, ATTN_NONE, pitch, startTime);
 			}
 		}
 	}
@@ -463,19 +465,19 @@ void S_PlaySoundPitch(AActor *a, int chan, EChanFlags flags, FSoundID sid, float
 
 void S_PlaySound(AActor *a, int chan, EChanFlags flags, FSoundID sid, float vol, float atten)
 {
-	S_PlaySoundPitch(a, chan, flags, sid, vol, atten, 0.f);
+	S_PlaySoundPitch(a, chan, flags, sid, vol, atten, 0.f, 0.f);
 }
 
-void A_StartSound(AActor *self, int soundid, int channel, int flags, double volume, double attenuation, double pitch)
+void A_StartSound(AActor *self, int soundid, int channel, int flags, double volume, double attenuation, double pitch, double startTime)
 {
-	S_PlaySoundPitch(self, channel, EChanFlags::FromInt(flags), soundid, (float)volume, (float)attenuation, (float)pitch);
+	S_PlaySoundPitch(self, channel, EChanFlags::FromInt(flags), soundid, (float)volume, (float)attenuation, (float)pitch, (float)startTime);
 }
 
 void A_PlaySound(AActor* self, int soundid, int channel, double volume, int looping, double attenuation, int local, double pitch)
 {
 	if (looping) channel |= CHANF_LOOP | CHANF_NOSTOP;
 	if (local) channel |= CHANF_LOCAL;
-	A_StartSound(self, soundid, channel & 7, channel & ~7, volume, attenuation, pitch);
+	A_StartSound(self, soundid, channel & 7, channel & ~7, volume, attenuation, pitch, 0.0f);
 }
 
 
@@ -492,6 +494,18 @@ void S_StopSound (AActor *actor, int channel)
 	soundEngine->StopSound(SOURCE_Actor, actor, (i_compatflags & COMPATF_MAGICSILENCE) ? -1 : channel);
 }
 
+//==========================================================================
+//
+// S_StopAllActorSounds
+//
+// Stops all sounds on an actor.
+//
+//==========================================================================
+
+void S_StopActorSounds(AActor *actor, int chanmin, int chanmax)
+{
+	soundEngine->StopActorSounds(SOURCE_Actor, actor, chanmin, chanmax);
+}
 
 //==========================================================================
 //

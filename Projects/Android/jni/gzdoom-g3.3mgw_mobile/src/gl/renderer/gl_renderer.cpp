@@ -110,9 +110,9 @@ FGLRenderer::FGLRenderer(OpenGLFrameBuffer *fb)
 	mViewVector = FVector2(0,0);
 	mVBO = nullptr;
 	mSkyVBO = nullptr;
+	mLights = nullptr;
 	gl_spriteindex = 0;
 	mShaderManager = nullptr;
-	mLights = nullptr;
 	m2DDrawer = nullptr;
 	mTonemapPalette = nullptr;
 	mBuffers = nullptr;
@@ -149,6 +149,12 @@ FGLRenderer::FGLRenderer(OpenGLFrameBuffer *fb)
 	for(int n = 0; n < gl_hardware_buffers; n++)
 	{
 		mSkyVBOBuff[n] = nullptr;
+	}
+
+	mLightsBuff = new FLightBuffer*[gl_hardware_buffers];
+	for(int n = 0; n < gl_hardware_buffers; n++)
+	{
+		mLightsBuff[n] = nullptr;
 	}
 
 	syncBuff = new GLsync[gl_hardware_buffers];
@@ -199,14 +205,13 @@ void FGLRenderer::Initialize(int width, int height)
 	for (int n = 0; n < gl_hardware_buffers; n++) {
 		mVBOBuff[n] = new FFlatVertexBuffer(width, height);
 		mSkyVBOBuff[n] = new FSkyVertexBuffer;
+		mLightsBuff[n] = new FLightBuffer;
 	}
 
 	//Set up the VBO pointer to the first buffer
 	NextVtxBuffer();
 	NextSkyBuffer();
-
-	if (!gl.legacyMode) mLights = new FLightBuffer();
-	else mLights = NULL;
+	NextLightBuffer();
 
 	gl_RenderState.SetVertexBuffer(mVBO);
 	mFBID = 0;
@@ -241,9 +246,16 @@ FGLRenderer::~FGLRenderer()
         delete mSkyVBOBuff[n];
     }
 	if (mSkyVBOBuff) delete []mSkyVBOBuff;
+
+    for(int n = 0; n < gl_hardware_buffers; n++)
+    {
+        delete mLightsBuff[n];
+    }
+	if (mLightsBuff) delete []mLightsBuff;
+
+
 	if (syncBuff) delete []syncBuff;
 
-	if (mLights != NULL) delete mLights;
 	if (mFBID != 0) glDeleteFramebuffers(1, &mFBID);
 	if (mVAOID != 0)
 	{

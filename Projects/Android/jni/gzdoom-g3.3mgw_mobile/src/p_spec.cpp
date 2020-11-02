@@ -274,7 +274,7 @@ bool P_TestActivateLine (line_t *line, AActor *mo, int side, int activationType,
 {
  	int lineActivation = line->activation;
 
-	if (line->flags & ML_FIRSTSIDEONLY && side == 1)
+	if ((line->flags & ML_FIRSTSIDEONLY && side == 1) || line->special == 0)
 	{
 		return false;
 	}
@@ -456,6 +456,9 @@ void P_PlayerInSpecialSector (player_t *player, sector_t * sector)
 
 	// Has hit ground.
 	AActor *ironfeet;
+
+	if (sector->damageinterval == 0)
+		sector->damageinterval = 32;
 
 	// [RH] Apply any customizable damage
 	if (sector->damageamount > 0)
@@ -651,7 +654,7 @@ DEFINE_ACTION_FUNCTION(FLevelLocals, GiveSecret)
 void P_PlayerOnSpecialFlat (player_t *player, int floorType)
 {
 	if (Terrains[floorType].DamageAmount &&
-		!(level.time & Terrains[floorType].DamageTimeMask))
+		!(level.time % (Terrains[floorType].DamageTimeMask+1)))
 	{
 		AActor *ironfeet = NULL;
 

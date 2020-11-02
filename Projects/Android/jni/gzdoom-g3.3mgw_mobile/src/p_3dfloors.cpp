@@ -285,6 +285,7 @@ static int P_Set3DFloor(line_t * line, int param, int param2, int alpha)
 			if ((param2 & 128) && !(flags & FF_SOLID)) flags |= FF_FLOOD | FF_SEETHROUGH | FF_SHOOTTHROUGH;
 			if (param2 & 512) flags |= FF_FADEWALLS;
 			if (param2&1024) flags |= FF_RESET;
+			if (param2 & 2048) flags |= FF_NODAMAGE;
 			FTextureID tex = line->sidedef[0]->GetTexture(side_t::top);
 			if (!tex.Exists() && alpha < 255)
 			{
@@ -327,7 +328,8 @@ void P_PlayerOnSpecial3DFloor(player_t* player)
 		else
 		{
 			//Water and DEATH FOG!!! heh
-			if (player->mo->Z() > rover->top.plane->ZatPoint(player->mo) || 
+			if ((rover->flags & FF_NODAMAGE) ||
+				player->mo->Z() > rover->top.plane->ZatPoint(player->mo) ||
 				player->mo->Top() < rover->bottom.plane->ZatPoint(player->mo))
 				continue;
 		}
@@ -900,7 +902,7 @@ void P_LineOpening_XFloors (FLineOpening &open, AActor * thing, const line_t *li
 //==========================================================================
 void P_Spawn3DFloors (void)
 {
-	static int flagvals[] = {512, 2+512, 512+1024};
+	static int flagvals[] = {512+2048, 2+512+2048, 512+1024+2048};
 
 	for (auto &line : level.lines)
 	{

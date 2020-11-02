@@ -3992,6 +3992,7 @@ void AActor::Tick ()
 						// to be in line with the case when an actor's side is hit.
 						if (!res && (flags & MF_MISSILE))
 						{
+							P_DoMissileDamage(this, onmo);
 							P_ExplodeMissile(this, nullptr, onmo);
 						}
 					}
@@ -4565,7 +4566,7 @@ AActor *AActor::StaticSpawn (PClassActor *type, const DVector3 &pos, replace_t a
 			return NULL;
 		}
 	}
-	if (level.flags & LEVEL_NOALLIES && !actor->player)
+	if (level.flags & LEVEL_NOALLIES && !actor->IsKindOf(NAME_PlayerPawn))
 	{
 		actor->flags &= ~MF_FRIENDLY;
 	}
@@ -4670,6 +4671,19 @@ void AActor::HandleSpawnFlags ()
 			//Printf("Secret %s in sector %i!\n", GetTag(), Sector->sectornum);
 			flags5 |= MF5_COUNTSECRET;
 			level.total_secrets++;
+		}
+	}
+	if (SpawnFlags & MTF_NOCOUNT)
+	{
+		if (flags & MF_COUNTKILL)
+		{
+			flags &= ~MF_COUNTKILL;
+			level.total_monsters--;
+		}
+		if (flags & MF_COUNTITEM)
+		{
+			flags &= ~MF_COUNTITEM;
+			level.total_items--;
 		}
 	}
 }
@@ -4878,9 +4892,6 @@ void AActor::AdjustFloorClip ()
 	double shallowestclip = INT_MAX;
 	const msecnode_t *m;
 
-	// possibly standing on a 3D-floor
-	if (Sector->e->XFloor.ffloors.Size() && Z() > Sector->floorplane.ZatPoint(this)) Floorclip = 0;
-
 	// [RH] clip based on shallowest floor player is standing on
 	// If the sector has a deep water effect, then let that effect
 	// do the floorclipping instead of the terrain type.
@@ -4888,12 +4899,30 @@ void AActor::AdjustFloorClip ()
 	{
 		DVector3 pos = PosRelative(m->m_sector);
 		sector_t *hsec = m->m_sector->GetHeightSec();
-		if (hsec == NULL && m->m_sector->floorplane.ZatPoint (pos) == Z())
+		if (hsec == NULL)
+		{
+			if (m->m_sector->floorplane.ZatPoint(pos) == Z())
 		{
 			double clip = Terrains[m->m_sector->GetTerrain(sector_t::floor)].FootClip;
 			if (clip < shallowestclip)
 			{
 				shallowestclip = clip;
+			}
+		}
+			else
+			{
+				for (auto& ff : m->m_sector->e->XFloor.ffloors)
+				{
+					if ((ff->flags & FF_SOLID) && (ff->flags & FF_EXISTS) && ff->top.plane->ZatPoint(pos) == Z())
+					{
+						double clip = Terrains[ff->top.model->GetTerrain(ff->top.isceiling)].FootClip;
+						if (clip < shallowestclip)
+						{
+							shallowestclip = clip;
+						}
+					}
+				}
+
 			}
 		}
 	}
@@ -4931,29 +4960,9 @@ extern "C" float QzDoom_GetFOV();
 
 extern bool demonew;
 
-AActor *P_SpawnPlayer (FPlayerStart *mthing, int playernum, int flags)
+void PlayerSpawnPickClass (int playernum)
 {
-	player_t *p;
-	AActor *mobj, *oldactor;
-	uint8_t	  state;
-	DVector3 spawn;
-	DAngle SpawnAngle;
-
-	if (mthing == NULL)
-	{
-		return NULL;
-	}
-	// not playing?
-	if ((unsigned)playernum >= (unsigned)MAXPLAYERS || !playeringame[playernum])
-		return NULL;
-
-	// Old lerp data needs to go
-	if (playernum == consoleplayer)
-	{
-		P_PredictionLerpReset();
-	}
-
-	p = &players[playernum];
+	auto p = &players[playernum];
 
 	if (p->cls == NULL)
 	{
@@ -4982,6 +4991,33 @@ AActor *P_SpawnPlayer (FPlayerStart *mthing, int playernum, int flags)
 		}
 		p->cls = PlayerClasses[p->CurrentPlayerClass].Type;
 	}
+}
+
+AActor *P_SpawnPlayer (FPlayerStart *mthing, int playernum, int flags)
+{
+	player_t *p;
+	AActor *mobj, *oldactor;
+	uint8_t state;
+	DVector3 spawn;
+	DAngle SpawnAngle;
+
+	if (mthing == NULL)
+	{
+		return NULL;
+	}
+	// not playing?
+	if ((unsigned)playernum >= (unsigned)MAXPLAYERS || !playeringame[playernum])
+		return NULL;
+
+	// Old lerp data needs to go
+	if (playernum == consoleplayer)
+	{
+		P_PredictionLerpReset();
+	}
+
+	p = &players[playernum];
+
+	PlayerSpawnPickClass(playernum);
 
 	if (( dmflags2 & DF2_SAME_SPAWN_SPOT ) &&
 		( p->playerstate == PST_REBORN ) &&
@@ -5482,6 +5518,11 @@ AActor *P_SpawnMapThing (FMapThing *mthing, int position)
 	}
 	else if (sz == ONCEILINGZ)
 		mobj->AddZ(-mthing->pos.Z);
+
+	if (mobj->flags2 & MF2_FLOORCLIP)
+	{
+		mobj->AdjustFloorClip();
+	}
 
 	mobj->SpawnPoint = mthing->pos;
 	mobj->SpawnAngle = mthing->angle;
@@ -7306,14 +7347,15 @@ void AActor::ClearCounters()
 int AActor::GetModifiedDamage(FName damagetype, int damage, bool passive, AActor *inflictor, AActor *source, int flags)
 {
 	auto inv = Inventory;
-	while (inv != nullptr)
+	while (inv != nullptr && !(inv->ObjectFlags & OF_EuthanizeMe))
 	{
+		auto nextinv = inv->Inventory;
 		IFVIRTUALPTRNAME(inv, NAME_Inventory, ModifyDamage)
 		{
 			VMValue params[8] = { (DObject*)inv, damage, int(damagetype), &damage, passive, inflictor, source, flags };
 			VMCall(func, params, 8, nullptr, 0);
 		}
-		inv = inv->Inventory;
+		inv = nextinv;
 	}
 	return damage;
 }

@@ -2991,7 +2991,7 @@ void AM_drawThings ()
 		while (t)
 		{
 			if (am_cheat > 0 || !(t->flags6 & MF6_NOTONAUTOMAP)
-				|| (am_thingrenderstyles && !(t->renderflags & RF_INVISIBLE)))
+				|| (am_thingrenderstyles && !(t->renderflags & RF_INVISIBLE) && !(t->flags6 & MF6_NOTONAUTOMAP)))
 			{
 				DVector3 pos = t->PosRelative(MapPortalGroup);
 				p.x = pos.X;

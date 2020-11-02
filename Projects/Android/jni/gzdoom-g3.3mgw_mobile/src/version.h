@@ -41,16 +41,16 @@ const char *GetVersionString();
 
 /** Lots of different version numbers **/
 
-#define VERSIONSTR "** 1.1.6-test_build_3 **"
+#define VERSIONSTR "DrBeef's QuestZDoom-1.1.6 (LZDoom 3.86)"
 
 // The version as seen in the Windows resource
-#define RC_FILEVERSION 3,85,0
-#define RC_PRODUCTVERSION 3,85,0
+#define RC_FILEVERSION 3,86,0
+#define RC_PRODUCTVERSION 3,86,0
 #define RC_PRODUCTVERSION2 VERSIONSTR
 // These are for content versioning.
 #define VER_MAJOR 4
-#define VER_MINOR 3
-#define VER_REVISION 3
+#define VER_MINOR 4
+#define VER_REVISION 2
 
 // Version identifier for network games.
 // Bump it every time you do a release unless you're certain you
@@ -60,7 +60,7 @@ const char *GetVersionString();
 // Version stored in the ini's [LastRun] section.
 // Bump it if you made some configuration change that you want to
 // be able to migrate in FGameConfigFile::DoGlobalSetup().
-#define LASTRUNVERSION "218"
+#define LASTRUNVERSION "219"
 
 // Protocol version used in demos.
 // Bump it if you change existing DEM_ commands or add new ones.
@@ -69,7 +69,7 @@ const char *GetVersionString();
 
 // Minimum demo version we can play.
 // Bump it whenever you change or remove existing DEM_ commands.
-#define MINDEMOVERSION 0x21F
+#define MINDEMOVERSION 0x221
 
 // SAVEVER is the version of the information stored in level snapshots.
 // Note that SAVEVER is not directly comparable to VERSION.
@@ -83,7 +83,7 @@ const char *GetVersionString();
 
 // Use 4500 as the base git save version, since it's higher than the
 // SVN revision ever got.
-#define SAVEVER 4556
+#define SAVEVER 4557
 
 // This is so that derivates can use the same savegame versions without worrying about engine compatibility
 #define GAMESIG "LZDOOM"
@@ -97,7 +97,7 @@ const char *GetVersionString();
 
 
 // More stuff that needs to be different for derivatives.
-#define GAMENAME "QzDoom"
+#define GAMENAME "QZDoom"
 #define GAMENAMELOWERCASE "qzdoom"
 
 #if defined(__APPLE__) || defined(_WIN32)

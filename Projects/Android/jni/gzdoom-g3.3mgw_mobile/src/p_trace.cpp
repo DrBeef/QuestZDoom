@@ -853,7 +853,7 @@ bool FTraceInfo::TraceTraverse (int ptflags)
 			}
 			if (!LineCheck(in, dist, hit, false)) break;
 		}
-		else if ((in->d.thing->flags & ActorMask) && in->d.thing != IgnoreThis)
+		else if (((in->d.thing->flags & ActorMask) || ActorMask == 0xffffffff) && in->d.thing != IgnoreThis)
 		{
 			if (!ThingCheck(in, dist, hit)) break;
 		}

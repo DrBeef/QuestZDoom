@@ -18,6 +18,7 @@
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 	<application android:allowBackup="false" android:icon="@drawable/ic_qquest" android:label="@string/qzdoom">
 		<meta-data android:name="com.samsung.android.vr.application.mode" android:value="vr_only"/>
+		<meta-data android:name="com.oculus.supportedDevices" android:value="quest|delmar"/>
 		<!-- The activity is the built-in NativeActivity framework class. -->
 		<!-- launchMode is set to singleTask because there should never be multiple copies of the app running. -->
 		<!-- Theme.Black.NoTitleBar.Fullscreen gives solid black instead of a (bad stereoscopic) gradient on app transition. -->
@@ -29,8 +30,9 @@
 				android:label="@string/qzdoom"
 				android:launchMode="singleTask"
 				android:screenOrientation="landscape"
+				android:resizeableActivity="false"
 				android:excludeFromRecents="false"
-				android:configChanges="screenSize|screenLayout|orientation|keyboardHidden|keyboard|navigation|uiMode">
+				android:configChanges="density|keyboard|keyboardHidden|navigation|orientation|screenLayout|screenSize|uiMode">
 			<!-- Tell NativeActivity the name of the .so -->
 			<meta-data android:name="android.app.lib_name" android:value="QuestZDoom" />
 			<!-- This filter lets the apk show up as a launchable icon. -->

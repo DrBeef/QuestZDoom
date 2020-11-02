@@ -219,15 +219,3 @@ skill nightmare
 	MustConfirm
 	Key = "n"
 }
-
-skill extreme_lzd
-{
-	AmmoFactor = 0.5
-	DamageFactor = 2
-	DisableCheats
-	SpawnFilter = Hard
-	PicName = "M_EXTR"
-	Name = "$SKILL_EXTREME"
-	MustConfirm
-	NoMenu
-}

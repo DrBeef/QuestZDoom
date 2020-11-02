@@ -36,28 +36,22 @@
 #include <assert.h>
 
 #include "info.h"
-#include "m_random.h"
 #include "p_local.h"
-#include "s_sound.h"
-#include "gi.h"
 #include "p_lnspec.h"
 #include "sbar.h"
 #include "statnums.h"
 #include "c_dispatch.h"
 #include "gstrings.h"
-#include "templates.h"
 #include "a_morph.h"
 #include "a_specialspot.h"
-#include "g_level.h"
 #include "g_game.h"
 #include "doomstat.h"
 #include "d_player.h"
-#include "p_spec.h"
 #include "serializer.h"
 #include "vm.h"
 #include "c_functions.h"
 #include "g_levellocals.h"
-#include "vm.h"
+#include "gi.h"
 
 EXTERN_CVAR(Bool, sv_unlimited_pickup)
 
@@ -72,7 +66,8 @@ static FString StaticLastMessage;
 
 void PrintPickupMessage(bool localview, const FString &str)
 {
-	if (str.IsNotEmpty() && localview && (StaticLastMessageTic != gametic || StaticLastMessage.Compare(str)))
+	// [MK] merge identical messages on same tic unless disabled in gameinfo
+	if (str.IsNotEmpty() && localview && (gameinfo.nomergepickupmsg || StaticLastMessageTic != gametic || StaticLastMessage.Compare(str)))
 	{
 		StaticLastMessageTic = gametic;
 		StaticLastMessage = str;
