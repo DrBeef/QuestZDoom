@@ -138,7 +138,7 @@ namespace s3d
         outViewShift[0] = outViewShift[1] = outViewShift[2] = 0;
 
         vec3_t angles;
-        VectorSet(angles, -GLRenderer->mAngles.Pitch.Degrees,  getViewpointYaw(), GLRenderer->mAngles.Roll.Degrees);
+        VectorSet(angles, GLRenderer->mAngles.Pitch.Degrees,  getViewpointYaw(), GLRenderer->mAngles.Roll.Degrees);
 
         vec3_t v_forward, v_right, v_up;
         AngleVectors(angles, v_forward, v_right, v_up);

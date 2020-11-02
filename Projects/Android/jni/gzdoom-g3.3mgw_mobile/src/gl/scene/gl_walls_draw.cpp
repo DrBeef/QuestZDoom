@@ -171,19 +171,21 @@ void GLWall::MakeVertices(bool nosplit)
 
 		FFlatVertex *ptr = GLRenderer->mVBO->GetBuffer();
 
-		ptr->Set(glseg.x1, zbottom[0], glseg.y1, tcs[LOLFT].u, tcs[LOLFT].v);
-		ptr++;
-		if (split && glseg.fracleft == 0) SplitLeftEdge(ptr);
-		ptr->Set(glseg.x1, ztop[0], glseg.y1, tcs[UPLFT].u, tcs[UPLFT].v);
-		ptr++;
-		if (split && !(flags & GLWF_NOSPLITUPPER)) SplitUpperEdge(ptr);
-		ptr->Set(glseg.x2, ztop[1], glseg.y2, tcs[UPRGT].u, tcs[UPRGT].v);
-		ptr++;
-		if (split && glseg.fracright == 1) SplitRightEdge(ptr);
-		ptr->Set(glseg.x2, zbottom[1], glseg.y2, tcs[LORGT].u, tcs[LORGT].v);
-		ptr++;
-		if (split && !(flags & GLWF_NOSPLITLOWER)) SplitLowerEdge(ptr);
-		vertcount = GLRenderer->mVBO->GetCount(ptr, &vertindex);
+		if (ptr != nullptr) {
+            ptr->Set(glseg.x1, zbottom[0], glseg.y1, tcs[LOLFT].u, tcs[LOLFT].v);
+            ptr++;
+            if (split && glseg.fracleft == 0) SplitLeftEdge(ptr);
+            ptr->Set(glseg.x1, ztop[0], glseg.y1, tcs[UPLFT].u, tcs[UPLFT].v);
+            ptr++;
+            if (split && !(flags & GLWF_NOSPLITUPPER)) SplitUpperEdge(ptr);
+            ptr->Set(glseg.x2, ztop[1], glseg.y2, tcs[UPRGT].u, tcs[UPRGT].v);
+            ptr++;
+            if (split && glseg.fracright == 1) SplitRightEdge(ptr);
+            ptr->Set(glseg.x2, zbottom[1], glseg.y2, tcs[LORGT].u, tcs[LORGT].v);
+            ptr++;
+            if (split && !(flags & GLWF_NOSPLITLOWER)) SplitLowerEdge(ptr);
+            vertcount = GLRenderer->mVBO->GetCount(ptr, &vertindex);
+        }
 	}
 }
 

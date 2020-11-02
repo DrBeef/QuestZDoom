@@ -104,7 +104,7 @@ int GPU_LEVEL			= 4;
 int NUM_MULTI_SAMPLES	= 1;
 int FFR					= 0;
 float SS_MULTIPLIER    = 1.0f;
-int DISPLAY_REFRESH		= 72;
+int DISPLAY_REFRESH		= -1;
 
 jclass clazz;
 
@@ -620,11 +620,6 @@ void ovrFramebuffer_Destroy( ovrFramebuffer * frameBuffer )
 
 void ovrFramebuffer_SetCurrent( ovrFramebuffer * frameBuffer )
 {
-    while (glGetError() != GL_NO_ERROR)
-    {
-
-    }
-
 	GL( glBindFramebuffer( GL_FRAMEBUFFER, frameBuffer->FrameBuffers[frameBuffer->ProcessingTextureSwapChainIndex] ) );
 }
 
@@ -694,7 +689,7 @@ void ovrRenderer_Clear( ovrRenderer * renderer )
 	{
 		ovrFramebuffer_Clear( &renderer->FrameBuffer[eye] );
 	}
-	renderer->ProjectionMatrix = ovrMatrix4f_CreateIdentity();
+
 	renderer->NumBuffers = VRAPI_FRAME_LAYER_EYE_MAX;
 }
 
@@ -716,11 +711,6 @@ void ovrRenderer_Create( int width, int height, ovrRenderer * renderer, const ov
 							   height,
 							   NUM_MULTI_SAMPLES );
 	}
-
-	// Setup the projection matrix.
-	renderer->ProjectionMatrix = ovrMatrix4f_CreateProjectionFov(
-			vrFOV, vrFOV, 0.0f, 0.0f, 1.0f, 0.0f );
-
 }
 
 void ovrRenderer_Destroy( ovrRenderer * renderer )
@@ -729,7 +719,6 @@ void ovrRenderer_Destroy( ovrRenderer * renderer )
 	{
 		ovrFramebuffer_Destroy( &renderer->FrameBuffer[eye] );
 	}
-	renderer->ProjectionMatrix = ovrMatrix4f_CreateIdentity();
 }
 
 
@@ -1307,6 +1296,10 @@ static ovrApp gAppState;
 static ovrJava java;
 static bool destroyed = false;
 
+int QzDoom_GetRefresh()
+{
+	return vrapi_GetSystemPropertyInt(&gAppState.Java, VRAPI_SYS_PROP_DISPLAY_REFRESH_RATE);
+}
 
 float QzDoom_GetFOV()
 {
@@ -1473,7 +1466,9 @@ void * AppThreadFunction(void * parm ) {
 	}
 
 	//Set the screen refresh
-	vrapi_SetDisplayRefreshRate(gAppState.Ovr, DISPLAY_REFRESH);
+	if (DISPLAY_REFRESH != -1) {
+		vrapi_SetDisplayRefreshRate(gAppState.Ovr, DISPLAY_REFRESH);
+	}
 
 	// Create the scene if not yet created.
 	ovrScene_Create( m_width, m_height, &gAppState.Scene, &java );

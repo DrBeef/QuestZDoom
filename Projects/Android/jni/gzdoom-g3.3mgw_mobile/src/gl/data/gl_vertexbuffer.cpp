@@ -38,6 +38,7 @@
 #include "gl/data/gl_data.h"
 #include "gl/data/gl_vertexbuffer.h"
 
+CVAR(Int, gl_buffer_size, 2000000, CVAR_ARCHIVE);
 
 //==========================================================================
 //
@@ -133,7 +134,7 @@ FFlatVertexBuffer::FFlatVertexBuffer(int width, int height)
 	{
 	case BM_PERSISTENT:
 	{
-		unsigned int bytesize = BUFFER_SIZE * sizeof(FFlatVertex);
+		unsigned int bytesize = gl_buffer_size * sizeof(FFlatVertex);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
 		glBufferStorage(GL_ARRAY_BUFFER, bytesize, NULL, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
 		map = (FFlatVertex*)glMapBufferRange(GL_ARRAY_BUFFER, 0, bytesize, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
@@ -143,7 +144,7 @@ FFlatVertexBuffer::FFlatVertexBuffer(int width, int height)
 
 	case BM_DEFERRED:
 	{
-		unsigned int bytesize = BUFFER_SIZE * sizeof(FFlatVertex);
+		unsigned int bytesize = gl_buffer_size * sizeof(FFlatVertex);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
 		glBufferData(GL_ARRAY_BUFFER, bytesize, NULL, GL_STREAM_DRAW);
 		map = nullptr;
@@ -153,7 +154,7 @@ FFlatVertexBuffer::FFlatVertexBuffer(int width, int height)
 
 	default:
 	{
-		map = new FFlatVertex[BUFFER_SIZE];
+		map = new FFlatVertex[gl_buffer_size];
 		DPrintf(DMSG_NOTIFY, "Using client array buffer\n");
 		break;
 	}
@@ -254,10 +255,16 @@ void FFlatVertexBuffer::Map()
 {
 	if (gl.buffermethod == BM_DEFERRED)
 	{
-		unsigned int bytesize = BUFFER_SIZE * sizeof(FFlatVertex);
+		unsigned int bytesize = gl_buffer_size * sizeof(FFlatVertex);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
 		gl_RenderState.ResetVertexBuffer();
-		map = (FFlatVertex*)glMapBufferRange(GL_ARRAY_BUFFER, 0, bytesize, GL_MAP_WRITE_BIT|GL_MAP_UNSYNCHRONIZED_BIT);
+		//map = (FFlatVertex*)glMapBufferRange(GL_ARRAY_BUFFER, 0, bytesize, GL_MAP_WRITE_BIT|GL_MAP_UNSYNCHRONIZED_BIT);
+		map = (FFlatVertex*)glMapBufferRange(GL_ARRAY_BUFFER, 0, bytesize, GL_MAP_WRITE_BIT|GL_MAP_INVALIDATE_BUFFER_BIT );
+		if (map == nullptr)
+		{
+			GLenum err = glGetError();
+			Printf("ERROR: glMapBufferRange failed to map with error %X - crash imminent!\n", (int)err);
+		}
 	}
 }
 
@@ -265,10 +272,14 @@ void FFlatVertexBuffer::Unmap()
 {
 	if (gl.buffermethod == BM_DEFERRED)
 	{
-		unsigned int bytesize = BUFFER_SIZE * sizeof(FFlatVertex);
+		unsigned int bytesize = gl_buffer_size * sizeof(FFlatVertex);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
 		gl_RenderState.ResetVertexBuffer();
-		glUnmapBuffer(GL_ARRAY_BUFFER);
+		if (glUnmapBuffer(GL_ARRAY_BUFFER) == GL_FALSE)
+        {
+            GLenum err = glGetError();
+            Printf("ERROR: glUnmapBuffer failed to unmap with error %X\n", (int)err);
+        }
 		map = nullptr;
 	}
 }

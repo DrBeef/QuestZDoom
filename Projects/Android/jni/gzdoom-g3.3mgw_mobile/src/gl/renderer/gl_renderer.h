@@ -9,9 +9,7 @@
 #include "gl/dynlights/gl_shadowmap.h"
 #include <functional>
 
-#ifdef USE_GL_HW_BUFFERS
 #include "gl/system/gl_system.h"
-#endif
 
 struct particle_t;
 class FCanvasTexture;
@@ -50,7 +48,7 @@ class FShadowMapShader;
 class FCustomPostProcessShaders;
 class GLSceneDrawer;
 
-
+EXTERN_CVAR(Int, gl_hardware_buffers)
 
 inline float DEG2RAD(float deg)
 {
@@ -154,18 +152,15 @@ public:
 	FRotator mAngles;
 	FVector2 mViewVector;
 
-#ifdef USE_GL_HW_BUFFERS
-    int nbrHwBuffers = 4;
-
 	int LightBuff = 0;
 	int SkyBuff = 0;
 	int VtxBuff = 0;
 
-    FFlatVertexBuffer *mVBOBuff[MAX_HW_BUFFERS];
-	FSkyVertexBuffer *mSkyVBOBuff[MAX_HW_BUFFERS];
+	FFlatVertexBuffer 	**mVBOBuff;
+	FSkyVertexBuffer 	**mSkyVBOBuff;
 
     // Used instead of GLsync
-    GLsync syncBuff[MAX_HW_BUFFERS];
+    GLsync *syncBuff;
 
     void GPUDropSync();
     void GPUWaitSync();
@@ -173,19 +168,24 @@ public:
     void NextVtxBuffer()
     {
         mVBO = mVBOBuff[VtxBuff];
-        VtxBuff++;
-        VtxBuff %= nbrHwBuffers;
+        if (gl_hardware_buffers > 1) {
+			VtxBuff++;
+			VtxBuff %= (int)gl_hardware_buffers;
+		}
     }
 
     void NextSkyBuffer()
     {
         mSkyVBO = mSkyVBOBuff[SkyBuff];
-        SkyBuff++;
-        SkyBuff %= nbrHwBuffers;
+		if (gl_hardware_buffers > 1) {
+			SkyBuff++;
+			SkyBuff %= (int)gl_hardware_buffers;
+		}
     }
-#endif
+
 	FFlatVertexBuffer *mVBO;
 	FSkyVertexBuffer *mSkyVBO;
+
 	FLightBuffer *mLights;
 	F2DDrawer *m2DDrawer;
 
