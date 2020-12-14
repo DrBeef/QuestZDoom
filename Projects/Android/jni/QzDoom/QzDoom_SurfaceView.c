@@ -1465,11 +1465,6 @@ void * AppThreadFunction(void * parm ) {
 		return NULL;
 	}
 
-	//Set the screen refresh
-	if (DISPLAY_REFRESH != -1) {
-		vrapi_SetDisplayRefreshRate(gAppState.Ovr, DISPLAY_REFRESH);
-	}
-
 	// Create the scene if not yet created.
 	ovrScene_Create( m_width, m_height, &gAppState.Scene, &java );
 
@@ -1486,26 +1481,6 @@ void * AppThreadFunction(void * parm ) {
 		//Should now be all set up and ready - start the Doom main loop
 		VR_DoomMain(argc, argv);
 	}
-	//Doesn't work
-	/*
-	else {
-	    if (!hasLauncher) {
-            vrapi_ShowFatalError(&gAppState.Java, "Missing Launcher",
-                                 "Please install and run QuestZDoom Launcher to start correctly",
-                                 "QuestZDoom", 666);
-        } else {
-            vrapi_ShowFatalError(&gAppState.Java, "No IWADs Found",
-                                 "Please install a valid IWAD using QuestZDoom Launcher",
-                                 "QuestZDoom", 666);
-	    }
-
-        while (!destroyed) {
-            QzDoom_processMessageQueue();
-            QzDoom_getTrackedRemotesOrientation(0);
-            incrementFrameIndex();
-            showLoadingIcon();
-        }
-	}*/
 
 	//We are done, shutdown cleanly
 	shutdownVR();
@@ -1521,6 +1496,11 @@ void QzDoom_FrameSetup()
 {
 	//Use floor based tracking space
 	vrapi_SetTrackingSpace(gAppState.Ovr, VRAPI_TRACKING_SPACE_LOCAL_FLOOR);
+
+    //Set the screen refresh - repeat this every frame so VrApi doesn't try changing it on us
+    if (DISPLAY_REFRESH != -1) {
+        vrapi_SetDisplayRefreshRate(gAppState.Ovr, DISPLAY_REFRESH);
+    }
 }
 
 void QzDoom_processHaptics() {//Handle haptics
