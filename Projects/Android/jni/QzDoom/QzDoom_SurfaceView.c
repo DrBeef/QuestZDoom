@@ -1442,9 +1442,10 @@ void * AppThreadFunction(void * parm ) {
 	//Set FFR property
 	vrapi_SetPropertyInt( &gAppState.Java, VRAPI_FOVEATION_LEVEL, FFR );
 
-	//Using a symmetrical render target
-	m_height = m_width = (int)(vrapi_GetSystemPropertyInt(&java, VRAPI_SYS_PROP_SUGGESTED_EYE_TEXTURE_WIDTH) *  SS_MULTIPLIER);
-
+	//Get dimensions of eye texture
+	m_width = (int)(vrapi_GetSystemPropertyInt(&java, VRAPI_SYS_PROP_SUGGESTED_EYE_TEXTURE_WIDTH) *  SS_MULTIPLIER);
+	m_height = (int)(vrapi_GetSystemPropertyInt(&java, VRAPI_SYS_PROP_SUGGESTED_EYE_TEXTURE_HEIGHT) *  SS_MULTIPLIER);
+	
 	gAppState.CpuLevel = CPU_LEVEL;
 	gAppState.GpuLevel = GPU_LEVEL;
 	gAppState.MainThreadTid = gettid();
