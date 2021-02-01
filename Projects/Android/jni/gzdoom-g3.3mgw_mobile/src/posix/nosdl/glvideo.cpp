@@ -81,6 +81,8 @@ EXTERN_CVAR (Int, vid_displaybits)
 EXTERN_CVAR (Int, vid_renderer)
 EXTERN_CVAR (Int, vid_maxfps)
 EXTERN_CVAR (Bool, cl_capfps)
+EXTERN_CVAR (Int, gl_hardware_buffers)
+
 
 DFrameBuffer *CreateGLSWFrameBuffer(int width, int height, bool bgra, bool fullscreen);
 
@@ -145,6 +147,8 @@ bool NoSDLGLVideo::NextMode (int *width, int *height, bool *letterbox)
 	return false;
 }
 
+extern "C" int QzDoom_GetRefresh();
+
 DFrameBuffer *NoSDLGLVideo::CreateFrameBuffer (int width, int height, bool bgra, bool fullscreen, DFrameBuffer *old)
 {
 	static int retry = 0;
@@ -164,14 +168,9 @@ DFrameBuffer *NoSDLGLVideo::CreateFrameBuffer (int width, int height, bool bgra,
 	}
 	
 	NoSDLBaseFB *fb;
-	const char *hwBuffers = Args->CheckValue("-hwbuffers");
-	int buffers = 4;
-	if (hwBuffers)
-	{
-		buffers = atoi(hwBuffers);
-	}
-	Printf("HW buffers = %d\n", buffers);
-	fb = new OpenGLFrameBuffer(0, width, height, 32, 72, true, buffers);
+
+    Printf("HW buffers = %d\n", (int)gl_hardware_buffers);
+    fb = new OpenGLFrameBuffer(0, width, height, 32, QzDoom_GetRefresh(), true);
 
 	retry = 0;
 	return fb;

@@ -42,6 +42,26 @@
 #include "r_data/renderstyle.h"
 #include "c_cvars.h"
 
+struct DoubleRect
+{
+	double left, top;
+	double width, height;
+
+
+	void Offset(double xofs, double yofs)
+	{
+		left += xofs;
+		top += yofs;
+	}
+	void Scale(double xfac, double yfac)
+	{
+		left *= xfac;
+		width *= xfac;
+		top *= yfac;
+		height *= yfac;
+	}
+};
+
 extern int CleanWidth, CleanHeight, CleanXfac, CleanYfac;
 extern int CleanWidth_1, CleanHeight_1, CleanXfac_1, CleanYfac_1;
 extern int DisplayWidth, DisplayHeight, DisplayBits;
@@ -110,6 +130,7 @@ enum
 	DTA_BilinearFilter,	// bool: apply bilinear filtering to the image
 	DTA_SpecialColormap,// pointer to FSpecialColormapParameters (likely to be forever hardware-only)
 	DTA_ColormapStyle,	// pointer to FColormapStyle (hardware-only)
+	DTA_Desaturate,		// explicit desaturation factor (hack, does not do anything)
 	DTA_Fullscreen,		// Draw image fullscreen (same as DTA_VirtualWidth/Height with graphics size.)
 
 	// floating point duplicates of some of the above:
@@ -129,9 +150,17 @@ enum
 
 	// New additions. 
 	DTA_Color,
+	DTA_FlipY,			// bool: flip image vertically
+	DTA_SrcX,			// specify a source rectangle (this supersedes the poorly implemented DTA_WindowLeft/Right
+	DTA_SrcY,
+	DTA_SrcWidth,
+	DTA_SrcHeight,
 	DTA_LegacyRenderStyle,	// takes an old-style STYLE_* constant instead of an FRenderStyle
 	DTA_Spacing,			// Strings only: Additional spacing between characters
 	DTA_Monospace,			// Fonts only: Use a fixed distance between characters.
+
+	DTA_FullscreenEx,
+	DTA_FullscreenScale,
 };
 
 enum EMonospacing : int
@@ -179,6 +208,7 @@ struct DrawParms
 	PalEntry color;
 	INTBOOL alphaChannel;
 	INTBOOL flipX;
+	INTBOOL flipY;
 	//float shadowAlpha;
 	int shadowColor;
 	INTBOOL keepratio;
@@ -187,6 +217,7 @@ struct DrawParms
 	FRenderStyle style;
 	struct FSpecialColormap *specialcolormap;
 	struct FColormapStyle *colormapstyle;
+	int desaturate;
 	int scalex, scaley;
 	int cellx, celly;
 	int monospace;
@@ -194,6 +225,10 @@ struct DrawParms
 	int maxstrlen;
 	bool fortext;
 	bool virtBottom;
+	double srcx, srcy;
+	double srcwidth, srcheight;
+	bool burn;
+	int8_t fsscalemode;
 };
 
 struct Va_List
@@ -319,6 +354,7 @@ public:
 	void SetClipRect(int x, int y, int w, int h);
 	void GetClipRect(int *x, int *y, int *w, int *h);
 
+	void CalcFullscreenScale(double srcwidth, double srcheight, int autoaspect, DoubleRect &rect) const;
 	bool SetTextureParms(DrawParms *parms, FTexture *img, double x, double y) const;
 	void DrawTexture (FTexture *img, double x, double y, int tags, ...);
 	void DrawTexture(FTexture *img, double x, double y, VMVa_List &);

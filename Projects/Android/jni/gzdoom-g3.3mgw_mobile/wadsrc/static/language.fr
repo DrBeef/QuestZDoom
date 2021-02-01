@@ -2733,7 +2733,6 @@ GLPREFMNU_FOGMODE 				= "Mode du broullard";
 GLPREFMNU_FOGFORCEFULLBRIGHT 	= "Brouillard force fullbright";
 GLPREFMNU_WPNLIGHTSTR 			= "Intensité lumineuse des armes";
 GLPREFMNU_ENVIRONMENTMAPMIRROR 	= "Mappage environment sur les miroirs";
-GLPREFMNU_PLANEREFLECTION 	    = "Plane Reflections (shiny floors etc)";
 GLPREFMNU_ENV 					= "Mode de vision nocture amélioré";
 GLPREFMNU_ENVSTEALTH 			= "VNA affiche monstres invisibles";
 GLPREFMNU_SPRBRIGHTFOG 			= "Forcer luminosité dans brouillard";

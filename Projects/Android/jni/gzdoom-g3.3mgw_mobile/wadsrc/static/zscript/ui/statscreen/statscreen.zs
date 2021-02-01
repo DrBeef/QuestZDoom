@@ -113,6 +113,8 @@ class StatusScreen abstract play version("2.5")
 	TextureID 		timepic;
 	TextureID 		par;
 	TextureID 		sucks;
+	TextureID		finishedPatch;
+	TextureID		enteringPatch;
 
 	// [RH] Info to dynamically generate the level name graphics
 	String			lnametexts[2];
@@ -737,12 +739,10 @@ class StatusScreen abstract play version("2.5")
 			break;
 	
 		case ShowNextLoc:
+		case LeavingIntermission:	// this must still draw the screen once more for the wipe code to pick up.
 			drawShowNextLoc();
 			break;
 	
-		case LeavingIntermission:
-			break;
-
 		default:
 			drawNoState();
 			break;
@@ -776,6 +776,8 @@ class StatusScreen abstract play version("2.5")
 		Timepic = TexMan.CheckForTexture("WITIME", TexMan.Type_MiscPatch);		// "time"
 		Sucks = TexMan.CheckForTexture("WISUCKS", TexMan.Type_MiscPatch);		// "sucks"
 		Par = TexMan.CheckForTexture("WIPAR", TexMan.Type_MiscPatch);			// "par"
+		enteringPatch = TexMan.CheckForTexture("WIENTER", TexMan.Type_MiscPatch);	// "entering"
+		finishedPatch = TexMan.CheckForTexture("WIF", TexMan.Type_MiscPatch);			// "finished"
 
 		// Use the local level structure which can be overridden by hubs
 		lnametexts[0] = level.LevelName;		

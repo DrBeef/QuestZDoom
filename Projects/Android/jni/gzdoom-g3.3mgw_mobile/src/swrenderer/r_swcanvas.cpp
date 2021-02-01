@@ -170,6 +170,12 @@ void SWCanvas::DrawTexture(DCanvas *canvas, FTexture *img, DrawParms &parms)
 			xiscale = -xiscale;
 		}
 
+		if (parms.flipY)
+		{
+			frac = (img->GetHeight() << FRACBITS) - 1;
+			iyscale = -iyscale;
+		}
+
 		if (parms.windowleft > 0 || parms.windowright < parms.texwidth)
 		{
 			double wi = MIN(parms.windowright, parms.texwidth);

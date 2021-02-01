@@ -377,7 +377,7 @@ void RenderDome(FMaterial * tex, float x_offset, float y_offset, bool mirror, in
 		gl_RenderState.mModelMatrix.loadIdentity();
 		gl_RenderState.mModelMatrix.rotate(-180.0f + x_offset, 0.f, 1.f, 0.f);
 
-		float xscale = texw < 1024.f ? floor(1024.f / float(texw)) : 1.f;
+		float xscale = texw < 1024.f ? floorf(1024.f / float(texw)) : 1.f;
 		float yscale = 1.f;
 		if (texh <= 128 && (level.flags & LEVEL_FORCETILEDSKY))
 		{

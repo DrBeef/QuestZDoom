@@ -97,7 +97,7 @@ void I_ShutdownJoysticks();
 
 // PRIVATE FUNCTION PROTOTYPES ---------------------------------------------
 
-static void DeleteStartupScreen();
+void DeleteStartupScreen();
 
 // EXTERNAL DATA DECLARATIONS ----------------------------------------------
 
@@ -139,7 +139,7 @@ FStartupScreen *FStartupScreen::CreateInstance(int max_progress)
 //
 //===========================================================================
 
-static void DeleteStartupScreen()
+void DeleteStartupScreen()
 {
 	if (StartScreen != NULL)
 	{

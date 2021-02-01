@@ -1914,6 +1914,7 @@ DSPLYMNU_DIMCOLOR				= "Dim color";
 DSPLYMNU_MOVEBOB 				= "View bob amount while moving";
 DSPLYMNU_STILLBOB 				= "View bob amount while not moving";
 DSPLYMNU_BOBSPEED				= "Weapon bob speed";
+DSPLYMNU_BOBFIRE				= "Weapon bob amount while firing";
 DSPLYMNU_GPUSWITCH				= "Notebook Switchable GPU";
 DSPLYMNU_CUSTOMINVERTMAP		= "Custom Inverse Map";
 DSPLYMNU_CUSTOMINVERTC1			= "Custom Inverse Color Dark";
@@ -2216,6 +2217,7 @@ CMPTMNU_PUSHWINDOW			= "Non-blocking lines can be pushed";
 CMPTMNU_CHECKSWITCHRANGE	= "Enable buggy CheckSwitchRange behavior";
 CMPTMNU_EXPLODE1			= "No vertical thrust from explosions";
 CMPTMNU_EXPLODE2			= "Use original Doom explosion behavior";
+CMPTMNU_RAILINGHACK			= "Enable buggy Strife railing";
 
 // Sound Options
 SNDMNU_TITLE			= "SOUND OPTIONS";
@@ -2452,6 +2454,7 @@ OPTVAL_DOOMSTRICT			= "Doom (strict)";
 OPTVAL_BOOM					= "Boom";
 OPTVAL_BOOMSTRICT			= "Boom (strict)";
 OPTVAL_MBF					= "MBF";
+OPTVAL_MBFSTRICT			= "MBF (strict)";
 OPTVAL_ZDOOM2063			= "ZDoom 2.0.63";
 OPTVAL_4000HZ				= "4000 Hz";
 OPTVAL_8000HZ				= "8000 Hz";
@@ -2767,7 +2770,6 @@ GLPREFMNU_FOGMODE 				= "Fog mode";
 GLPREFMNU_FOGFORCEFULLBRIGHT 	= "Fog forces fullbright";
 GLPREFMNU_WPNLIGHTSTR 			= "Weapon light strength";
 GLPREFMNU_ENVIRONMENTMAPMIRROR 	= "Environment map on mirrors";
-GLPREFMNU_PLANEREFLECTION 	    = "Plane Reflections (shiny floors etc)";
 GLPREFMNU_ENV 					= "Enhanced night vision mode";
 GLPREFMNU_ENVSTEALTH 			= "ENV shows stealth monsters";
 GLPREFMNU_SPRBRIGHTFOG 			= "Force brightness in fog";
@@ -2879,7 +2881,7 @@ OPTVAL_REVERSEFIRST			= "Reverse";
 OPTVAL_CLASSICZ				= "Classic ZDoom";
 OPTVAL_MODERN				= "Modern (WASD)";
 OPTVAL_MODERN2				= "Modern (ESDF)";
-OPTVAL_MODERN3				= "Modern (IJKL)";
+OPTVAL_MODERN3				= "Modern (OKL;)";
 
 // QZDoom exclusive:
 

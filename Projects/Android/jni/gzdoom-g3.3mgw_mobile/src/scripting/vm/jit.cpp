@@ -276,7 +276,7 @@ void JitCompiler::SetupFrame()
 	offsetD = offsetA + (int)(sfunc->NumRegA * sizeof(void*));
 	offsetExtra = (offsetD + (int)(sfunc->NumRegD * sizeof(int32_t)) + 15) & ~15;
 
-	if (sfunc->SpecialInits.Size() == 0 && sfunc->NumRegS == 0)
+	if (sfunc->SpecialInits.Size() == 0 && sfunc->NumRegS == 0 && sfunc->ExtraSpace == 0)
 	{
 		SetupSimpleFrame();
 	}
@@ -389,7 +389,7 @@ static void PopFullVMFrame(VMFrameStack *stack)
 
 void JitCompiler::EmitPopFrame()
 {
-	if (sfunc->SpecialInits.Size() != 0 || sfunc->NumRegS != 0)
+	if (sfunc->SpecialInits.Size() != 0 || sfunc->NumRegS != 0 || sfunc->ExtraSpace != 0)
 	{
 		auto popFrame = CreateCall<void, VMFrameStack *>(PopFullVMFrame);
 		popFrame->setArg(0, stack);

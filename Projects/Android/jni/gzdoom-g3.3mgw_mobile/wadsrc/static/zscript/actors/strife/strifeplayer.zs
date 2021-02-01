@@ -121,6 +121,8 @@ class StrifePlayer : PlayerPawn
 			State firehandslower = FindState("FireHandsLower");
 			State firehands = FindState("FireHands");
 
+			if (psp)
+			{
 			if (psp.CurState != null && firehandslower != null && firehands != null)
 			{
 				// Calculate state to go to.
@@ -136,13 +138,15 @@ class StrifePlayer : PlayerPawn
 			psp.SetState(null);
 		}
 	}
+	}
 
 	void A_HandLower()
 	{
 		if (player != null)
 		{
 			PSprite psp = player.GetPSprite(PSP_STRIFEHANDS);
-
+			if (psp)
+			{
 			if (psp.CurState == null)
 			{
 				psp.SetState(null);
@@ -154,7 +158,7 @@ class StrifePlayer : PlayerPawn
 			{
 				psp.SetState(null);
 			}
-
+			}
 			if (player.extralight > 0) player.extralight--;
 		}
 		return;

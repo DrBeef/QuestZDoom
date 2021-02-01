@@ -104,7 +104,7 @@ int GPU_LEVEL			= 4;
 int NUM_MULTI_SAMPLES	= 1;
 int FFR					= 0;
 float SS_MULTIPLIER    = 1.0f;
-int DISPLAY_REFRESH		= 72;
+int DISPLAY_REFRESH		= -1;
 
 jclass clazz;
 
@@ -620,11 +620,6 @@ void ovrFramebuffer_Destroy( ovrFramebuffer * frameBuffer )
 
 void ovrFramebuffer_SetCurrent( ovrFramebuffer * frameBuffer )
 {
-    while (glGetError() != GL_NO_ERROR)
-    {
-
-    }
-
 	GL( glBindFramebuffer( GL_FRAMEBUFFER, frameBuffer->FrameBuffers[frameBuffer->ProcessingTextureSwapChainIndex] ) );
 }
 
@@ -694,17 +689,18 @@ void ovrRenderer_Clear( ovrRenderer * renderer )
 	{
 		ovrFramebuffer_Clear( &renderer->FrameBuffer[eye] );
 	}
-	renderer->ProjectionMatrix = ovrMatrix4f_CreateIdentity();
+
 	renderer->NumBuffers = VRAPI_FRAME_LAYER_EYE_MAX;
 }
 
+float QzDoom_GetFOV();
 
 void ovrRenderer_Create( int width, int height, ovrRenderer * renderer, const ovrJava * java )
 {
 	renderer->NumBuffers = VRAPI_FRAME_LAYER_EYE_MAX;
 
 	//Now using a symmetrical render target, based on the horizontal FOV
-    vrFOV = vrapi_GetSystemPropertyInt( java, VRAPI_SYS_PROP_SUGGESTED_EYE_FOV_DEGREES_X);
+	QzDoom_GetFOV();
 
 	// Create the render Textures.
 	for ( int eye = 0; eye < VRAPI_FRAME_LAYER_EYE_MAX; eye++ )
@@ -715,11 +711,6 @@ void ovrRenderer_Create( int width, int height, ovrRenderer * renderer, const ov
 							   height,
 							   NUM_MULTI_SAMPLES );
 	}
-
-	// Setup the projection matrix.
-	renderer->ProjectionMatrix = ovrMatrix4f_CreateProjectionFov(
-			vrFOV, vrFOV, 0.0f, 0.0f, 1.0f, 0.0f );
-
 }
 
 void ovrRenderer_Destroy( ovrRenderer * renderer )
@@ -728,7 +719,6 @@ void ovrRenderer_Destroy( ovrRenderer * renderer )
 	{
 		ovrFramebuffer_Destroy( &renderer->FrameBuffer[eye] );
 	}
-	renderer->ProjectionMatrix = ovrMatrix4f_CreateIdentity();
 }
 
 
@@ -946,8 +936,8 @@ static void ovrApp_Clear( ovrApp * app )
 	app->FrameIndex = 1;
 	app->DisplayTime = 0;
 	app->SwapInterval = 1;
-	app->CpuLevel = 2;
-	app->GpuLevel = 2;
+	app->CpuLevel = 3;
+	app->GpuLevel = 3;
 	app->MainThreadTid = 0;
 	app->RenderThreadTid = 0;
 
@@ -1306,6 +1296,17 @@ static ovrApp gAppState;
 static ovrJava java;
 static bool destroyed = false;
 
+int QzDoom_GetRefresh()
+{
+	return vrapi_GetSystemPropertyInt(&gAppState.Java, VRAPI_SYS_PROP_DISPLAY_REFRESH_RATE);
+}
+
+float QzDoom_GetFOV()
+{
+	vrFOV = vrapi_GetSystemPropertyInt(&gAppState.Java, VRAPI_SYS_PROP_SUGGESTED_EYE_FOV_DEGREES_Y);
+	return vrFOV;
+}
+
 void QzDoom_prepareEyeBuffer(int eye )
 {
 	ovrRenderer *renderer = QzDoom_useScreenLayer() ? &gAppState.Scene.CylinderRenderer : &gAppState.Renderer;
@@ -1464,9 +1465,6 @@ void * AppThreadFunction(void * parm ) {
 		return NULL;
 	}
 
-	//Set the screen refresh
-	vrapi_SetDisplayRefreshRate(gAppState.Ovr, DISPLAY_REFRESH);
-
 	// Create the scene if not yet created.
 	ovrScene_Create( m_width, m_height, &gAppState.Scene, &java );
 
@@ -1483,26 +1481,6 @@ void * AppThreadFunction(void * parm ) {
 		//Should now be all set up and ready - start the Doom main loop
 		VR_DoomMain(argc, argv);
 	}
-	//Doesn't work
-	/*
-	else {
-	    if (!hasLauncher) {
-            vrapi_ShowFatalError(&gAppState.Java, "Missing Launcher",
-                                 "Please install and run QuestZDoom Launcher to start correctly",
-                                 "QuestZDoom", 666);
-        } else {
-            vrapi_ShowFatalError(&gAppState.Java, "No IWADs Found",
-                                 "Please install a valid IWAD using QuestZDoom Launcher",
-                                 "QuestZDoom", 666);
-	    }
-
-        while (!destroyed) {
-            QzDoom_processMessageQueue();
-            QzDoom_getTrackedRemotesOrientation(0);
-            incrementFrameIndex();
-            showLoadingIcon();
-        }
-	}*/
 
 	//We are done, shutdown cleanly
 	shutdownVR();
@@ -1518,6 +1496,11 @@ void QzDoom_FrameSetup()
 {
 	//Use floor based tracking space
 	vrapi_SetTrackingSpace(gAppState.Ovr, VRAPI_TRACKING_SPACE_LOCAL_FLOOR);
+
+    //Set the screen refresh - repeat this every frame so VrApi doesn't try changing it on us
+    if (DISPLAY_REFRESH != -1) {
+        vrapi_SetDisplayRefreshRate(gAppState.Ovr, DISPLAY_REFRESH);
+    }
 }
 
 void QzDoom_processHaptics() {//Handle haptics

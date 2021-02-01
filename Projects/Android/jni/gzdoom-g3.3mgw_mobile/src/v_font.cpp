@@ -1139,6 +1139,7 @@ FFont::FFont (const char *name, const char *nametemplate, const char *filetempla
 	ActiveColors = 0;
 	SpaceWidth = 0;
 	FontHeight = 0;
+	int FixedWidth = 0; // hack
 
 	maxyoffs = 0;
 
@@ -1196,6 +1197,14 @@ FFont::FFont (const char *name, const char *nametemplate, const char *filetempla
 					}
 					else if (sc.Compare("FontHeight"))
 					{
+						sc.MustGetValue(false);
+						FontHeight = sc.Number;
+					}
+					else if (sc.Compare("CellSize")) // hack
+					{
+						sc.MustGetValue(false);
+						FixedWidth = sc.Number;
+						sc.MustGetToken(',');
 						sc.MustGetValue(false);
 						FontHeight = sc.Number;
 					}
@@ -1768,7 +1777,7 @@ double GetBottomAlignOffset(FFont *font, int c)
 //
 //==========================================================================
 
-int FFont::StringWidth(const uint8_t *string) const
+int FFont::StringWidth(const uint8_t *string, int spacing) const
 {
 	int w = 0;
 	int maxw = 0;
@@ -1798,13 +1807,17 @@ int FFont::StringWidth(const uint8_t *string) const
 				maxw = w;
 			w = 0;
 		}
+		else if (spacing >= 0)
+		{
+			w += GetCharWidth(chr) + GlobalKerning + spacing;
+		}
 		else
 		{
-			w += GetCharWidth(chr) + GlobalKerning;
+			w -= spacing;
 		}
 	}
 
-	return MAX(maxw, w);
+	return std::max(maxw, w);
 }
 
 //==========================================================================
@@ -3714,10 +3727,33 @@ void V_InitFonts()
 	{
 		BigFont = SmallFont;
 	}
+
+	// ugly hack for fake fonts
+	if (!(NewSmallFont = V_GetFont("NewSmallFont", "SMALLFNT")))
+	{
+		if (Wads.CheckNumForName ("FONTA_S") >= 0)
+		{
+			NewSmallFont = new FFont("NewSmallFont", "FONTA%02u", "defsmallfont", HU_FONTSTART, HU_FONTSIZE, 1, -1);
+			SmallFont->SetCursor('[');
+		}
+		else if (Wads.CheckNumForName ("STCFN033", ns_graphics) >= 0)
+		{
+			NewSmallFont = new FFont("NewSmallFont", "STCFN%.3d", "defsmallfont", HU_FONTSTART, HU_FONTSIZE, HU_FONTSTART, -1);
+		}
+	}
+
+	if (!(NewConsoleFont = V_GetFont("NewConsoleFont", "CONFONT")))
+	{
+		NewConsoleFont = ConFont;
+	}
+
+	if (NewSmallFont == nullptr)
+	{
+		NewSmallFont = SmallFont;
+	}
+
 	// hack hack
-	NewConsoleFont = ConFont;
 	CurrentConsoleFont = ConFont;
-	NewSmallFont = SmallFont;
 	AlternativeSmallFont = SmallFont;
 	OriginalSmallFont = SmallFont;
 	OriginalBigFont = BigFont;

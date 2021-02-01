@@ -25,6 +25,11 @@ android {
     }
       minSdkVersion 24
       targetSdkVersion 26
+
+//      packagingOptions {
+          // specify the path to your object binaries, or generally:
+//          doNotStrip '**.so'
+//      }
   }
 
   sourceSets {
@@ -42,6 +47,11 @@ android {
     }
     compileSdkVersion = 24
     buildToolsVersion = '29.0.1'
+/*    buildTypes {
+        release {
+            debuggable true
+        }
+    }*/
 }
 
 dependencies {

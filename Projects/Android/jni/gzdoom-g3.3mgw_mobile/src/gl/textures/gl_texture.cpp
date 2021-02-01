@@ -48,6 +48,7 @@
 #include "gl/textures/gl_samplers.h"
 #include "gl/textures/gl_translate.h"
 #include "gl/models/gl_models.h"
+#include "stats.h"
 
 //==========================================================================
 //

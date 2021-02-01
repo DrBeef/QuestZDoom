@@ -256,7 +256,6 @@ void DIntermissionScreen::Drawer ()
 		if (CheckOverlay(i))
 			screen->DrawTexture (TexMan[mOverlays[i].mPic], mOverlays[i].x, mOverlays[i].y, DTA_320x200, true, TAG_DONE);
 	}
-	if (!mFlatfill) screen->FillBorder (NULL);
 	if (mSubtitle)
 	{
 		const char *sub = mSubtitle.GetChars();
@@ -774,7 +773,6 @@ void DIntermissionScreenScroller::Drawer ()
 			DTA_Masked, false,
 			TAG_DONE);
 
-		screen->FillBorder (NULL);
 		mBackground = mSecondPic;
 	}
 	else 
@@ -868,21 +866,21 @@ bool DIntermissionController::Responder (event_t *ev)
 		{
 			const char *cmd = Bindings.GetBind (ev->data1);
 
-			if (cmd != NULL &&
-				(!stricmp(cmd, "toggleconsole") ||
-				 !stricmp(cmd, "screenshot")))
+			if (cmd != nullptr)
+			{
+				if (!stricmp(cmd, "toggleconsole") || !stricmp(cmd, "screenshot"))
 			{
 				return false;
 			}
-
 			// The following is needed to be able to enter main menu with a controller,
 			// by pressing buttons that are usually assigned to this action, Start and Back by default
-			if (!stricmp(cmd, "menu_main") || !stricmp(cmd, "pause"))
+				else if (!stricmp(cmd, "menu_main") || !stricmp(cmd, "pause"))
 			{
 				M_StartControlPanel(true);
 				M_SetMenu(NAME_Mainmenu, -1);
 				return true;
 			}
+		}
 		}
 
 		if (mScreen->mTicker < 2) return false;	// prevent some leftover events from auto-advancing
@@ -940,6 +938,7 @@ void DIntermissionController::Drawer ()
 {
 	if (mScreen != NULL)
 	{
+		screen->FillBorder(nullptr);
 		mScreen->Drawer();
 	}
 }
@@ -994,7 +993,11 @@ void F_StartIntermission(FIntermissionDescriptor *desc, bool deleteme, uint8_t s
 void F_StartIntermission(FName seq, uint8_t state)
 {
 	FIntermissionDescriptor **pdesc = IntermissionDescriptors.CheckKey(seq);
-	if (pdesc != NULL)
+	if (pdesc == nullptr)
+	{
+		gameaction = ga_nothing;
+	}
+	else
 	{
 		F_StartIntermission(*pdesc, false, state);
 	}

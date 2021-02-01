@@ -365,7 +365,7 @@ void PolyCull::MarkViewFrustum()
 	if (tilt > 46.0) // If the pitch is larger than this you can look all around
 		return;
 
-	double floatangle = 2.0 + (45.0 + ((tilt / 1.9)))*viewpoint.FieldOfView.Degrees*48.0 / AspectMultiplier(viewwindow.WidescreenRatio) / 90.0;
+	double floatangle = 2.0 + (45.0 + ((tilt / 1.9)))*viewpoint.FieldOfView().Degrees*48.0 / AspectMultiplier(viewwindow.WidescreenRatio) / 90.0;
 	angle_t a1 = DAngle(floatangle).BAMs();
 	if (a1 < ANGLE_180)
 	{

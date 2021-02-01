@@ -90,6 +90,7 @@ EXTERN_CVAR (Float, underwater_fade_scalar)
 EXTERN_CVAR (Float, r_visibility)
 EXTERN_CVAR (Bool, gl_legacy_mode)
 EXTERN_CVAR (Bool, r_drawvoxels)
+EXTERN_CVAR(Bool, gl_sync)
 
 extern bool NoInterpolateView;
 
@@ -943,12 +944,13 @@ sector_t * GLSceneDrawer::RenderViewpoint (AActor * camera, GL_IRECT * bounds, f
 
 void FGLRenderer::RenderView (player_t* player)
 {
-#ifdef USE_GL_HW_BUFFERS
-    GLRenderer->NextVtxBuffer();
-    GLRenderer->NextSkyBuffer();
+	GLRenderer->NextVtxBuffer();
+	GLRenderer->NextSkyBuffer();
+	GLRenderer->NextLightBuffer();
 
-    GLRenderer->GPUWaitSync();
-#endif
+	if (gl_sync) {
+		GLRenderer->GPUWaitSync();
+	}
 
 	gl_ClearFakeFlat();
 
@@ -995,7 +997,7 @@ void FGLRenderer::RenderView (player_t* player)
 	mLightCount = !!level.lights;
 
 	mShadowMap.Update();
-	sector_t * viewsector = drawer.RenderViewpoint(player->camera, NULL, r_viewpoint.FieldOfView.Degrees, ratio, fovratio, true, true);
+	sector_t * viewsector = drawer.RenderViewpoint(player->camera, NULL, r_viewpoint.FieldOfView().Degrees, ratio, fovratio, true, true);
 
 	All.Unclock();
 }
@@ -1026,7 +1028,7 @@ void GLSceneDrawer::WriteSavePic (player_t *player, FileWriter *file, int width,
 	GLRenderer->mLightCount = !!level.lights;
 
 	sector_t *viewsector = RenderViewpoint(players[consoleplayer].camera, &bounds,
-								r_viewpoint.FieldOfView.Degrees, 1.6f, 1.6f, true, false);
+								r_viewpoint.FieldOfView().Degrees, 1.6f, 1.6f, true, false);
 	glDisable(GL_STENCIL_TEST);
 	gl_RenderState.SetFixedColormap(CM_DEFAULT);
 	gl_RenderState.SetSoftLightLevel(-1);

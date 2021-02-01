@@ -112,9 +112,9 @@ public:
 	static void StaticPreloadFonts();
 
 	// Return width of string in pixels (unscaled)
-	int StringWidth (const uint8_t *str) const;
-	inline int StringWidth (const char *str) const { return StringWidth ((const uint8_t *)str); }
-	inline int StringWidth (const FString &str) const { return StringWidth ((const uint8_t *)str.GetChars()); }
+	int StringWidth (const uint8_t *str, int spacing = 0) const;
+	inline int StringWidth (const char *str, int spacing = 0) const { return StringWidth ((const uint8_t *)str, spacing); }
+	inline int StringWidth (const FString &str, int spacing = 0) const { return StringWidth ((const uint8_t *)str.GetChars(), spacing); }
 
 	inline bool CanPrint(const uint8_t *str) const { return true; } // hack hack
 

@@ -850,7 +850,7 @@ public:
 		return (Pos().XY() - otherpos).LengthSquared();
 	}
 
-	double Distance2D(AActor *other, bool absolute = false)
+	double Distance2D(AActor *other, bool absolute = false) const
 	{
 		DVector2 otherpos = absolute ? other->Pos() : other->PosRelative(this);
 		return (Pos().XY() - otherpos).Length();
@@ -861,7 +861,7 @@ public:
 		return DVector2(X() - x, Y() - y).Length();
 	}
 
-	double Distance2D(AActor *other, double xadd, double yadd, bool absolute = false)
+	double Distance2D(AActor *other, double xadd, double yadd, bool absolute = false) const
 	{
 		DVector3 otherpos = absolute ? other->Pos() : other->PosRelative(this);
 		return DVector2(X() - otherpos.X + xadd, Y() - otherpos.Y + yadd).Length();
@@ -1490,7 +1490,7 @@ public:
 
 	// This is used by many vertical velocity calculations.
 	// Better have it in one place, if something needs to be changed about the formula.
-	double DistanceBySpeed(AActor *dest, double speed)
+	double DistanceBySpeed(AActor *dest, double speed) const
 	{
 		return MAX(1., Distance2D(dest) / speed);
 	}
@@ -1500,7 +1500,7 @@ public:
 	void DeleteAttachedLights();
 	static void DeleteAllAttachedLights();
 	static void RecreateAllAttachedLights();
-	bool isFrozen();
+	bool isFrozen() const;
 
 	bool				hasmodel;
 

@@ -542,8 +542,6 @@ enum
 
 #define BLINKTHRESHOLD (4*32)
 
-#ifdef USE_GL_HW_BUFFERS
-#define MAX_HW_BUFFERS 4
-#endif
+#define MAX_HW_BUFFERS 10
 
 #endif	// __DOOMDEF_H__

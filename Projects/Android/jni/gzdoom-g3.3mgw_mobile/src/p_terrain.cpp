@@ -272,6 +272,7 @@ static void MakeDefaultTerrain ()
 
 	def.Name = "Solid";
 	def.Splash = -1;
+	def.DamageTimeMask = 31;
 	Terrains.Push (def);
 }
 
@@ -434,6 +435,7 @@ void ParseTerrain (FScanner &sc)
 		memset (&def, 0, sizeof(def));
 		def.Splash = -1;
 		def.Name = name;
+		def.DamageTimeMask = 31;
 		terrainnum = (int)Terrains.Push (def);
 	}
 
@@ -445,6 +447,7 @@ void ParseTerrain (FScanner &sc)
 		memset (&Terrains[terrainnum], 0, sizeof(FTerrainDef));
 		Terrains[terrainnum].Splash = -1;
 		Terrains[terrainnum].Name = name;
+		Terrains[terrainnum].DamageTimeMask = 31;
 	}
 	else
 	{

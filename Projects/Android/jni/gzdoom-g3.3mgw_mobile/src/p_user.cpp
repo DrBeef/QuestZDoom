@@ -125,12 +125,8 @@ CUSTOM_CVAR(Float, cl_predict_lerpthreshold, 2.00f, CVAR_ARCHIVE | CVAR_GLOBALCO
 ColorSetList ColorSets;
 PainFlashList PainFlashes;
 
-// [Nash] FOV cvar setting
-CUSTOM_CVAR(Float, fov, 104.f, CVAR_ARCHIVE | CVAR_USERINFO | CVAR_NOINITCALL)
-{
-	player_t *p = &players[consoleplayer];
-	p->SetFOV(fov);
-}
+// FOV cvar - This is not really used, is only here in case a mod needs to call it
+CVAR(Float, fov, 90.f, CVAR_ARCHIVE | CVAR_USERINFO | CVAR_NOINITCALL)
 
 struct PredictPos
 {
@@ -812,6 +808,12 @@ DEFINE_ACTION_FUNCTION(_PlayerInfo, GetWBobSpeed)
 {
 	PARAM_SELF_STRUCT_PROLOGUE(player_t);
 	ACTION_RETURN_FLOAT(self->userinfo.GetWBobSpeed());
+}
+
+DEFINE_ACTION_FUNCTION(_PlayerInfo, GetWBobFire)
+{
+	PARAM_SELF_STRUCT_PROLOGUE(player_t);
+	ACTION_RETURN_FLOAT(self->userinfo.GetWBobFire());
 }
 
 DEFINE_ACTION_FUNCTION(_PlayerInfo, GetMoveBob)

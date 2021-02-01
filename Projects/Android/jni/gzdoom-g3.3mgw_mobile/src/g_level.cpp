@@ -596,8 +596,7 @@ void G_ChangeLevel(const char *levelname, int position, int flags, int nextSkill
 		nextlevel = levelname;
 	}
 
-	if (nextSkill != -1)
-		NextSkill = nextSkill;
+	NextSkill = (unsigned)nextSkill < AllSkills.Size() ? nextSkill : -1;
 
 	if (flags & CHANGELEVEL_NOINTERMISSION)
 	{
@@ -853,6 +852,8 @@ void G_DoCompleted (void)
 	// Intermission stats for entire hubs
 	G_LeavingHub(mode, thiscluster, &wminfo);
 
+	// Do not allow playing sounds in here - they'd never be able to play properly.
+	soundEngine->BlockNewSounds(true);
 	for (i = 0; i < MAXPLAYERS; i++)
 	{
 		if (playeringame[i])
@@ -860,6 +861,7 @@ void G_DoCompleted (void)
 			G_PlayerFinishLevel (i, mode, changeflags);
 		}
 	}
+	soundEngine->BlockNewSounds(false);
 
 	if (mode == FINISH_SameHub)
 	{ // Remember the level's state for re-entry.

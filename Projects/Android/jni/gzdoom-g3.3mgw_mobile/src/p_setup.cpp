@@ -1717,6 +1717,7 @@ void P_LoadLineDefs (MapData * map)
 		
 	auto mldf = map->Read(ML_LINEDEFS);
 	int numlines = mldf.Size() / sizeof(maplinedef_t);
+	int numsides = map->Size(ML_SIDEDEFS) / sizeof(mapsidedef_t);
 	linemap.Resize(numlines);
 
 	// [RH] Count the number of sidedef references. This is the number of
@@ -1744,13 +1745,6 @@ void P_LoadLineDefs (MapData * map)
 		}
 		else
 		{
-			// patch missing first sides instead of crashing out.
-			// Visual glitches are better than not being able to play.
-			if (LittleShort(mld->sidenum[0]) == NO_INDEX)
-			{
-				Printf("Line %d has no first side.\n", i);
-				mld->sidenum[0] = 0;
-			}
 			sidecount++;
 			if (LittleShort(mld->sidenum[1]) != NO_INDEX)
 				sidecount++;
@@ -1789,6 +1783,22 @@ void P_LoadLineDefs (MapData * map)
 			ProcessEDLinedef(ld, mld->tag);
 		}
 #endif
+		// cph 2006/09/30 - fix sidedef errors right away.
+		for (int j=0; j < 2; j++)
+		{
+			if (LittleShort(mld->sidenum[j]) != NO_INDEX && mld->sidenum[j] >= numsides)
+			{
+				mld->sidenum[j] = 0; // dummy sidedef
+				Printf("Linedef %d has a bad sidedef\n", i);
+			}
+		}
+		// patch missing first sides instead of crashing out.
+		// Visual glitches are better than not being able to play.
+		if (LittleShort(mld->sidenum[0]) == NO_INDEX)
+		{
+			Printf("Line %d has no first side.\n", i);
+			mld->sidenum[0] = 0;
+		}
 
 		ld->v1 = &level.vertexes[LittleShort(mld->v1)];
 		ld->v2 = &level.vertexes[LittleShort(mld->v2)];
@@ -2261,11 +2271,11 @@ void P_LoadSideDefs2 (MapData *map, FMissingTextureTracker &missingtex)
 		// killough 4/4/98: allow sidedef texture names to be overloaded
 		// killough 4/11/98: refined to allow colormaps to work as wall
 		// textures if invalid as colormaps but valid as textures.
-
+		// cph 2006/09/30 - catch out-of-range sector numbers; use sector 0 instead
 		if ((unsigned)LittleShort(msd->sector)>=level.sectors.Size())
 		{
 			Printf (PRINT_HIGH, "Sidedef %d has a bad sector\n", i);
-			sd->sector = sec = NULL;
+			sd->sector = sec = &level.sectors[0];
 		}
 		else
 		{

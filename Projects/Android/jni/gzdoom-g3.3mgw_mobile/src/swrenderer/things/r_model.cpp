@@ -291,7 +291,7 @@ namespace swrenderer
 		float adjustedViewAngle = (float)(Viewpoint.Angles.Yaw - 90).Radians();
 		float ratio = Viewwindow.WidescreenRatio;
 		float fovratio = (Viewwindow.WidescreenRatio >= 1.3f) ? 1.333333f : ratio;
-		float fovy = (float)(2 * DAngle::ToDegrees(atan(tan(Viewpoint.FieldOfView.Radians() / 2) / fovratio)).Degrees);
+		float fovy = (float)(2 * DAngle::ToDegrees(atan(tan(Viewpoint.FieldOfView().Radians() / 2) / fovratio)).Degrees);
 		Mat4f altWorldToView =
 			Mat4f::Rotate(adjustedPitch, 1.0f, 0.0f, 0.0f) *
 			Mat4f::Rotate(adjustedViewAngle, 0.0f, -1.0f, 0.0f) *

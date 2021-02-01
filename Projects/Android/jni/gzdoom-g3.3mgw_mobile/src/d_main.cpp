@@ -620,6 +620,12 @@ CUSTOM_CVAR(Int, compatmode, 0, CVAR_ARCHIVE|CVAR_NOINITCALL)
 		w = COMPATF2_POINTONLINE | COMPATF2_EXPLODE2;
 		break;
 
+	case 7: // Stricter MBF compatibility
+		v = COMPATF_CORPSEGIBS | COMPATF_NOBLOCKFRIENDS | COMPATF_MBFMONSTERMOVE | COMPATF_INVISIBILITY |
+			COMPATF_NOTOSSDROPS | COMPATF_MUSHROOM | COMPATF_NO_PASSMOBJ | COMPATF_BOOMSCROLL | COMPATF_WALLRUN |
+			COMPATF_TRACE | COMPATF_HITSCAN | COMPATF_MISSILECLIP | COMPATF_MASKEDMIDTEX | COMPATF_SOUNDTARGET;
+		w = COMPATF2_POINTONLINE | COMPATF2_EXPLODE1 | COMPATF2_EXPLODE2;
+		break;
 	}
 	compatflags = v;
 	compatflags2 = w;
@@ -679,6 +685,8 @@ CVAR(Bool, vid_activeinbackground, false, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 //
 //==========================================================================
 
+extern "C" float QzDoom_GetFOV();
+
 void D_Display ()
 {
 	bool wipe;
@@ -707,7 +715,7 @@ void D_Display ()
 
 	if (viewactive)
 	{
-		DAngle fov = 104.f;
+		DAngle fov = QzDoom_GetFOV();
 		AActor *cam = players[consoleplayer].camera;
 		if (cam)
 		{
@@ -3013,25 +3021,6 @@ void FStartupScreen::LoadingStatus(const char *message, int colors)
 void FStartupScreen::AppendStatusLine(const char *status)
 {
 }
-
-//===========================================================================
-//
-// DeleteStartupScreen
-//
-// Makes sure the startup screen has been deleted before quitting.
-//
-//===========================================================================
-
-void DeleteStartupScreen()
-{
-	if (StartScreen != nullptr)
-	{
-		delete StartScreen;
-		StartScreen = nullptr;
-	}
-}
-
-
 
 void FStartupScreen::Progress(void) {}
 void FStartupScreen::NetInit(char const *,int) {}

@@ -634,7 +634,7 @@ extend class Actor
 			Actor mo;
 			double spawnz = 0;
 
-			if (!(Level.compatflags & COMPATF_NOTOSSDROPS))
+			if (!(compatflags & COMPATF_NOTOSSDROPS))
 			{
 				int style = sv_dropstyle;
 				if (style == 0)
@@ -655,7 +655,7 @@ extend class Actor
 			{
 				mo.bDropped = true;
 				mo.bNoGravity = false;	// [RH] Make sure it is affected by gravity
-				if (!(Level.compatflags & COMPATF_NOTOSSDROPS))
+				if (!(compatflags & COMPATF_NOTOSSDROPS))
 				{
 					mo.TossItem ();
 				}

@@ -273,6 +273,7 @@ static const char *DecalKeywords[] =
 	"colors",
 	"animator",
 	"lowerdecal",
+	"opaqueblood",
 	NULL
 };
 
@@ -293,7 +294,8 @@ enum
 	DECAL_SHADE,
 	DECAL_COLORS,
 	DECAL_ANIMATOR,
-	DECAL_LOWERDECAL
+	DECAL_LOWERDECAL,
+	DECAL_OPAQUEBLOOD,
 };
 
 const FDecalTemplate *FDecalBase::GetDecal () const
@@ -571,6 +573,11 @@ void FDecalLib::ParseDecal (FScanner &sc)
 		case DECAL_LOWERDECAL:
 			sc.MustGetString ();
 			newdecal.LowerDecal = GetDecalByName (sc.String);
+			break;
+
+		case DECAL_OPAQUEBLOOD:
+			newdecal.RenderStyle = STYLE_Normal;
+			newdecal.opaqueBlood = true;
 			break;
 		}
 	}
