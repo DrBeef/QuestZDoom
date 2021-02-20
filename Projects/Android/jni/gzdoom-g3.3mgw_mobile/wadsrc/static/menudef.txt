@@ -2278,7 +2278,8 @@ OptionMenu VideoModeMenu protected
 OptionValue ControlScheme
 {
 	0, "Right-Handed"
-	10, "Left-Handed"
+	10, "Left-Handed (A)"
+	11, "Left-Handed (B)"
 }
 
 OptionValue "Sprites3DMode"
@@ -2325,7 +2326,7 @@ OptionMenu VROptionsMenu protected
 	StaticText ""
 	StaticText "VR Controls"
 	Option "Control Scheme",		    "vr_control_scheme", "ControlScheme"
-	Option "Switch Thumsticks",		    "vr_switch_sticks", "OnOff"
+	Option "Switch Thumbsticks",		    "vr_switch_sticks", "OnOff"
 	Option "Allow Secondary Button Mappings",	"vr_secondary_button_mappings", "OnOff"
 	Option "Two Handed Weapons",	    "vr_two_handed_weapons", "OnOff"
 

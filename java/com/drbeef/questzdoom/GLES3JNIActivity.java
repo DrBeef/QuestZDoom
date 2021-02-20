@@ -48,10 +48,6 @@ import android.support.v4.content.ContextCompat;
 	private SurfaceHolder mSurfaceHolder;
 	private long mNativeHandle;
 
-	// Audio
-	protected static AudioTrack mAudioTrack;
-	protected static AudioRecord mAudioRecord;
-
 	public void shutdown() {
 		System.exit(0);
 	}

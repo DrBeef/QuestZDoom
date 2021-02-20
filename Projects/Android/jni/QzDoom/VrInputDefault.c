@@ -23,7 +23,7 @@ int getMenuState();
 void Joy_GenerateButtonEvents(int oldbuttons, int newbuttons, int numbuttons, int base);
 float getViewpointYaw();
 
-void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew, ovrInputStateTrackedRemote *pDominantTrackedRemoteOld, ovrTracking* pDominantTracking,
+void HandleInput_Default( int control_scheme, ovrInputStateTrackedRemote *pDominantTrackedRemoteNew, ovrInputStateTrackedRemote *pDominantTrackedRemoteOld, ovrTracking* pDominantTracking,
                           ovrInputStateTrackedRemote *pOffTrackedRemoteNew, ovrInputStateTrackedRemote *pOffTrackedRemoteOld, ovrTracking* pOffTracking,
                           int domButton1, int domButton2, int offButton1, int offButton2 )
 
@@ -66,6 +66,41 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
         pPrimaryTrackedRemoteOld = pDominantTrackedRemoteOld;
         pSecondaryTrackedRemoteNew = pOffTrackedRemoteNew;
         pSecondaryTrackedRemoteOld = pOffTrackedRemoteOld;
+    }
+
+    //All this to allow stick and button switching!
+    uint32_t primaryButtonsNew;
+    uint32_t primaryButtonsOld;
+    uint32_t secondaryButtonsNew;
+    uint32_t secondaryButtonsOld;
+    int primaryButton1;
+    int primaryButton2;
+    int secondaryButton1;
+    int secondaryButton2;
+
+    if (control_scheme == 11) // Left handed Alt
+    {
+        primaryButtonsNew = pOffTrackedRemoteNew->Buttons;
+        primaryButtonsOld = pOffTrackedRemoteOld->Buttons;
+        secondaryButtonsNew = pDominantTrackedRemoteNew->Buttons;
+        secondaryButtonsOld = pDominantTrackedRemoteOld->Buttons;
+
+        primaryButton1 = offButton1;
+        primaryButton2 = offButton2;
+        secondaryButton1 = domButton1;
+        secondaryButton2 = domButton2;
+    }
+    else // Left and right handed
+    {
+        primaryButtonsNew = pDominantTrackedRemoteNew->Buttons;
+        primaryButtonsOld = pDominantTrackedRemoteOld->Buttons;
+        secondaryButtonsNew = pOffTrackedRemoteNew->Buttons;
+        secondaryButtonsOld = pOffTrackedRemoteOld->Buttons;
+
+        primaryButton1 = domButton1;
+        primaryButton2 = domButton2;
+        secondaryButton1 = offButton1;
+        secondaryButton2 = offButton2;
     }
 
     //In cinema mode, right-stick controls mouse
@@ -334,13 +369,13 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                                      1, KEY_PAD_RTRIGGER);
 
             //"Use" (open door, toggle switch etc)
-            Joy_GenerateButtonEvents(((pDominantTrackedRemoteOld->Buttons & domButton1) != 0) && !dominantGripPushedOld ? 1 : 0,
-                                     ((pDominantTrackedRemoteNew->Buttons & domButton1) != 0) && !dominantGripPushedNew ? 1 : 0,
+            Joy_GenerateButtonEvents(((primaryButtonsOld & primaryButton1) != 0) && !dominantGripPushedOld ? 1 : 0,
+                                     ((primaryButtonsNew & primaryButton1) != 0) && !dominantGripPushedNew ? 1 : 0,
                                      1, KEY_PAD_A);
 
             //No Binding
-            Joy_GenerateButtonEvents(((pDominantTrackedRemoteOld->Buttons & domButton2) != 0) && !dominantGripPushedOld ? 1 : 0,
-                                     ((pDominantTrackedRemoteNew->Buttons & domButton2) != 0) && !dominantGripPushedNew ? 1 : 0,
+            Joy_GenerateButtonEvents(((primaryButtonsOld & primaryButton2) != 0) && !dominantGripPushedOld ? 1 : 0,
+                                     ((primaryButtonsNew & primaryButton2) != 0) && !dominantGripPushedNew ? 1 : 0,
                                      1, KEY_PAD_B);
 
             // Inv Use
@@ -361,16 +396,16 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                         1, KEY_PAD_LTRIGGER);
 
                 //Crouch
-                Joy_GenerateButtonEvents(((pDominantTrackedRemoteOld->Buttons & domButton1) != 0) &&
+                Joy_GenerateButtonEvents(((primaryButtonsOld & primaryButton1) != 0) &&
                                          dominantGripPushedOld ? 1 : 0,
-                                         ((pDominantTrackedRemoteNew->Buttons & domButton1) != 0) &&
+                                         ((primaryButtonsNew & primaryButton1) != 0) &&
                                          dominantGripPushedNew ? 1 : 0,
                                          1, KEY_PAD_LTHUMB);
 
                 //No Binding
-                Joy_GenerateButtonEvents(((pDominantTrackedRemoteOld->Buttons & domButton2) != 0) &&
+                Joy_GenerateButtonEvents(((primaryButtonsOld & primaryButton2) != 0) &&
                                          dominantGripPushedOld ? 1 : 0,
-                                         ((pDominantTrackedRemoteNew->Buttons & domButton2) != 0) &&
+                                         ((primaryButtonsNew & primaryButton2) != 0) &&
                                          dominantGripPushedNew ? 1 : 0,
                                          1, KEY_RSHIFT);
 
@@ -400,13 +435,13 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                                      1, KEY_LSHIFT);
 
             //No Default Binding
-            Joy_GenerateButtonEvents(((pOffTrackedRemoteOld->Buttons & offButton1) != 0) && !dominantGripPushedOld ? 1 : 0,
-                                     ((pOffTrackedRemoteNew->Buttons & offButton1) != 0) && !dominantGripPushedNew ? 1 : 0,
+            Joy_GenerateButtonEvents(((secondaryButtonsOld & secondaryButton1) != 0) && !dominantGripPushedOld ? 1 : 0,
+                                     ((secondaryButtonsNew & secondaryButton1) != 0) && !dominantGripPushedNew ? 1 : 0,
                                      1, KEY_PAD_X);
 
             //Toggle Map
-            Joy_GenerateButtonEvents(((pOffTrackedRemoteOld->Buttons & offButton2) != 0) && !dominantGripPushedOld ? 1 : 0,
-                                     ((pOffTrackedRemoteNew->Buttons & offButton2) != 0) && !dominantGripPushedNew ? 1 : 0,
+            Joy_GenerateButtonEvents(((secondaryButtonsOld & secondaryButton2) != 0) && !dominantGripPushedOld ? 1 : 0,
+                                     ((secondaryButtonsNew & secondaryButton2) != 0) && !dominantGripPushedNew ? 1 : 0,
                                      1, KEY_PAD_Y);
 
             //"Use" (open door, toggle switch etc) - Can be rebound for other uses
@@ -437,17 +472,17 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 
                 //Move Down
                 Joy_GenerateButtonEvents(
-                        ((pOffTrackedRemoteOld->Buttons & offButton1) != 0) && dominantGripPushedOld
+                        ((secondaryButtonsOld & secondaryButton1) != 0) && dominantGripPushedOld
                         ? 1 : 0,
-                        ((pOffTrackedRemoteNew->Buttons & offButton1) != 0) && dominantGripPushedNew
+                        ((secondaryButtonsNew & secondaryButton1) != 0) && dominantGripPushedNew
                         ? 1 : 0,
                         1, KEY_PGDN);
 
                 //Move Up
                 Joy_GenerateButtonEvents(
-                        ((pOffTrackedRemoteOld->Buttons & offButton2) != 0) && dominantGripPushedOld
+                        ((secondaryButtonsOld & secondaryButton2) != 0) && dominantGripPushedOld
                         ? 1 : 0,
-                        ((pOffTrackedRemoteNew->Buttons & offButton2) != 0) && dominantGripPushedNew
+                        ((secondaryButtonsNew & secondaryButton2) != 0) && dominantGripPushedNew
                         ? 1 : 0,
                         1, KEY_PGUP);
 

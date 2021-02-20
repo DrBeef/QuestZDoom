@@ -98,7 +98,7 @@ CUSTOM_CVAR(Int,gl_fogmode,1,CVAR_ARCHIVE|CVAR_NOINITCALL)
 	if (self<0) self=0;
 }
 
-CUSTOM_CVAR(Int, gl_lightmode, 0 ,CVAR_ARCHIVE|CVAR_NOINITCALL) // Use Standard Sector Lighting for VR
+CUSTOM_CVAR(Int, gl_lightmode, 2,CVAR_ARCHIVE|CVAR_NOINITCALL) // Use Standard Sector Lighting for VR
 {
 	int newself = self;
 	if (newself > 8) newself = 16;	// use 8 and 16 for software lighting to avoid conflicts with the bit mask

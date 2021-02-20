@@ -74,7 +74,7 @@ static int sortforremap2 (const void *a, const void *b);
 /**************************/
 
 uint8_t newgamma[256];
-CUSTOM_CVAR (Float, Gamma, 1.f, CVAR_ARCHIVE|CVAR_GLOBALCONFIG)
+CUSTOM_CVAR (Float, Gamma, 1.2f, CVAR_ARCHIVE|CVAR_GLOBALCONFIG)
 {
 	if (self == 0.f)
 	{ // Gamma values of 0 are illegal.

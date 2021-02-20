@@ -134,6 +134,7 @@ int argc=0;
 enum control_scheme {
 	RIGHT_HANDED_DEFAULT = 0,
 	LEFT_HANDED_DEFAULT = 10,
+	LEFT_HANDED_ALT = 11,
 	GAMEPAD = 20 //Not implemented, someone else can do this!
 };
 
@@ -1603,12 +1604,13 @@ void QzDoom_getTrackedRemotesOrientation(int vr_control_scheme) {//Get info for 
     switch ((int)vr_control_scheme)
     {
             case RIGHT_HANDED_DEFAULT:
-            HandleInput_Default(&rightTrackedRemoteState_new, &rightTrackedRemoteState_old, &rightRemoteTracking_new,
+    	        HandleInput_Default(vr_control_scheme, &rightTrackedRemoteState_new, &rightTrackedRemoteState_old, &rightRemoteTracking_new,
                                 &leftTrackedRemoteState_new, &leftTrackedRemoteState_old, &leftRemoteTracking_new,
                                 ovrButton_A, ovrButton_B, ovrButton_X, ovrButton_Y);
                     break;
             case LEFT_HANDED_DEFAULT:
-            HandleInput_Default(&leftTrackedRemoteState_new, &leftTrackedRemoteState_old, &leftRemoteTracking_new,
+			case LEFT_HANDED_ALT:
+	            HandleInput_Default(vr_control_scheme, &leftTrackedRemoteState_new, &leftTrackedRemoteState_old, &leftRemoteTracking_new,
                                         &rightTrackedRemoteState_new, &rightTrackedRemoteState_old, &rightRemoteTracking_new,
                                         ovrButton_X, ovrButton_Y, ovrButton_A, ovrButton_B);
                     break;
