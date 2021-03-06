@@ -6842,7 +6842,7 @@ AActor *P_SpawnPlayerMissile (AActor *source, double x, double y, double z,
 	if (P_CheckMissileSpawn (MissileActor, source->radius))
 	{
 	    //Could be the Brutal Doom flashlight!
-		if (MissileActor->DamageType.GetIndex() != 0)
+		if (MissileActor->DamageFunc != nullptr)
 		{
 			//Haptics
 			long rightHanded = vr_control_scheme < 10;

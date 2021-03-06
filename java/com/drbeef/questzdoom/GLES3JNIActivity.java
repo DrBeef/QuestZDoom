@@ -117,6 +117,7 @@ import android.support.v4.content.ContextCompat;
 			}
 			else
 			{
+				finish();
 				System.exit(0);
 			}
 		}
@@ -127,6 +128,7 @@ import android.support.v4.content.ContextCompat;
 			}
 			else
 			{
+				finish();
 				System.exit(0);
 			}
 		}
