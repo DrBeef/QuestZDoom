@@ -6841,8 +6841,9 @@ AActor *P_SpawnPlayerMissile (AActor *source, double x, double y, double z,
 
 	if (P_CheckMissileSpawn (MissileActor, source->radius))
 	{
-		if (MissileActor->DamageFunc != nullptr ||
-		    MissileActor->DamageType.GetIndex() != 0)
+		if (MissileActor->DamageFunc != nullptr || // If it causes damage...
+		    MissileActor->DamageType.GetIndex() != 0 ||
+		    MissileActor->SeeSound != 0) // .. or if it plays a sound, we might as well play a haptic
 		{
 			//Haptics
 			long rightHanded = vr_control_scheme < 10;
