@@ -63,6 +63,7 @@
 #include "i_time.h"
 #include "actorinlines.h"
 
+#include <QzDoom/VrCommon.h>
 
 // EXTERNAL DATA DECLARATIONS ----------------------------------------------
 
@@ -748,7 +749,6 @@ static double QuakePower(double factor, double intensity, double offset)
 	return factor * (offset + randumb);
 }
 
-extern "C" void QzDoom_Vibrate(float duration, int channel, float intensity );
 
 //==========================================================================
 //
@@ -928,6 +928,9 @@ void R_SetupFrame (FRenderViewpoint &viewpoint, FViewWindow &viewwindow, AActor 
                 double right = QuakePower(vr_quake_haptic_level, jiggers.Intensity.Y, jiggers.Offset.Y);
                 QzDoom_Vibrate(10, 0, (float)left); // left
                 QzDoom_Vibrate(10, 1, (float)right); // right
+
+                QzDoom_HapticEvent("rumble_front", 0, 100 * left, 120, 0);
+                QzDoom_HapticEvent("rumble_back", 0, 100 * right, 120, 0);
             }
 		}
 	}

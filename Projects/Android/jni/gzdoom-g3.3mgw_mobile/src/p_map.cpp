@@ -102,6 +102,8 @@
 #include "g_levellocals.h"
 #include "actorinlines.h"
 
+#include <QzDoom/VrCommon.h>
+
 CVAR(Bool, cl_bloodsplats, true, CVAR_ARCHIVE)
 CVAR(Int, sv_smartaim, 0, CVAR_ARCHIVE | CVAR_SERVERINFO)
 CVAR(Bool, cl_doautoaim, false, CVAR_ARCHIVE)
@@ -4445,7 +4447,6 @@ static ETraceStatus CheckForActor(FTraceResults &res, void *userdata)
 //
 //==========================================================================
 EXTERN_CVAR(Int, vr_control_scheme)
-extern "C" void QzDoom_Vibrate(float duration, int channel, float intensity );
 extern bool weaponStabilised;
 
 AActor *P_LineAttack(AActor *t1, DAngle angle, double distance,
@@ -4490,9 +4491,12 @@ AActor *P_LineAttack(AActor *t1, DAngle angle, double distance,
             //Haptics
             long rightHanded = vr_control_scheme < 10;
             QzDoom_Vibrate(150, rightHanded ? 1 : 0, 0.8);
+			QzDoom_HapticEvent("fire_weapon", rightHanded ? 2 : 1, 100, 0, 0);
+
             if (weaponStabilised) {
                 QzDoom_Vibrate(150, rightHanded ? 0 : 1, 0.6);
-            }
+				QzDoom_HapticEvent("fire_weapon", rightHanded ? 1 : 2, 100, 0, 0);
+			}
         }
 	}
 

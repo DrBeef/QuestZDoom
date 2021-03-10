@@ -109,6 +109,8 @@
 #include "actorinlines.h"
 #include "a_dynlight.h"
 
+#include <QzDoom/VrCommon.h>
+
 // MACROS ------------------------------------------------------------------
 
 #define WATER_SINK_FACTOR		0.125
@@ -915,6 +917,16 @@ bool P_GiveBody(AActor *actor, int num, int max)
 				{
 					player->health = max;
 				}
+
+				if (player == &players[consoleplayer])
+				{
+					float level = (float)(0.4 + (0.6 * (num / 100.0)));
+					QzDoom_Vibrate(100, 0, level); // left
+					QzDoom_Vibrate(100, 1, level); // right
+
+					QzDoom_HapticEvent("healstation", 0, 100 * level, 0, 0);
+				}
+
 				actor->health = player->health;
 				return true;
 			}
@@ -6727,7 +6739,6 @@ DEFINE_ACTION_FUNCTION(AActor, SpawnSubMissile)
 ================
 */
 EXTERN_CVAR(Int, vr_control_scheme)
-extern "C" void QzDoom_Vibrate(float duration, int channel, float intensity );
 extern bool weaponStabilised;
 
 AActor *P_SpawnPlayerMissile (AActor *source, double x, double y, double z,
@@ -6848,9 +6859,11 @@ AActor *P_SpawnPlayerMissile (AActor *source, double x, double y, double z,
 			//Haptics
 			long rightHanded = vr_control_scheme < 10;
 			QzDoom_Vibrate(150, rightHanded ? 1 : 0, 0.8);
+			QzDoom_HapticEvent("fire_weapon", rightHanded ? 2 : 1, 100, 0, 0);
 			if (weaponStabilised)
 			{
 				QzDoom_Vibrate(150, rightHanded ? 0 : 1, 0.6);
+				QzDoom_HapticEvent("fire_weapon", rightHanded ? 1 : 2, 100, 0, 0);
 			}
 		}
 
