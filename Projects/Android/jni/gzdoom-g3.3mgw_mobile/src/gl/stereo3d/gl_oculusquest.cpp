@@ -70,6 +70,7 @@ EXTERN_CVAR(Bool, vr_teleport);
 EXTERN_CVAR(Bool, vr_switch_sticks);
 EXTERN_CVAR(Bool, vr_secondary_button_mappings);
 EXTERN_CVAR(Bool, vr_two_handed_weapons);
+EXTERN_CVAR (Bool, vr_bhaptics)
 
 //HUD control
 EXTERN_CVAR(Float, vr_hud_scale);
@@ -433,6 +434,14 @@ namespace s3d
         super::SetUp();
 
         QzDoom_FrameSetup();
+
+        if (vr_bhaptics)
+        {
+            QzDoom_HapticEnable();
+        } else
+        {
+            QzDoom_HapticDisable();
+        }
 
         if (shutdown)
         {

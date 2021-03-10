@@ -35,6 +35,8 @@
 #include "gl/system/gl_cvars.h"
 #include "version.h"
 
+#include <QzDoom/VrCommon.h>
+
 // Set up 3D-specific console variables:
 CVAR(Int, vr_mode, 15, CVAR_GLOBALCONFIG)
 
@@ -74,6 +76,16 @@ CVAR(Bool, vr_momentum, false, CVAR_ARCHIVE | CVAR_GLOBALCONFIG) // Only used in
 
 CVAR(Float, vr_pickup_haptic_level, 0.2, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 CVAR(Float, vr_quake_haptic_level, 0.8, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
+CUSTOM_CVAR(Bool, vr_bhaptics, false, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
+{
+	if (self)
+	{
+		QzDoom_HapticEnable();
+	} else
+	{
+		QzDoom_HapticDisable();
+	}
+}
 
 //HUD control
 CVAR(Float, vr_hud_scale, 0.25f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)

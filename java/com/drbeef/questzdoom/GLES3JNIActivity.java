@@ -2,6 +2,22 @@
 package com.drbeef.questzdoom;
 
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
+import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.util.Log;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+import android.view.WindowManager;
+
+import com.bhaptics.commons.PermissionUtils;
+import com.drbeef.questzdoom.bhaptics.bHaptics;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -10,23 +26,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
-import android.Manifest;
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.pm.PackageManager;
-import android.content.res.AssetManager;
-
-import android.media.AudioRecord;
-import android.media.AudioTrack;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
-import android.view.WindowManager;
-
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 
 @SuppressLint("SdCardPath") public class GLES3JNIActivity extends Activity implements SurfaceHolder.Callback
 {
@@ -52,6 +51,35 @@ import android.support.v4.content.ContextCompat;
 		System.exit(0);
 	}
 
+	/*
+    position is used for weapon based haptics:
+        0 - Will play on both arms if tactosy tact files present for both
+        1 - Will play on left arm only if tactosy tact files present for left
+        2 - Will play on right arm only if tactosy tact files present for right
+ 	*/
+	public void haptic_event(String event, int position, int intensity, float angle, float yHeight) {
+
+		bHaptics.playHaptic(event, position, intensity, angle, yHeight);
+	}
+
+	public void haptic_stopevent(String event) {
+
+		bHaptics.stopHaptic(event);
+	}
+
+	public void haptic_stopall() {
+		bHaptics.stopAll();
+	}
+
+	public void haptic_enable() {
+		bHaptics.enable(this);
+	}
+
+	public void haptic_disable() {
+		bHaptics.disable();
+	}
+
+
 	@Override protected void onCreate( Bundle icicle )
 	{
 		Log.v( TAG, "----------------------------------------------------------------" );
@@ -76,64 +104,43 @@ import android.support.v4.content.ContextCompat;
 
 	/** Initializes the Activity only if the permission has been granted. */
 	private void checkPermissionsAndInitialize() {
-		// Boilerplate for checking runtime permissions in Android.
-		if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-				!= PackageManager.PERMISSION_GRANTED){
-			ActivityCompat.requestPermissions(
-					GLES3JNIActivity.this,
-					new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE},
-					WRITE_EXTERNAL_STORAGE_PERMISSION_ID);
-		}
-		else
-		{
-			permissionCount++;
-		}
-
-		if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-				!= PackageManager.PERMISSION_GRANTED)
-		{
-			ActivityCompat.requestPermissions(
-					GLES3JNIActivity.this,
-					new String[] {Manifest.permission.READ_EXTERNAL_STORAGE},
-					READ_EXTERNAL_STORAGE_PERMISSION_ID);
-		}
-		else
-		{
-			permissionCount++;
-		}
-
-		if (permissionCount == 2) {
-			// Permissions have already been granted.
+		if (PermissionUtils.hasFilePermissions(this)) {
 			create();
+			onStart();
+		}
+		else
+		{
+			requestPermissions();
 		}
 	}
+
+	private void requestPermissions() {
+		ActivityCompat.requestPermissions(this,
+				new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
+						Manifest.permission.WRITE_EXTERNAL_STORAGE},
+				1);
+	}
+
 
 	/** Handles the user accepting the permission. */
 	@Override
 	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] results) {
-		if (requestCode == READ_EXTERNAL_STORAGE_PERMISSION_ID) {
+		if (requestCode == 1) {
+			//Quit for now
+			finish();
+			System.exit(0);
+		}
+		//Was this a bHaptics FINE LOCATION perms request?
+		else if (requestCode == 2) {
 			if (results.length > 0 && results[0] == PackageManager.PERMISSION_GRANTED) {
-				permissionCount++;
+				//call enable again
+				bHaptics.enable(this);
 			}
 			else
 			{
-				finish();
-				System.exit(0);
+				//Don't do anything here, we can't enable if permissions were denied
 			}
 		}
-
-		if (requestCode == WRITE_EXTERNAL_STORAGE_PERMISSION_ID) {
-			if (results.length > 0 && results[0] == PackageManager.PERMISSION_GRANTED) {
-				permissionCount++;
-			}
-			else
-			{
-				finish();
-				System.exit(0);
-			}
-		}
-
-		checkPermissionsAndInitialize();
 	}
 
 	private boolean isPackageInstalled(String packageName, PackageManager packageManager) {
@@ -246,7 +253,10 @@ import android.support.v4.content.ContextCompat;
 		Log.v( TAG, "GLES3JNIActivity::onStart()" );
 		super.onStart();
 
-		GLES3JNILib.onStart( mNativeHandle, this );
+		if ( mNativeHandle != 0 )
+		{
+			GLES3JNILib.onStart(mNativeHandle, this);
+		}
 	}
 
 	@Override protected void onResume()
@@ -254,20 +264,29 @@ import android.support.v4.content.ContextCompat;
 		Log.v( TAG, "GLES3JNIActivity::onResume()" );
 		super.onResume();
 
-		GLES3JNILib.onResume( mNativeHandle );
+		if ( mNativeHandle != 0 )
+		{
+			GLES3JNILib.onResume(mNativeHandle);
+		}
 	}
 
 	@Override protected void onPause()
 	{
 		Log.v( TAG, "GLES3JNIActivity::onPause()" );
-		GLES3JNILib.onPause( mNativeHandle );
+		if ( mNativeHandle != 0 )
+		{
+			GLES3JNILib.onPause(mNativeHandle);
+		}
 		super.onPause();
 	}
 
 	@Override protected void onStop()
 	{
 		Log.v( TAG, "GLES3JNIActivity::onStop()" );
-		GLES3JNILib.onStop( mNativeHandle );
+		if ( mNativeHandle != 0 )
+		{
+			GLES3JNILib.onStop(mNativeHandle);
+		}
 		super.onStop();
 	}
 
@@ -275,12 +294,17 @@ import android.support.v4.content.ContextCompat;
 	{
 		Log.v( TAG, "GLES3JNIActivity::onDestroy()" );
 
+		bHaptics.destroy();
+
 		if ( mSurfaceHolder != null )
 		{
 			GLES3JNILib.onSurfaceDestroyed( mNativeHandle );
 		}
 
-		GLES3JNILib.onDestroy( mNativeHandle );
+		if ( mNativeHandle != 0 )
+		{
+			GLES3JNILib.onDestroy(mNativeHandle);
+		}
 
 		super.onDestroy();
 		mNativeHandle = 0;
@@ -305,7 +329,7 @@ import android.support.v4.content.ContextCompat;
 			mSurfaceHolder = holder;
 		}
 	}
-	
+
 	@Override public void surfaceDestroyed( SurfaceHolder holder )
 	{
 		Log.v( TAG, "GLES3JNIActivity::surfaceDestroyed()" );

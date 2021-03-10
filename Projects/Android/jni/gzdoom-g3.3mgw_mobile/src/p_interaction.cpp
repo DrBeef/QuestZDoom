@@ -67,6 +67,8 @@
 #include "events.h"
 #include "actorinlines.h"
 
+#include <QzDoom/VrCommon.h>
+
 static FRandom pr_botrespawn ("BotRespawn");
 static FRandom pr_killmobj ("ActorDie");
 FRandom pr_damagemobj ("ActorTakeDamage");
@@ -1000,8 +1002,6 @@ static int hasBuddha(player_t *player)
 	return 0;
 }
 
-extern "C" void QzDoom_Vibrate(float duration, int channel, float intensity );
-
 // Returns the amount of damage actually inflicted upon the target, or -1 if
 // the damage was cancelled.
 static int DamageMobj (AActor *target, AActor *inflictor, AActor *source, int damage, FName mod, int flags, DAngle angle, bool& needevent)
@@ -1356,6 +1356,20 @@ static int DamageMobj (AActor *target, AActor *inflictor, AActor *source, int da
 			float level = (float)(0.4 + (0.6 * (temp / 100.0)));
 			QzDoom_Vibrate(200, 0, level); // left
 			QzDoom_Vibrate(200, 1, level); // right
+
+			DAngle attackAngle = angle.Degrees - player->mo->Angles.Yaw;
+
+			if (mod == NAME_None)
+            {
+				if (damage >= 15) {
+					QzDoom_HapticEvent("shotgun", 0, 100, attackAngle.Normalized360().Degrees, 0);
+				}
+				else {
+					QzDoom_HapticEvent("bullet", 0, 100, attackAngle.Normalized360().Degrees, 0);
+				}
+            } else {
+                QzDoom_HapticEvent(mod, 0, 100, attackAngle.Normalized360().Degrees, 0);
+            }
 		}
 	}
 	else
@@ -1763,6 +1777,18 @@ void P_PoisonDamage (player_t *player, AActor *source, int damage, bool playPain
 		P_AutoUseHealth(player, damage - player->health+1);
 	}
 	player->health -= damage; // mirror mobj health here for Dave
+
+	if (player == &players[consoleplayer])
+	{
+		//Haptic feedback when hurt - level indicates amount of damage
+		float temp = damage < 100 ? damage : 100;
+		float level = (float)(0.4 + (0.6 * (temp / 100.0)));
+		QzDoom_Vibrate(500, 0, level); // left
+		QzDoom_Vibrate(500, 1, level); // right
+
+		QzDoom_HapticEvent(player->poisontype, 0, 100, 0, 0);
+	}
+
 	if (player->health < 50 && !deathmatch)
 	{
 		P_AutoUseStrifeHealth(player);

@@ -876,6 +876,37 @@ void QzDoom_Vibrate(float duration, int channel, float intensity )
 	vibration_channel_intensity[channel] = intensity;
 }
 
+void jni_haptic_event(const char* event, int position, int intensity, float angle, float yHeight);
+void jni_haptic_stopevent(const char* event);
+void jni_haptic_stopall();
+void jni_haptic_enable();
+void jni_haptic_disable();
+
+void QzDoom_HapticEvent(const char* event, int position, int intensity, float angle, float yHeight )
+{
+	jni_haptic_event(event, position, intensity, angle, yHeight);
+}
+
+void QzDoom_HapticStopAll()
+{
+	jni_haptic_stopall();
+}
+
+void QzDoom_HapticStopEvent(const char* event)
+{
+	jni_haptic_stopevent(event);
+}
+
+void QzDoom_HapticEnable()
+{
+	jni_haptic_enable();
+}
+
+void QzDoom_HapticDisable()
+{
+	jni_haptic_disable();
+}
+
 void VR_DoomMain(int argc, char** argv);
 
 void VR_GetMove( float *joy_forward, float *joy_side, float *hmd_forward, float *hmd_side, float *up, float *yaw, float *pitch, float *roll )
@@ -1728,8 +1759,13 @@ Activity lifecycle
 */
 
 jmethodID android_shutdown;
+jmethodID android_haptic_event;
+jmethodID android_haptic_stopevent;
+jmethodID android_haptic_stopall;
+jmethodID android_haptic_enable;
+jmethodID android_haptic_disable;
 static JavaVM *jVM;
-static jobject shutdownCallbackObj=0;
+static jobject jniCallbackObj=0;
 
 void jni_shutdown()
 {
@@ -1740,7 +1776,77 @@ void jni_shutdown()
     {
         (*jVM)->AttachCurrentThread(jVM,&env, NULL);
     }
-    return (*env)->CallVoidMethod(env, shutdownCallbackObj, android_shutdown);
+    return (*env)->CallVoidMethod(env, jniCallbackObj, android_shutdown);
+}
+
+
+void jni_haptic_event(const char* event, int position, int intensity, float angle, float yHeight)
+{
+	ALOGV("Calling: jni_haptic_event");
+	JNIEnv *env;
+	jobject tmp;
+	if (((*jVM)->GetEnv(jVM, (void**) &env, JNI_VERSION_1_4))<0)
+	{
+		(*jVM)->AttachCurrentThread(jVM,&env, NULL);
+	}
+
+	jstring StringArg1 = (*env)->NewStringUTF(env, event);
+
+	return (*env)->CallVoidMethod(env, jniCallbackObj, android_haptic_event, StringArg1, position, intensity, angle, yHeight);
+}
+
+void jni_haptic_stopevent(const char* event)
+{
+	ALOGV("Calling: jni_haptic_stopevent");
+	JNIEnv *env;
+	jobject tmp;
+	if (((*jVM)->GetEnv(jVM, (void**) &env, JNI_VERSION_1_4))<0)
+	{
+		(*jVM)->AttachCurrentThread(jVM,&env, NULL);
+	}
+
+	jstring StringArg1 = (*env)->NewStringUTF(env, event);
+
+	return (*env)->CallVoidMethod(env, jniCallbackObj, android_haptic_stopevent, StringArg1);
+}
+
+void jni_haptic_stopall()
+{
+	ALOGV("Calling: jni_haptic_stopall");
+	JNIEnv *env;
+	jobject tmp;
+	if (((*jVM)->GetEnv(jVM, (void**) &env, JNI_VERSION_1_4))<0)
+	{
+		(*jVM)->AttachCurrentThread(jVM,&env, NULL);
+	}
+
+	return (*env)->CallVoidMethod(env, jniCallbackObj, android_haptic_stopall);
+}
+
+void jni_haptic_enable()
+{
+	ALOGV("Calling: jni_haptic_enable");
+	JNIEnv *env;
+	jobject tmp;
+	if (((*jVM)->GetEnv(jVM, (void**) &env, JNI_VERSION_1_4))<0)
+	{
+		(*jVM)->AttachCurrentThread(jVM,&env, NULL);
+	}
+
+	return (*env)->CallVoidMethod(env, jniCallbackObj, android_haptic_enable);
+}
+
+void jni_haptic_disable()
+{
+	ALOGV("Calling: jni_haptic_disable");
+	JNIEnv *env;
+	jobject tmp;
+	if (((*jVM)->GetEnv(jVM, (void**) &env, JNI_VERSION_1_4))<0)
+	{
+		(*jVM)->AttachCurrentThread(jVM,&env, NULL);
+	}
+
+	return (*env)->CallVoidMethod(env, jniCallbackObj, android_haptic_disable);
 }
 
 int JNI_OnLoad(JavaVM* vm, void* reserved)
@@ -1842,10 +1948,15 @@ JNIEXPORT void JNICALL Java_com_drbeef_questzdoom_GLES3JNILib_onStart( JNIEnv * 
 {
 	ALOGV( "    GLES3JNILib::onStart()" );
 
-    shutdownCallbackObj = (jobject)(*env)->NewGlobalRef(env, obj1);
-    jclass callbackClass = (*env)->GetObjectClass(env, shutdownCallbackObj);
+    jniCallbackObj = (jobject)(*env)->NewGlobalRef(env, obj1);
+    jclass callbackClass = (*env)->GetObjectClass(env, jniCallbackObj);
 
     android_shutdown = (*env)->GetMethodID(env,callbackClass,"shutdown","()V");
+	android_haptic_event = (*env)->GetMethodID(env, callbackClass, "haptic_event", "(Ljava/lang/String;IIFF)V");
+	android_haptic_stopevent = (*env)->GetMethodID(env, callbackClass, "haptic_stopevent", "(Ljava/lang/String;)V");
+	android_haptic_stopall = (*env)->GetMethodID(env, callbackClass, "haptic_stopall", "()V");
+	android_haptic_enable = (*env)->GetMethodID(env, callbackClass, "haptic_enable", "()V");
+	android_haptic_disable = (*env)->GetMethodID(env, callbackClass, "haptic_disable", "()V");
 
 	ovrAppThread * appThread = (ovrAppThread *)((size_t)handle);
 	ovrMessage message;

@@ -54,6 +54,8 @@
 #include "g_levellocals.h"
 #include "vm.h"
 
+#include <QzDoom/VrCommon.h>
+
 CVAR( Float, blood_fade_scalar, 0.0f, CVAR_ARCHIVE )	// Default ro 0.0 for VR
 CVAR( Float, pickup_fade_scalar, 0.0f, CVAR_ARCHIVE )	// Default ro 0.0 for VR
 
@@ -101,8 +103,6 @@ void V_AddBlend (float r, float g, float b, float a, float v_blend[4])
 //
 //---------------------------------------------------------------------------
 
-extern "C" void QzDoom_Vibrate(float duration, int channel, float intensity );
-
 void V_AddPlayerBlend (player_t *CPlayer, float blend[4], float maxinvalpha, int maxpainblend)
 {
 	int cnt;
@@ -134,6 +134,8 @@ void V_AddPlayerBlend (player_t *CPlayer, float blend[4], float maxinvalpha, int
 		if (vr_pickup_haptic_level > 0.0) {
 			QzDoom_Vibrate(50, 0, vr_pickup_haptic_level); // left
 			QzDoom_Vibrate(50, 1, vr_pickup_haptic_level); // right
+
+			QzDoom_HapticEvent("pickup", 0, 100, 0, 0);
 		}
 
 		// [SP] Allow player to tone down intensity of pickup flash.

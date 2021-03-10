@@ -43,6 +43,8 @@
 #include "r_utility.h"
 #include "actorinlines.h"
 
+#include <QzDoom/VrCommon.h>
+
 #define ST_RAMPAGEDELAY 		(2*TICRATE)
 #define ST_MUCHPAIN 			20
 
@@ -339,8 +341,6 @@ bool FMugShot::SetState(const char *state_name, bool wait_till_done, bool reset)
 //
 //===========================================================================
 
-extern "C" void QzDoom_Vibrate(float duration, int channel, float intensity );
-
 CVAR(Bool,st_oldouch,false,CVAR_ARCHIVE)
 int FMugShot::UpdateState(player_t *player, StateFlags stateflags)
 {
@@ -356,6 +356,8 @@ int FMugShot::UpdateState(player_t *player, StateFlags stateflags)
 				if (vr_pickup_haptic_level > 0.0) {
 					QzDoom_Vibrate(80, 0, vr_pickup_haptic_level); // left
 					QzDoom_Vibrate(80, 1, vr_pickup_haptic_level); // right
+
+					QzDoom_HapticEvent("pickup", 0, 100, 0, 0);
 				}
 
 				SetState("grin", false);

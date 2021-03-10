@@ -58,6 +58,7 @@
 **
 */
 
+#include <QzDoom/VrCommon.h>
 #include "templates.h"
 #include "doomdef.h"
 #include "d_event.h"
@@ -1259,7 +1260,23 @@ void P_PlayerThink (player_t *player)
 		I_Error ("No player %td start\n", player - players + 1);
 	}
 
-	if (player->SubtitleCounter > 0)
+    static int previous_health = 0;
+
+    if (previous_health != player->health)
+    {
+        if (player->health > previous_health)
+        {
+            QzDoom_HapticEvent("healstation", 0, 100, 0, 0);
+        }
+    }
+    else if (player->health > 0 && player->health < 40)
+    {
+        //heartbeat is a special case that uses intensity for a different purpose
+        QzDoom_HapticEvent("heartbeat", 0, player->health, 0, 0);
+    }
+
+
+    if (player->SubtitleCounter > 0)
 	{
 		player->SubtitleCounter--;
 	}
@@ -1285,11 +1302,14 @@ void P_PlayerThink (player_t *player)
 	// Don't interpolate the view for more than one tic
 	player->cheats &= ~CF_INTERPVIEW;
 
+
 	IFVIRTUALPTRNAME(player->mo, NAME_PlayerPawn, PlayerThink)
 	{
 		VMValue param = player->mo;
 		VMCall(func, &param, 1, nullptr, 0);
 	}
+
+    previous_health = player->health;
 }
 
 void P_PredictionLerpReset()

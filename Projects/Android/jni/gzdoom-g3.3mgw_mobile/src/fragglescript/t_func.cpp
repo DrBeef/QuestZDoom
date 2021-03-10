@@ -34,6 +34,7 @@
 //---------------------------------------------------------------------------
 //
 
+#include <QzDoom/VrCommon.h>
 #include "templates.h"
 #include "p_local.h"
 #include "t_script.h"
@@ -2080,6 +2081,7 @@ void FParser::SF_CloseDoor(void)
 		else speed = 1;    // 1= normal speed
 		
 		EV_DoDoor(DDoor::doorClose, NULL, NULL, sectag, 2.*clamp(speed, 1, 127), 0, 0, 0);
+		QzDoom_HapticEvent("doorclose", 0, 100, 0, 0);
 	}
 }
 

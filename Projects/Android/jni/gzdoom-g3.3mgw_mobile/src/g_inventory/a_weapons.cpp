@@ -53,6 +53,7 @@
 #include "d_net.h"
 #include "serializer.h"
 #include "vm.h"
+#include <QzDoom/VrCommon.h>
 
 //===========================================================================
 //
@@ -107,6 +108,9 @@ bool FWeaponSlot::AddWeapon(PClassActor *type)
 	}
 	WeaponInfo info = { type, -1 };
 	Weapons.Push(info);
+
+	QzDoom_HapticEvent("pickup_weapon", 0, 100, 0, 0);
+
 	return true;
 }
 

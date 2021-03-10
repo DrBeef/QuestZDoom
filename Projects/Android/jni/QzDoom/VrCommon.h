@@ -93,6 +93,10 @@ void QzDoom_processHaptics();
 void QzDoom_getHMDOrientation(ovrTracking2 *tracking);
 void QzDoom_getTrackedRemotesOrientation(int vr_control_scheme);
 
+void QzDoom_HapticEvent(const char* event, int position, int intensity, float angle, float yHeight );
+void QzDoom_HapticEnable();
+void QzDoom_HapticDisable();
+
 void incrementFrameIndex();
 
 void QzDoom_prepareEyeBuffer(int eye );

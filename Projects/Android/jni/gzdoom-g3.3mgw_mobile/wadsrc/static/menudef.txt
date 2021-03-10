@@ -2345,6 +2345,8 @@ OptionMenu VROptionsMenu protected
 	StaticText "Haptics"
 	Slider "Item Pickup Haptic Level",  "vr_pickup_haptic_level", 0.0, 1.0, 0.1, 2
 	Slider "Quake Haptic Level",        "vr_quake_haptic_level", 0.0, 1.0, 0.1, 2
+	StaticText ""
+	Option "bHaptics Support",		        "vr_bhaptics", "OnOff"
 
 	StaticText ""
 	StaticText "Weapon"
