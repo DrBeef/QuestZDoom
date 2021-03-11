@@ -1361,7 +1361,7 @@ static int DamageMobj (AActor *target, AActor *inflictor, AActor *source, int da
 
 			if (mod == NAME_None)
             {
-				if (damage >= 15) {
+				if (damage >= 12) {
 					QzDoom_HapticEvent("shotgun", 0, 100, attackAngle.Normalized360().Degrees, 0);
 				}
 				else {

@@ -91,6 +91,7 @@ public class bHaptics {
         registerFromAsset(context, "bHaptics/Damage/Body_DMG_Fireball.tact", "fireball");
         registerFromAsset(context, "bHaptics/Damage/Body_DMG_Bullet.tact", "bullet");
         registerFromAsset(context, "bHaptics/Damage/Body_DMG_Shotgun.tact", "shotgun");
+        registerFromAsset(context, "bHaptics/Damage/Body_DMG_Electric.tact", "electric");
         registerFromAsset(context, "bHaptics/Damage/Body_DMG_Fire.tact", "fire");
         registerFromAsset(context, "bHaptics/Damage/Body_DMG_Fire.tact", "poison"); // reuse
         registerFromAsset(context, "bHaptics/Damage/Body_DMG_Falling.tact", "fall");
@@ -100,14 +101,17 @@ public class bHaptics {
             INTERACTIONS
          */
         registerFromAsset(context, "bHaptics/Interaction/Vest/Body_Healstation.tact", "healstation");
+        registerFromAsset(context, "bHaptics/Interaction/Arms/Healthstation_L.tact", PositionType.ForearmL, "healstation");
+        registerFromAsset(context, "bHaptics/Interaction/Arms/Healthstation_R.tact", PositionType.ForearmR, "healstation");
 
-        registerFromAsset(context, "bHaptics/Interaction/Arms/Pickup_L.tact", PositionType.ForearmL, "pickup");
-        registerFromAsset(context, "bHaptics/Interaction/Arms/Pickup_R.tact", PositionType.ForearmR, "pickup");
+        registerFromAsset(context, "bHaptics/Interaction/Arms/Ammo_L.tact", PositionType.ForearmL, "pickup");
+        registerFromAsset(context, "bHaptics/Interaction/Arms/Ammo_R.tact", PositionType.ForearmR, "pickup");
 
         registerFromAsset(context, "bHaptics/Interaction/Vest/Body_Shield_Get.tact", "pickup_weapon");
         registerFromAsset(context, "bHaptics/Interaction/Arms/Pickup_L.tact", PositionType.ForearmL, "pickup_weapon");
         registerFromAsset(context, "bHaptics/Interaction/Arms/Pickup_R.tact", PositionType.ForearmR, "pickup_weapon");
 
+        registerFromAsset(context, "bHaptics/Weapon/Vest/Body_Pistol.tact", "fire_weapon");
         registerFromAsset(context, "bHaptics/Weapon/Arms/ShootDefault_L.tact", PositionType.ForearmL, "fire_weapon");
         registerFromAsset(context, "bHaptics/Weapon/Arms/ShootDefault_R.tact", PositionType.ForearmR, "fire_weapon");
 
@@ -277,11 +281,14 @@ public class bHaptics {
                         {
                             //The worse condition we are in, the faster the heart beats!
                             float health = intensity;
-                            duration = 1.0f - (0.4f * ((40 - health) / 40));
-                            flIntensity = 1.0f;
+                            duration = 1.0f - (0.6f * ((25 - health) / 25));
+                            flIntensity = ((25 - health) / 25);
                         }
 
-                        player.submitRegistered(haptic.key, haptic.altKey, flIntensity, duration, angle, yHeight);
+                        if (flIntensity > 0)
+                        {
+                            player.submitRegistered(haptic.key, haptic.altKey, flIntensity, duration, angle, yHeight);
+                        }
                     }
                 }
             }
