@@ -30,6 +30,7 @@ void HandleInput_Default( int control_scheme, ovrInputStateTrackedRemote *pDomin
 {
     //Menu button - invoke menu
     handleTrackedControllerButton(&leftTrackedRemoteState_new, &leftTrackedRemoteState_old, ovrButton_Enter, KEY_ESCAPE);
+    handleTrackedControllerButton(&rightTrackedRemoteState_new, &rightTrackedRemoteState_old, ovrButton_Enter, KEY_ESCAPE); // For users who have switched the buttons
 
     if (getGameState() != 0 || getMenuState() == 1) // If getMenuState returns 2, then we are waiting for a key mapping input, so send normal keymappings, don't send these
     {
