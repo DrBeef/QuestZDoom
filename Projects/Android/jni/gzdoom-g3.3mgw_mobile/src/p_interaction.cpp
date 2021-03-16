@@ -1002,8 +1002,6 @@ static int hasBuddha(player_t *player)
 	return 0;
 }
 
-extern "C" float getViewpointYaw();
-
 // Returns the amount of damage actually inflicted upon the target, or -1 if
 // the damage was cancelled.
 static int DamageMobj (AActor *target, AActor *inflictor, AActor *source, int damage, FName mod, int flags, DAngle angle, bool& needevent)
@@ -1359,8 +1357,7 @@ static int DamageMobj (AActor *target, AActor *inflictor, AActor *source, int da
 			QzDoom_Vibrate(200, 0, level); // left
 			QzDoom_Vibrate(200, 1, level); // right
 
-			//Blargh?!
-			DAngle attackAngle = (90 + angle.Degrees) - getViewpointYaw();
+			DAngle attackAngle = player->mo->Angles.Yaw - target->AngleTo(source);
 
 			if (mod == NAME_None)
             {
