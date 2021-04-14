@@ -1357,11 +1357,11 @@ static int DamageMobj (AActor *target, AActor *inflictor, AActor *source, int da
 			QzDoom_Vibrate(200, 0, level); // left
 			QzDoom_Vibrate(200, 1, level); // right
 
-			DAngle attackAngle = player->mo->Angles.Yaw - target->AngleTo(source);
+			DAngle attackAngle = (source != NULL) ? (target->AngleTo(source) - player->mo->Angles.Yaw) : angle;
 
 			if (mod == NAME_None)
             {
-				if (damage >= 12) {
+				if (damage >= 15) {
 					QzDoom_HapticEvent("shotgun", 0, 100, attackAngle.Normalized360().Degrees, 0);
 				}
 				else {
