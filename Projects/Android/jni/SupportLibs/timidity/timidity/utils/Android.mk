@@ -1,0 +1,27 @@
+LOCAL_PATH := $(call my-dir)
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE := utils
+
+LOCAL_C_INCLUDES := $(LOCAL_PATH)
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/..
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/../timidity
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/../libarc
+
+LOCAL_CFLAGS = -DHAVE_CONFIG_H
+
+LOCAL_CPP_EXTENSION := .cpp
+
+LOCAL_SRC_FILES:= bitset.c
+LOCAL_SRC_FILES+= fft4g.c
+LOCAL_SRC_FILES+= mblock.c
+LOCAL_SRC_FILES+= memb.c
+LOCAL_SRC_FILES+= nkflib.c
+LOCAL_SRC_FILES+= strtab.c
+LOCAL_SRC_FILES+= timer.c
+LOCAL_SRC_FILES+= support.c
+
+LOCAL_STATIC_LIBRARIES := arc
+
+include $(BUILD_STATIC_LIBRARY)

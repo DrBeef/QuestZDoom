@@ -1,0 +1,1523 @@
+2012-06-28  TAMUKI Shoichi <tamuki@linet.gr.jp>
+
+	* configure.in: Change version to 2.14.0
+
+2012-06-28  Yair K. <cesium2@gmail.com>
+
+	* interface/xaw_i.c: Under some rare circumstances (a file
+	  with a specifically crafted name and timidity executed from
+	  the same directory), a missing NULL check in setDirACT can
+	  lead to a crash. Add the check. While at it, add another
+	  NULL check just in case.
+
+2012-06-26  TAMUKI Shoichi <tamuki@linet.gr.jp>
+
+	* NEWS: Add new entry for 2.14.0
+
+2012-06-25  Yair K. <cesium2@gmail.com>
+
+	* timidity/timidity.c: Make timidity continue the dynamic
+	  interface loading loop if dl_load_file fails. Earlier, it
+	  simply returned NULL in that case, which meant that if an
+	  dlopen failed at an dynamic interface loaded before arriving
+	  at the desired interface (say, because of missing
+	  dependencies or bad symlink) one couldn't load said desired
+	  (dynamically-linked) interface at all.
+	* interface/TiMidity-uj.ad, interface/TiMidity.ad,
+	  interface/x_trace.c, interface/xaw_i.c: Make a double-click
+	  open/save a file in the dialogs. It also removes some
+	  useless casts, and a no longer necessary action
+	  (do-popdown()).
+	* interface/x_trace.c: Make the trace cut off text in the
+	  instrument name column correctly in the Xft case.
+
+2012-06-12  Yair K. <cesium2@gmail.com>
+
+	* interface/xaw_i.c: xaw interface: various fixes
+	  - There was an off-by-one in the ARGB converter.
+	  - Make sure the pause button can't be set when not playing
+	  - and visa versa for the play button
+	  - leak less memory
+	* interface/TiMidity-uj.ad, interface/TiMidity.ad,
+	  interface/x_trace.c, interface/xaw_i.c, interface/xdnd.c:
+	  Various fixes
+	  - make the play button activate when autostarting a saved
+	    list and when saving a file (two chunks).
+	  - add a few consts (not needed by most compilers)
+	  - add some keysyms of the numeric keyboard to the resource
+	    files
+
+2012-06-05  Yair K. <cesium2@gmail.com>
+
+	* doc/C/README.xaw, interface/TiMidity-uj.ad,
+	  interface/TiMidity.ad, interface/xaw_i.c, interface/xdnd.c,
+	  interface/xdnd.h: xaw: Setup _NET_WM_ICON correctly
+	  Having upgraded to a new KDE version, I noticed the task
+	  switcher didn't display timidity's thumbnail. Apparently it
+	  doesn't acknowledge the WM_HINTS bitmap.
+	  So the attached diff includes a trivial converter (1bit
+	  bitmap->ARGB) to set up _NET_WM_ICON correctly. It uses the
+	  simple timidity.xbm icon (I also had a version using the
+	  color icon from pixmap/timidity.xpm but I prefer this icon -
+	  I could add that as an option).
+	  The diff also includes some #include rationalization and
+	  resource renaming ("noPlaying" had a different spelling in
+	  .ad files vs the code).
+
+2012-06-01  Takashi Iwai <tiwai@suse.de>
+
+	* interface/xskin_spectrum.c: [PATCH 1/9] Fix possible invalid
+	  access below the array range
+	* interface/server_c.c: [PATCH 3/9] Fix the faulty check of
+	  parameters in server_c.c:control_getcmd()
+	  The check of the array size in server_c.c:control_getcmd()
+	  is wrong as the nparmas is incremeted after the check with
+	  MAX_GETCMD_PARAMS.  Also, there are other bugs that *nparams
+	  isn't initialized when the first token is NULL, etc.
+	  Overall, the code is unnecessarily tricky.
+	  This patch simplifies the code and fixes the array size
+	  check.
+	  Bugzila: https://bugzilla.novell.com/show_bug.cgi?id=517719
+	* libunimod/mloader.c: [PATCH 4/9] Add missing void argument
+	  for function declarations
+	* autoconf/utils.m4: [PATCH 5/9] Add missing quotes in
+	  autoconf/utils.m4
+	* timidity/timidity.h: [PATCH 6/9] Add the lzma decompression
+	  support
+	* interface/emacs_c.c: [PATCH 7/9] Fix the missing return
+	  value in emacs_c.c
+	* timidity/smplfile.c: [PATCH 8/9] Fix type-punning in
+	  smplfile.c
+	* autoconf/alsa.m4, autoconf/ao.m4, autoconf/arts.m4,
+	  autoconf/esd.m4, autoconf/gtk-2.0.m4, autoconf/gtk.m4,
+	  autoconf/libFLAC.m4, autoconf/libOggFLAC.m4,
+	  autoconf/ogg.m4, autoconf/vorbis.m4, configure.in:
+	  [PATCH 9/9] Use AS_HELP_STRING to make the --help output
+	  more readable
+
+2012-05-29  Yair K. <cesium2@gmail.com>
+
+	* doc/C/README.xaw, interface/TiMidity-uj.ad,
+	  interface/TiMidity.ad, interface/xaw_c.c, interface/xaw_i.c,
+	  interface/xaw_p.h: Make the interface apply the previous
+	  volume.  It also fixes some minor display issues (remove the
+	  checkmark next to hidetrace menu item when initing the trace
+	  the first time after starting with '-ia' and 'Disp:Trace'
+	  set to 0, don't allow activing the play button when no files
+	  are loaded).
+	* interface/x_trace.c, interface/x_trace.h, interface/xaw_i.c,
+	  interface/xdnd.c: Fix some off by ones (one prevented the
+	  channel number being displayed when muting it [right-click
+	  in trace mode], another in xdnd.c led to a gcc warning with
+	  -Wall), and free a bit more memory (less valgrind warnings).
+	* timidity/miditrace.c: Revert fix soundspec in trace mode
+
+2012-05-26  Hans de Goede <hdegoede@redhat.com>
+
+	* configure.in: configure: Fix building of dynamic user
+	  interfaces
+	* timidity/mac_main.c, timidity/timidity.c: Add a trysource
+	  config file directive
+	  Add a "trysource" config file directive, which allows to try
+	  and source other config files, while continuing without
+	  error if the specified file is missing.
+	  Also cleanup the user config loading code using this new
+	  functionality.
+	* interface/x_trace.c, interface/xaw_c.c: xaw-interface: Fix
+	  crash when MAX_CHANNELS > 32 (by Yair K.)
+	* configure.in, doc/C/README.xaw, interface/Makefile.am,
+	  interface/TiMidity-uj.ad, interface/TiMidity.ad,
+	  interface/x_trace.c, interface/x_trace.h, interface/xaw.h,
+	  interface/xaw_c.c, interface/xaw_i.c, interface/xaw_p.h,
+	  interface/xdnd.h: xaw interface update (by Yair K.)
+	* timidity/timidity.h: Improve timidity default settings
+	  (by Yair K.)
+	* configure.in: configure: Fix building with X11 based
+	  userinterfaces builtin (Reported by Yair K.)
+	* interface/xaw_i.c, interface/xdnd.c: Fix compiler warnings
+	  from clang (by Yair K.)
+	* interface/xaw_i.c: Xaw: unbreak xdnd (by Yair K.)
+
+2011-12-30  TAMUKI Shoichi <tamuki@linet.gr.jp>
+
+	* COPYING: Remove due to autogenerated file
+	* Makefile.am, autogen.sh: Add autogen.sh
+
+2011-12-22  Hans de Goede <hdegoede@redhat.com>
+
+	* configure.in: [PATCH 18/18] configure: Don't add -lX11 to
+	  the generic LIBS
+	  This stops timidity itself from depending on libX11 even
+	  when build without any interfaces builtin which need libX11.
+	  (revised by TAMUKI Shoichi)
+	* interface/x_sherry.c: Fix to fit with libpng 1.5 and newer
+
+2011-12-18  TAMUKI Shoichi <tamuki@linet.gr.jp>
+
+	* Makefile.in, aclocal.m4, autoconf/Makefile.in,
+	  autoconf/config.guess, autoconf/config.sub,
+	  autoconf/depcomp, autoconf/install-sh, autoconf/missing,
+	  autoconf/mkinstalldirs, config.h.in, configs/Makefile.in,
+	  configure, doc/C/Makefile.in, doc/Makefile.in,
+	  doc/ja_JP.eucJP/Makefile.in, interface/Makefile.in,
+	  interface/bitmaps/Makefile.in,
+	  interface/motif_bitmaps/Makefile.in,
+	  interface/pixmaps/Makefile.in, libarc/Makefile.in,
+	  libunimod/Makefile.in, script/Makefile.in,
+	  timidity/Makefile.in, utils/Makefile.in, windrv/Makefile.in:
+	  Remove all the autogenerated files
+
+2011-12-08  TAMUKI Shoichi <tamuki@linet.gr.jp>
+
+	* interface/alsaseq_c.c: About 4 years ago, a simple patch was
+	  merged, which disabled ALSA sequencer interface polling,
+	  when it's not needed.  As a result, when using ALSA
+	  sequencer interface (timidity -iA -B2,8 -q0/0), it comes to
+	  cause a terrible sound.  That improves with "timidity -iA",
+	  however the real-time response is too bad for practical use.
+	  So, I reverted the patch as a workaround.  And then, I
+	  applied yet another patch instead, which works fine.  See
+	  http://fedev.blogspot.com/2007/07/timidity-power-usage.html
+
+2011-12-07  TAMUKI Shoichi <tamuki@linet.gr.jp>
+
+	* timidity/playmidi.c: About 6 years ago, a simple patch was
+	  merged, which changed sustained notes not to drop when
+	  opt_overlap_voice_allow is enabled.  Perhaps, that might
+	  have a good effect in a certain case, however it often
+	  misses the tracer display.  So, I reverted the patch as a
+	  workaround.
+
+2011-12-06  TAMUKI Shoichi <tamuki@linet.gr.jp>
+
+	* interface/Makefile.am, interface/timidity.el,
+	  interface/timidity.pel: Set the absolute path of timidity
+	  in timidity.el automatically; add timidity.pel file to be
+	  preprocessed, and remove timidity.el
+	* configure.in: In the case of --enable-dynamic=emacs and
+	  --enable-dynamic=alsaseq, make install timidity.el and
+	  enable the long option of ALSA sequencer interface,
+	  respectively (in addition, autoreconf)
+
+2011-12-05  Hans de Goede <hdegoede@redhat.com>
+
+	* interface/tkmidity.ptcl, interface/tkpanel.tcl,
+	  script/dllutl.rb: [PATCH 11/17] Make shebang paths
+	  /usr/bin/foo rather then /usr/local/bin/foo
+	  This makes life easier for packagers, people who want to use
+	  non standard paths will need to fix this up themselves...
+	  (revised by TAMUKI Shoichi)
+
+2011-12-04  TAMUKI Shoichi <tamuki@linet.gr.jp>
+
+	* configure.in: Support for Tcl/Tk 8.5 and autoreconf
+
+2011-12-04  Hans de Goede <hdegoede@redhat.com>
+
+	* timidity/esd_a.c: [PATCH 1/9] esd_a: Don't start ESD
+	  Don't start ESD if it is not running yet, esp. not from
+	  detect() !
+	* timidity/ao_a.c: [PATCH 2/9] libao: Add a detect() function
+	  Most Linux distros use pulseaudio by now, and libao is the
+	  best way to use pulseaudio from timidity. This patch adds a
+	  detect function to libao, which will make libao autodetect
+	  succeed only when pulse is available, so that we can prefer
+	  libao in the probe order to get pulse, without also getting
+	  libao on systems where we should be using alsa directly.
+	* timidity/output.c: [PATCH 3/9] Change audio output detection
+	  order
+	  First try the various desktop daemons we support, and only
+	  when those are not available use the systems native sound
+	  system. Also try ALSA before the native sound system, since
+	  the native sound system on Linux is set to OSS, and ALSA
+	  definitely is preferable over OSS.
+	* doc/C/timidity.1, doc/C/timidity.cfg.5: [PATCH 4/9] Various
+	  man page fixes
+	  courtesy of Debian (revised by TAMUKI Shoichi)
+	* interface/alsaseq_c.c, timidity/timidity.c: [PATCH 6/9] Fork
+	  earlier when we're going to run deamonized in ALSA sequencer
+	  mode
+	  If we're going to fork for daemon mode, we need to fork
+	  earlier, as certain output libraries (pulseaudio) become
+	  unhappy if initialized before forking and then being used
+	  from the child.
+	* timidity/flac_a.c: [PATCH 7/9] flac_a: Fix compiling with
+	  recent flac versions
+	  The LEGACY_FLAC test was only succeeding on windows since
+	  the FLAC/export.h was inside a windows #ifdef block.
+	  While at it also fix various compiler warnings, including
+	  atleast 2 real bugs:
+	  1) The missing include for common.h meant the safe_malloc
+	     prototype was missing, making the compiler assume it
+	     returns an int -> fail on 64 bits
+	  2) The | with FLAC__STREAM_ENCODER_VERIFY_MISMATCH_IN_AUDIO_DATA
+	     in the error handling test was missing () and it is the
+	     wrong thing to do in general since this is an enum not a
+	     flags field.
+	* timidity/controls.c, timidity/effect.c, timidity/oss_a.c,
+	  timidity/playmidi.h, timidity/speex_a.c, timidity/wrd.h:
+	  [PATCH 8/9] Fix a bunch of: warning: implicit declaration of
+	  function ... warnings
+	* timidity/sndfont.c: [PATCH 9/9] sndfont: Work around
+	  soundfonts with missing links between stereo samples
+	  Some sf2 files have all their link ids between stereo
+	  samples set to 0, this patch works around that, atleast for
+	  files which have 2 matching the matched left + right samples
+	  directly after each other in the instruments layers list.
+	* interface/gtk_i.c, interface/server_c.c, interface/tk_c.c,
+	  interface/wrdt_tty.c, interface/x_sherry.c, interface/xaw_c.c,
+	  interface/xaw_i.c, interface/xskin_c.c, libarc/unlzh.c,
+	  libunimod/load_far.c, libunimod/load_it.c, libunimod/mloader.c,
+	  libunimod/mlutil.c, timidity/ao_a.c, timidity/calcnewt.c,
+	  timidity/common.c, timidity/effect.c, timidity/esd_a.c,
+	  timidity/freq.c, timidity/instrum.c, timidity/loadtab.c,
+	  timidity/m2m.c, timidity/miditrace.c, timidity/output.c,
+	  timidity/playmidi.c, timidity/readmidi.c, timidity/recache.c,
+	  timidity/resample.c, timidity/reverb.c, timidity/smplfile.c,
+	  timidity/speex_a.c, timidity/timidity.c, utils/net.c,
+	  utils/nkflib.c: [PATCH 10/17] Fix / silence various compiler
+	  warnings
+	* configure.in: [PATCH 14/17] Silence autofoo warnings about
+	  have_speex ac cache identifier (autoreconf by TAMUKI Shochi)
+	* interface/Makefile.am, interface/dynamic_c.c,
+	  timidity/controls.c, timidity/timidity.c,
+	  (remove) interface/dynamic_c.c: [PATCH 15/17] Get rid of the
+	  dynamic_control_mode ControlMode
+	  This is a left over from before the dynamic_interface_module()
+	  rewrite, not only is it no longer needed its code is plain
+	  wrong, as it still contains a prototype for the old way
+	  different dynamic_interface_module() and tries to call it as
+	  if it were the old version, if that code path where to ever
+	  be invoked bad things (tm) would happen. Luckily it is never
+	  used, so simply nuke it. (autoreconf by TAMUKI Shoichi)
+	* timidity/dl_dlopen.c: [PATCH 16/17] Silence dlsym errors
+	  The way the new dynamic_interface_module() function probes
+	  for dynamic interfaces cause it to always hit a few dlsym
+	  errors as soon as you have more then one dynamic interface,
+	  so silence these errors.
+	* timidity/timidity.c: [PATCH 17/17] Fix listing of dynamic
+	  interfaces in --help output
+
+2010-09-19  Kentaro Sato <kentaro@ranvis.com>
+
+	* timidity/instrum.[ch]: Fix a bug created at the previous commit
+	  that prevents alternate instruments from loading occasionally.
+	* timidity/instrum.c, timidity/readmidi.[ch]:
+	  Fix a bug that ignores user drum source instrument when
+	  "soundfont" directive is used.
+	* timidity/playmidi.c: Fix a bug that ignores non-standard drumsets
+	  when a soundfont is specified with "soundfont" directive and
+	  the instrument is loaded as needed.
+	* interface/w32g_pref.c: Fix potential uninitialized pointers access.
+	* interface/w32g_syn.c: Add access keys to some of twsyng menuitems.
+
+2010-09-12  Kentaro Sato <kentaro@ranvis.com>
+
+	* timidity/timidity.c (set_val_float_t):
+	  Fix an error message for the bad floating point values.
+	* timidity/instrum.c: Fix a bug that ignores non-standard drumsets
+	  when a soundfont is specified with "soundfont" directive.
+
+2010-08-28  Kentaro Sato <kentaro@ranvis.com>
+
+	* timidity/timidity.c: Remove the current directory for
+	  the search path of LoadLibrary(), which is invoked when using
+	  output formats that depends on a DLL. (Windows executable)
+	  Quick fix for Microsoft Security Advisory 2269637.
+
+2010-07-10  Kentaro Sato <kentaro@ranvis.com>
+
+	* timidity/sndfont.c: Correct soundfont broken loop point
+	  to avoid infinite loop on resampling.
+
+2010-06-05  Kentaro Sato <kentaro@ranvis.com>
+
+	* timidity/reverb.[ch]:
+	  Fix insertion effect Lo-Fi making loud noise.
+	* timidity/mix.c: Workaround for Moog VCF making loud noise.
+	* timidity/playmidi.c: Remove obsolete filter frequency cap.
+
+2010-05-23  Kentaro Sato <kentaro@ranvis.com>
+
+	* timidity/readmidi.c, timidity/reverb.[ch]:
+	  Fix ch_3tap_delay crash.
+	* timidity/sndfont.c:
+	  Fix infinite loop on reusing soundfont struct.
+
+2010-05-17  Eric A. Welsh <ewelsh@ccb.wustl.edu>
+
+	* timidity/readmidi.c: Allow Device Numbers other than 0x10 for
+	  XG SYSTEM ON SYSEX events.
+	* timidity/mix.c: Fix existing anti-popping minimum volume ramps
+	  for expression, volume, pans, etc.
+	  Extend anti-popping minimum volume ramps to envelope amp changes.
+
+2009-12-23  Yair K. <cesium2@gmail.com>
+
+	* timidity/sun_a.c (acntl):
+	  Fix for message PM_REQ_GETQSIZ, PM_REQ_GETFRAGSIZ.
+
+2009-12-19  Kentaro Sato <kentaro@ranvis.com>
+
+	* timidity/readmidi.c: Fixed crash when loading long music.
+	* timidity/output.[ch], timidity/timidity.c:
+	  Fixed corruption of the default device encoding on some occasion.
+	* timidity/output.[ch], timidity/w32_a.c:
+	  Fixed Windows audio driver 24-bit output.
+	* interface/w32g_syn.c: Better tray icon removal.
+
+2009-10-04  Kentaro Sato <kentaro@ranvis.com>
+
+	* doc/C/timidity.1, doc/ja_JP.eucJP/timidity.1,
+	  timidity/reverb.[ch], timidity/timidity.c:
+	  Added Freeverb parameter options to --reverb.
+	* timidity/freq.c, timidity/sndfont.c:
+	  Reduced warnings.
+
+2009-03-16  TAMUKI Shoichi <tamuki@linet.gr.jp>
+
+	* timidity/readmidi.c (gloom_list):
+	  Fix for GM2 drumch on program change
+	* timidity/playmidi.c (midi_drumpart_change): Beautify
+
+2009-03-15  Kentaro Sato <kentaro@ranvis.com>
+
+	* timidity/miditrace.c:
+	  Fix for Mac sound spectrum being out of sync in trace mode.
+	* timidity/reverb.c:
+	  Revert r1.69 change for panning delay that caused off-by-one.
+
+2009-03-15  Kentaro Sato <kentaro@ranvis.com>
+
+	* interface/w32g_c.c: Display errors reported on startup.
+	* interface/w32g_utl.c: Add configuration fallbacks.
+	* timidity/midi_a.c: Remove unused local variables.
+	* timidity/sndfont.c:
+	  CFG_FOR_SF_SUPPORT_FFT can be externally defined. (cfgforsf)
+
+2009-03-04  TAMUKI Shoichi <tamuki@linet.gr.jp>
+
+	* interface/ncurs_c.c, timidity/readmidi.c:
+	  Fix to fit with MAX_CHANNELS > 32
+	* timidity/playmidi.c (find_voice): Beautify
+
+2008-12-06  Keishi Suenaga <skeishi@yahoo.co.jp>
+
+	* configure.in: Fix mingw detection and replace wsock32 by ws2_32.
+	* timidity/w32_libOggFLAC_dll.c: Small fix.
+	* utils/getaddrinfo.c(new file), utils/Makefile.am, utils/net.c:
+	  utils/net.h: Windows 2000 compatible network.
+
+2008-05-22  Yair K. <cesium2@gmail.com>
+
+	* interface/xaw_i.c: reinstate one line.
+
+2008-05-22  TAMUKI Shoichi <tamuki@linet.gr.jp>
+
+	* utils/net.c: Fix for AI_ADDRCONFIG unsupported
+
+2008-05-21  Yair K. <cesium2@gmail.com>
+
+	* interface/server_c.c, libarc/url_ftp.c, libarc/url_http.c,
+	  libarc/url_news.c, timidity/timidity.c, utils/net.c:
+	  add ipv6 support.
+	* timidity/sysdep.h: include more possible LP64 defines.
+	* timidity/readmidi.c: fix for broken karaoke files produced
+	  by abc2mid.
+	* interface/xaw_i.c, interface/xaw.h: make compatible with
+	  xaw3d v1.5, style changes.
+	* interface/TiMidity(-uj).ad: move useButtom, useRight resources
+	  from xaw_i.c to here.
+	* timidity/oss_a.c: use 0x7fff arg to get maximum number of
+	  fragments.  modernize ioctls a bit.
+
+2008-04-16  Keishi Suenaga <skeishi@yahoo.co.jp>
+
+	* interface/w32g_pref.c: WIN64 with AMD64 small fix
+
+2008-04-16  Keishi Suenaga <skeishi@yahoo.co.jp>
+
+	patches by Yair K.
+	* interface/xaw_i.c, interface/x_trace.c, interface/x_trace.h:
+	  xaw SIGSEGV fix.
+
+2008-04-16  Keishi Suenaga <skeishi@yahoo.co.jp>
+
+	a patch by Stas Sergeev
+	* interface/alsaseq_c.c: idle time patch.
+
+2008-04-13  Keishi Suenaga <skeishi@yahoo.co.jp>
+
+	* configure.in, doc/C/README.w32, doc/ja_JP.eucJP/README.w32,
+	  interface/Makefile.am, timidity/sysdep.h:
+	  update files about Compile for Windows.
+	* interface/w32g.h, interface/w32g_c.c, interface/w32g_i.c,
+	  interface/w32g_pref.c, interface/w32g_ut2.c, interface/w32g_utl.c,
+	  timidity/controls.h, timidity/optcode.h, timidity/playmidi.c,
+	  timidity/sysdep.h, timidity/w32_a.c, timidity/reverb.c:
+	  support for WIN64 with AMD64
+
+2008-04-08  TAMUKI Shoichi <tamuki@linet.gr.jp>
+
+	* timidity/timidity.c: Fix atavism (reversion) and change a bit
+
+2008-04-08  Keishi Suenaga <skeishi@yahoo.co.jp>
+
+	* timidity/ao_a.c, timidity/portaudio_a.c, timidity/timidity.c,
+	  timidity/w32_a.c: select audio device only in -o option
+
+2008-04-06  TAMUKI Shoichi <tamuki@linet.gr.jp>
+
+	* timidity/timidity.c: Revert short -Od(n) option for output
+	  device ID
+
+2008-04-06  Keishi Suenaga <skeishi@yahoo.co.jp>
+
+	* timidity/w32_libFLAC_dll.c, timidity/w32_libFLAC_dll_g.h:
+	  support new flac dll(1.2.1)
+
+2008-04-06  Keishi Suenaga <skeishi@yahoo.co.jp>
+
+	* timidity/common.c, timidity/speex_a.c: fix compliation
+	* timidity/midi_a.c: BorlancC patch
+
+2008-04-05  TAMUKI Shoichi <tamuki@linet.gr.jp>
+
+	* timidity/timidity.c: Remove short option -Od(n) for output
+	  device ID because -O? option is assigned for output format
+	* TiMidity(-uj).ad, interface/Makefile.am: Fix trivial typo,
+	  translate into Japanese, and move to interface directory
+	TODO: update man page of timidity.1
+	      --output-devices=n
+	      --preserve-silence
+	TODO: update ja_JP.eucJP/README.xaw
+
+2008-04-03  Keishi Suenaga <skeishi@yahoo.co.jp>
+
+	patches by Yair K.
+	* interface/Makefile.am, bitmaps/Makefile.am, interface/arrow.xbm,
+	  interface/check.xbm, interface/off.xbm, interface/on.xbm: remove
+
+2008-04-02  Keishi Suenaga <skeishi@yahoo.co.jp>
+
+	patches by Yair K.
+	* timidity/common.c, common.makefile.in, configure.in,
+	  doc/C/README.xaw, interface/arrow.xbm, interface/check.xbm,
+	  interface/Makefile.am, interface/off.xbm, interface/on.xbm,
+	  interface/xaw_c.c, interface/xaw.h, interface/xaw_i.c,
+	  Makefile.am, Makefile.in, script/unix2dos.sh, timidity/aiff_a.c,
+	  timidity/au_a.c, timidity/common.c, timidity/flac_a.c,
+	  timidity/gogo_a.c, timidity/m2m.c, timidity/midi_a.c,
+	  timidity/modmid_a.c, imidity/output.h, timidity/playmidi.c,
+	  timidity/raw_a.c, timidity/speex_a.c, timidity/vorbis_a.c,
+	  timidity/wave_a.c: some improvements of XAW interface.
+	* interface/bitmaps/arrow.xbm, interface/bitmaps/check.xbm,
+	  interface/bitmaps/fast.xbm, interface/bitmaps/keydown.xbm,
+	  interface/bitmaps/keyup.xbm, interface/bitmaps/off.xbm,
+	  interface/bitmaps/on.xbm, interface/bitmaps/slow.xbm,
+	  interface/xdnd.c, interface/xdnd.h, interface/x_trace.c,
+	  interface/x_trace.h, TiMidity.ad, TiMidity-uj.ad: add
+	* TiMidity.ad.in, TiMidity-uj.ad.in: remove
+
+2008-04-01  Keishi Suenaga <skeishi@yahoo.co.jp>
+
+	a patch by Milan Zamazal
+	* timidity/playmidi.c, timidity/playmidi.h, timidity/readmidi.c,
+	  timidity/timidity.c: add preserve-silence option
+
+2008-03-31  Keishi Suenaga <skeishi@yahoo.co.jp>
+
+	a patch from Yair K.
+	* configure.in, utils/support.c, utils/support.h: fix-snprintf-crash
+
+2008-03-30  Keishi Suenaga <skeishi@yahoo.co.jp>
+
+	patches from Yair K.
+	* libarc/arc_tar.c: fix archive add crash
+	* timidity/reverb.c: fix reverb crash from Debian
+	* timidity/miditrace.c: fix soundspec in trace mode
+	* autoconf/utils.m4, configure.in, timidity/Makefile.am,
+	  timidity/midi_a.c, timidity/output.c, timidity/reverb.c,
+	  timidity/reverb.h, timidity/sun_a.c, timidity/sysdep.h:
+	  for support OpenBSD
+
+2008-03-28  Stas Sergeev <stsp@aknet.ru>
+
+	* timidity/midi_a.c: remove gnuc extensions
+
+2007-03-10  Keishi Suenaga <skeishi@yahoo.co.jp>
+
+	* interface/npsyn_c.c, interface/rtsyn.h, interface/rtsyn_common.c,
+	  interface/rtsyn_npipe.c, timidity/npipe_a.c, timidity/playmidi.c,
+	  timidity/portaudio_a.c, timidity/timidity.c, utils/timer.c:
+	  Windows Named Pipe interface.
+
+2007-02-09  Keishi Suenaga <skeishi@yahoo.co.jp>
+
+	* interface.h.in: Windows Named Pipe interface
+	* timidity/timidity.c: fix typo
+
+2007-02-09  Keishi Suenaga <skeishi@yahoo.co.jp>
+
+	* configure.in, interface/Makefile.am, interface/rtsyn.h,
+	  interface/rtsyn_common.c, timidity/Makefile.am, timidity/output.c,
+	  timidity/timidity.c, timidity/controls.c:
+	  Windows Named Pipe interface (new)
+	* interface/npsyn_c.c, interface/rtsyn_npipe.c, timidity/npipe_a.c:
+	  (add)
+	* timidity/resample.c: small fix freeing gauss_table.
+	* windrv/timiditydrv.c, windrv/timiwp_timidity.c:
+	  fix for WindowsMediaPlayer.
+
+2007-01-28  Keishi Suenaga <skeishi@yahoo.co.jp>
+
+	* interface/rtsyn_common.c: fix sysex check
+	* timidity/portaudio_a.c, timidity/w32_a.c: small fix for compiling
+	* timidity/timidity.c: w32 cfg file sequence changed
+	  (option > exe dir > win dir).  w32 set stdin&out binarymode
+	* windrv/Makefile.am, windrv/timiditydrv.idl: re-add timidity.idl
+	* windrv/timiditydrv.c: re-add MIDIOUTCAPS2A(W)
+
+2007-01-14  Keishi Suenaga <skeishi@yahoo.co.jp>
+
+	* timidity/flac_a.c, timidity/gogo_a.c, timidity/speex_a.c,
+	  timidity/vorbis_a.c, timidity/wave_a.c, timidity/output_a.c:
+	  fix for autofilename
+
+2007-01-13  Keishi Suenaga <skeishi@yahoo.co.jp>
+
+	* timidity/wave_a.c: fix for server interface.
+
+2007-01-12  Keishi Suenaga <skeishi@yahoo.co.jp>
+
+	* timidity/wave_a.c: fix for autofilename.
+
+2007-01-05  TAMUKI Shoichi <tamuki@linet.gr.jp>
+
+	* timidity/timidity.c (main): Fix to avoid segmentation fault
+	  when "." or nonexistent archive name is given
+
+2007-01-04  Keishi Suenaga <skeishi@yahoo.co.jp>
+
+	Fix -iW and timiditydrv.dll sound problem.
+	* timidity/portaudio_a.c: fix buffer overlow.
+
+2007-01-04  TAMUKI Shoichi <tamuki@linet.gr.jp>
+
+	* timidity/midi_a.c (M_FWRITE):
+	  Keep backward compatibility for gcc-2.95 or earlier
+	* timidity/timidity.c (parse_opt_output_device): Change a bit
+
+2007-01-03  Keishi Suenaga <skeishi@yahoo.co.jp>
+
+	Fix -iW and timiditydrv.dll sound problem.
+	* timidity/portaudio_a.c: remove broken acntl()s.
+
+2007-01-01  Keishi Suenaga <skeishi@yahoo.co.jp>
+
+	* timidity/timidity.c, timidity/w32_a.c,
+	  timidity/portaudio_a.c: can select output device.
+
+2007-01-01  Kentaro Sato <kentaro@ranvis.com>
+
+	* timidity/playmidi.[ch], timidity/readmidi.c:
+	  Added support for GM2 Master Fine/Coarse Tuning, GS Master Tune
+	  and XG Master Tuning (4C not 27) SysEx.
+	* timidity/readmidi.c: Fix suspected typo.
+	* libarc/unlzh.c: Reverted a useless fix of the previous commit.
+
+2006-12-30  Keishi Suenaga <skeishi@yahoo.co.jp>
+
+	* interfece/w32g_pref.c: can change timidity.cfg editor
+	  by environment valuable TIMIDITY_CFG_EDITOR.
+
+2006-12-29  Kentaro Sato <kentaro@ranvis.com>
+
+	* timidity/controls.[ch]: Changed argument type of std_write().
+	* timidity/midi_a.c: Imploved system independency.
+	* libarc/unlzh.c: Fixed vulnerabilities named
+	  CVE-2006-4335, CVE-2006-4337, CVE-2006-4338.
+
+2006-12-27  Keishi Suenaga <skeishi@yahoo.co.jp>
+
+	* timidity/portaudio_a.c: bug fix
+	* interface/w32g_pref.c, interface/w32g_pref.h,
+	  w32_portaudio_dll.c: asio dialog in win GUI.
+
+2006-12-26  Keishi Suenaga <skeishi@yahoo.co.jp>
+
+	* timidity/portaudio_a.c,
+	  timidity/w32_portaudio_dll.c: fix portaudio v19 support
+	  now use only one dll named portaudio.dll.
+
+2006-12-23  Keishi Suenaga <skeishi@yahoo.co.jp>
+
+	* windrv/Makefile.am, windrv/timiditydrv.c: free from idl
+	* windrv/timiditydrv.idl: removed
+	* windrv/oemsetup.inf: removed
+	* doc/C/README.w32, doc/ja_JP.eucJP/README.w32: updated
+
+2006-12-23  Keishi Suenaga <skeishi@yahoo.co.jp>
+
+	* configure.in, doc/C/README.w32, doc/ja_JP.eucJP/README.w32,
+	  interface/Makefile.am, interface/ncurs_c.c,
+	  interface/rtsyn_common.c, interface/rtsyn_winmm.c,
+	  interface/w32g_syn.c, interface/winsyn_c.c,
+	  interface/wrdt_w32g.c, libarc/Makefile.am, libarc/url_file.c,
+	  libarc/url_ftp.c, libarc/url_http.c, libarc/url_mem.c,
+	  libarc/url_news.c, libarc/url_newsgroup.c, libunimod/Makefile.am,
+	  libunimod/unimod.h, timidity/Makefile.am, timidity/aiff_a.c,
+	  timidity/aq.c, timidity/au_a.c, timidity/controls.c,
+	  timidity/flac_a.c, timidity/gogo_a.c, timidity/list_a.c,
+	  timidity/midi_a.c, timidity/miditrace.c, timidity/mod2midi.c,
+	  timidity/playmidi.c, timidity/playmidi.h, timidity/portaudio_a.c,
+	  timidity/raw_a.c, timidity/readmidi.c, timidity/recache.c,
+	  timidity/sndfont.c, timidity/sysdep.h, timidity/timidity.c,
+	  timidity/w32_a.c, timidity/w32_gogo.c,
+	  timidity/w32_libFLAC_dll.c, timidity/w32_libOggFLAC_dll.c,
+	  timidity/wave_a.c, utils/Makefile.am, utils/mblock.c,
+	  utils/readdir.h, utils/readdir_win.c, utils/support.c,
+	  utils/tmdy_getopt.h, windrv/Makefile.am: Pelles C Compiler support
+
+2006-12-21  Keishi Suenaga <skeishi@yahoo.co.jp>
+
+	C++ dependency is removed.
+	* configure.in: remove AC_PROG_CXX, always link winsock32 for midi_a.c
+	* windrv/timiditydrv.cpp: removed
+	* windrv/timiditydrv.c: added
+	* windrv/Makefile_am: remove C++ dependency
+
+2006-12-20  Keishi Suenaga <skeishi@yahoo.co.jp>
+
+	* timidity/midi_a.c: windows compilers support.
+	* timidity/effect.c: remove duplicate definitions.
+
+2006-12-18  Keishi Suenaga <skeishi@yahoo.co.jp>
+
+	* timidity/midi_a.c: u_int8_t must be uint8_t.
+	* timidity/flac_a.c: fix for mingw.
+
+2006-12-18  Keishi Suenaga <skeishi@yahoo.co.jp>
+
+	* autoconf/ogg.m4: from libogg-1.1.3.tar.gz
+	* autoconf/vorbis.m4: from libvorbis-1.1.2.tar.gz
+	* timidity/portaudio_a.c: bug fix
+
+2006-12-14  Stas Sergeev <stsp@aknet.ru>
+
+	* interface/server_c.c: extend midi protocol.
+	* timidity/midi_a.c: new file.
+
+2006-12-13  URABE Shyouhei <shyouhei@ruby-lang.org>
+
+	* timidity/flac_a.c: merge patch from FLAC team.
+	* interface/xaw_i.c: merge patch fixing gcc4 compilation problem.
+	* interface/alsaseq_c.c, interface/emacs_c.c, interface/gtk_c.c,
+	  interface/mac_c.c, interface/motif_c.c, interface/ncurs_c.c,
+	  interface/portmidisyn_c.c, interface/server_c.c,
+	  interface/tk_c.c, interface/w32g_c.c, interface/w32g_syn.c,
+	  interface/winsyn_c.c, interface/xaw_c.c, interface/xskin_c.c,
+	  timidity/controls.h, timidity/playmidi.c, timidity/playmidi.h,
+	  timidity/sndfont.c, timidity/timidity.c:
+	  propagate return code
+
+2006-07-27  Keishi Suenaga <s_keishi@mutt.freemai.ne.jp>
+
+	* timidity/timidity.c (open_file): Fix coredump when random play.
+	  (free files problem)
+
+2006-06-02  TAMUKI Shoichi <tamuki@linet.gr.jp>
+
+	* timidity/common.c (open_file): Ignore directories only when
+	  loading a GUS/patch instrument in order to avoid the trouble
+	  in {gtk,motif,tcltk} interface and WRD display
+	* timidity/timidity.c (main): Revert fix supplying suffix '/'
+	  to each argv elements when the path *is* a directory but
+	  *is not* suffixed by '/'
+
+2006-05-31  TAMUKI Shoichi <tamuki@linet.gr.jp>
+
+	* timidity/instrum.c, timidity/readmidi.c:
+	  Revert and fix around alternate assign
+
+2006-05-28  TAMUKI Shoichi <tamuki@linet.gr.jp>
+
+	* interface/mac_c.c, interface/motif_c.c, interface/vt100_c.c,
+	  interface/xaw_c.c, timidity/sndfont.c:
+	  Add struct member of ControlMode to fit with new interface
+
+2006-05-26  Eric A. Welsh <ewelsh@ccb.wustl.edu>
+
+	* timidity/timidity.c (main): The free(files[i]) loop was causing
+	  segfaults by free'ing previously free'd memory.  The strings
+	  within files[] are allocated as a single block pointed to by
+	  files[0], then the other string pointers point to the separate
+	  strings within the files[0] block.  Thus only files[0] should
+	  be free'd.
+
+2006-05-12  TAMUKI Shoichi <tamuki@linet.gr.jp>
+
+	* coufigure.in: Fix CFLAGS issue
+
+2006-05-06  URABE Shyouhei <shyouhei@ice.uec.ac.jp>
+
+	* configure.in: add wcc386 check.
+
+2006-04-14  Stas Sergeev <stsp@aknet.ru>
+
+	* interface/server_c.c: add midi protocol.
+
+2006-03-21  Kentaro Sato <kentaro@ranvis.com>
+
+	* timidity/aq.c: Made use of free-on-exit thingie.
+	* timidity/instrum.c: Reverted needless r1.24 changes.
+	* timidity/resample.c: Reverted gauss_table to be realloc'ed to allow
+	  interfaces to change N-order dynamically. No leaks.
+	* timidity/timidity.c: Reverted r1.173 changes around mblock.
+	* libarc/arc.c: Better path separators skipping.
+
+2006-03-19  Stas Sergeev <stsp@aknet.ru>
+
+	* timidity/timidity.c (main): dynamic allocation of
+	  dynamic_lib_root
+	* interface/server_c.c: save CPU power
+
+2006-02-04  Keishi Suenaga <s_keishi@mutt.freemai.ne.jp>
+
+	* configure.in, doc/ja_JP.eucJP/README.w32, timidity/Makefile.am,
+	  windrv/Makefile.am, windrv/timiditydrv.cpp, windrv/timiditydrv.def:
+	  timiditydrv.dll can comple with digital Mars
+	* timidity/portaudio_a.c: enable WRD with portaudio.
+	* timidity/playmidi.c, interface/rtsyn_common.c, timidity/instrum.c,
+	  timidity/readmidi.c: fix unfreed memory.
+
+2006-01-29  Keishi Suenaga <s_keishi@mutt.freemai.ne.jp>
+
+	* timidity/playmidy.c: export reet_midi();
+	* interface/rtsyn_common.c: bugfix
+	* timidity/portaudio_a.c: latency changes by interface charactor.
+
+2006-01-28  Keishi Suenaga <s_keishi@mutt.freemai.ne.jp>
+
+	Fixes of memory leak (checked with win_and dumb win_gui)
+	* interface/w32g.h, interface/w32g_mag.c, interface/w32g_mag.h,
+	  interface/w32g_playlist.c, interface/w32g_subwin.c,
+	  interface/w32g_subwin.h, interface/w32g_utl.c, interface/w32g_utl.h,
+	  libarc/arc.c, timidity/aq.c, timidity/aq.h, timidity/instrum.c,
+	  timidity/instrum.h, timidity/playmidi.c, timidity/readmidi.c,
+	  timidity/readmidi.h, timidity/recache.c, timidity/recache.h,
+	  timidity/resample.c, timidity/resample.h, timidity/sffile.c,
+	  timidity/sndfont.c, timidity/timidity.c, timidity/wrdt.c,
+	  windrv/timiwp_timidity.c, interface/rtsyn_common.c:
+	  not free_global_mblock() bitween sound;
+
+2006-01-25  Keishi Suenaga <s_keishi@mutt.freemai.ne.jp>
+
+	* windrv/mmddk.h: Added. LGPL version.
+	* windrv/Makefile.am, doc/ja_JP.eucJP/README.w32, doc/C/README.w32:
+	  no more depence on NTDDK.
+	* interface/rtsyn_common.c: call free_global_mblock() with option -U
+	* timidity/readmidi.c: Mingw gcc3 and Borland C hack
+
+2006-01-23  Keishi Suenaga <s_keishi@mutt.freemai.ne.jp>
+
+	* timidity/mix.c, timidity/optcode.c, timidity/optcode.h,
+	  timidity/playmidi.c, timidity/reverb.c, timidity/timidity.c,
+	  timidity/wrd.h, timidity/wrdt.c: supress Borland C inline warrings.
+
+2006-01-23  Keishi Suenaga <s_keishi@mutt.freemai.ne.jp>
+
+	* timidity/readmidi.c: XG reverb fix
+	* timidity/sysdep.h: digital mars fix
+
+2006-01-21  Keishi Suenaga <s_keishi@mutt.freemai.ne.jp>
+
+	* timidity/portaudio_a.c: bug fix
+	* interface/w32g_syn.c: digital mars compile fix
+	* timidity/effect.c: Noise shaping noise fix.
+
+2006-01-19  Keishi Suenaga <s_keishi@mutt.freemai.ne.jp>
+
+	Can compile with Digital Mars.
+	* configure.in, interface/Makefile.am, libarc/Makefile.am,
+	  libunimod/Makefile.am, timidity/Makefile.am, utils/Makefile.am,
+	  timidity/common.c, timidity/list_a.c, timidity/timidity.c,
+	  utils/support.c: Changes for Digital Mars.
+	* timidity/effect.c.orig: Noise shaping noise hack.
+	* script/unix2dos.sh: Added. newline code conversion(LF->CRLF).
+
+2006-01-17  Keishi Suenaga <s_keishi@mutt.freemai.ne.jp>
+
+	* interface/w32g.h: fix LCD array size mismatch hang up.
+	* interface/w32g_pref.c, interface/w32g_utl.c:
+	  fix over 256 voces hang up about win GUI.
+	* timidity/reverb.h: small fix.
+
+2006-01-16  Keishi Suenaga <s_keishi@mutt.freemai.ne.jp>
+
+	Supress linker errors about Windows GUI executables.
+	* configure.in: shape up.
+	* interface/Makefile.am: don't link tty and dumb objs
+	  to GUI executables.
+	* interface/w32g_i.c: borand C volatile link problem fix.
+	* interface/w32g_ut2.c.orig: small fix.
+	* timidity/controls.c, timidity/timidity.c, timidity/wrdt.c:
+	  GUI executables don't use dumb or tty controls.
+	* timidity/reverb.c: don't define public variables in .h file.
+
+2006-01-15  Keishi Suenaga <s_keishi@mutt.freemai.ne.jp>
+
+	* configure.in: MSVC compile fix
+	* windrv/timiditydrv.cpp: use _beginthreadex not CreateThread
+	* doc/ja_JP.eucJP/README.w32: typo
+	* script/Makefile.am: add script/wpp386_w.sh
+	* interface/ncurs_c.c: fix
+
+2006-01-12  Keishi Suenaga <s_keishi@mutt.freemai.ne.jp>
+
+	* doc/C/README.w32, doc/ja_JP.eucJP/README.w32:
+	  add wine wrc.exe discription
+	* interface/Makefile.am: add rc.exe japanese language option -l0x11
+
+2006-01-12  Keishi Suenaga <s_keishi@mutt.freemai.ne.jp>
+
+	* configure.in: Add mkstemp check
+	* doc/C/README.w32, doc/ja_JP.eucJP/README.w32:
+	  About timiditydrv compilation
+	* windrv/Makefile.am: Change to use midl.exe
+	* windrv/dlldata.c, windrv/timiditydrv.h, windrv/timiditydrv_i.c,
+	  windrv/timiditydrv_p.c:
+	  Removed because will be ganerated by midl.exe.
+
+2006-01-08  Keishi Suenaga <s_keishi@mutt.freemai.ne.jp>
+
+	* configure configure.in, utils/tmdy_getopt.h, doc/C/README.w32,
+	  doc/ja_JP.eucJP/README.w32, script/wcc386_w.sh, timidity/au_a.c,
+	  timidity/wave_a.c, utils/support.h: Changes for OpenWatcom 1.4
+
+2005-12-19  Stas Sergeev <stsp@aknet.ru>
+
+	* interface/server_c.c: Add server version.
+
+2005-12-03  Stas Sergeev <stsp@aknet.ru>
+
+	* interface/server_c.c: Do not ignore SIGPIPE
+
+2005-11-26  URABE Shyouhei <shyouhei@ice.uec.ac.jp>
+
+	* timidity/timidity.c (parse_opt_i): fix for possible null-pointer
+	  dereference when interface plugin is not found.
+
+2005-11-26 Stas Sergeev <stsp@aknet.ru>
+
+	* interface/ncurs_c.c, interface/dumb_c.c, interface/slang_c.c,
+	  interface/tk_c.c, interface/emacs_c.c, interface/xskin_c.c,
+	  interface/gtk_c.c, interface/server_c.c, interface/alsaseq_c.c,
+	  interface/dynamic_c.c, timidity/controls.h, timidity/tables.c,
+	  timidity/raw_a.c, timidity/controls.c, timidity/flac_a.c,
+	  timidity/vorbis_a.c, timidity/au_a.c, timidity/wave_a.c,
+	  timidity/aiff_a.c, timidity/speex_a.c:
+	  warn when output to stdout makes no sense
+
+2005-11-15  URABE Shyouhei <shyouhei@ice.uec.ac.jp>
+
+	* timidity/sysdep.h: [timidity-bugs-en:61] Add stdint.h check
+
+2005-11-02  Kentaro Sato <kentaro@ranvis.com>
+
+	* timidity/playmidi.c: Changed sustained notes not to drop
+	  when opt_overlap_voice_allow is enabled.
+	* interface/rtsyn.h: Added #ifdef for <sys/types.h>.
+
+2005-11-01  URABE Shyouhei <shyouhei@ice.uec.ac.jp>
+
+	* doc/ja_JP.eucJP/README.tk: not -itt but -ikt
+	  (thanks AOKI Taichi @naist)
+
+2005-10-31  Stas Sergeev <stsp@aknet.ru>
+
+	* interface/server_c.c: fix for timing bugs
+
+2005-10-31  TAMUKI Shoichi <tamuki@linet.gr.jp>
+
+	* timidity/timidity.c: Change a bit
+
+2005-10-31  Keishi Suenaga <s_keishi@mutt.freemail.ne.jp>
+
+	* Makefile.am, configure.in, doc/C/README.w32, timidity/Makefile.am,
+	  timidity/timidity.c: Changed files
+	* windrv/Makefile.am, windrv/dlldata.c, windrv/oemsetup.inf,
+	  windrv/timiditydrv.cpp, windrv/timiditydrv.def,
+	  windrv/timiditydrv.h, windrv/timiditydrv.i,
+	  windrv/timiditydrv.idl, windrv/timiditydrv.inf,
+	  windrv/timiditydrv_i.c, windrv/timiditydrv_p.c,
+	  windrv/timiwp_timidity.c, windrv/timiwp_timidity.h:
+	  Windows Driver merged (New files)
+
+2005-10-31  Keishi Suenaga <s_keishi@mutt.freemail.ne.jp>
+
+	* timidity/portaudio_a.c: for ASIO4ALL fix
+	* interface/rtsyn.h, interface/rtsyn_common.c: Change a bit
+
+2005-10-30  TAMUKI Shoichi <tamuki@linet.gr.jp>
+
+	* timidity/playmidi.c, timidity/sndfont.c, timidity/timidity.c:
+	  Change a bit
+
+2005-10-28  Keishi Suenaga <s_keishi@mutt.freemail.ne.jp>
+
+	* timidity/w32_gogo.h: small fix
+	* interface/w32g_utl.c, interface/w32g_syn.c: changes for gcc4 windows
+	* interface/rtsyn_portmidi.c, interface/rtsyn_winmm.c,
+	  timidity/playmidi.c, interface/rtsyn.h, timidity/instrum.h,
+	  timidity/sndfont.c, interface/rtsyn_common.c, timidity/timidity.c:
+	  New version of windows synthesizer mode. (new windows synth.)
+	  Introduce --rtsyn-latency=(seconds) long-option.
+	* doc/C/README.w32, doc/ja_JP.eucJP/README.w32: correlated changes.
+
+2005-10-22  Stas Sergeev <stsp@aknet.ru>
+
+	* interface/server_c.c: fix for cmd_setbuf
+
+2005-09-30  Stas Sergeev <stsp@aknet.ru>
+
+	* interface/xaw_i.c, interface/server_c.c, interface/soundspec.c,
+	  interface/motif_i.c, libarc/url_newsgroup.c, libarc/url_http.c,
+	  libarc/url.c, libarc/url_ftp.c, libarc/url_file.c,
+	  libarc/url_news.c, timidity/audriv_mme.c, timidity/wrd_read.c:
+	  use stderr instead of stdout
+
+2005-09-30  Eric A. Welsh <ewelsh@ccb.wustl.edu>
+
+	* timidity/mod2midi.c: Defining out the ME_KEYPRESSURE related code
+
+2005-09-28  URABE Shyouhei <shyouhei@ice.uec.ac.jp>
+
+	* interface/Makefile.am (EXTRA_DIST, install.dynamics):
+	  sorry, this file was broken.
+
+2005-09-26  Stas Sergeev <stsp@aknet.ru>
+
+	* interface/server_c.c: usr stdout instead when stdin is a pipe.
+
+2005-09-23  Stas Sergeev <stsp@aknet.ru>
+
+	* interface/server_c.c (cmd_open): Security fix.
+
+2005-09-23  URABE Shyouhei <shyouhei@ice.uec.ac.jp>
+
+	* configure.in: FreeBSD has tcltk named libtcl84 and libtk84
+	* timidity/timidity.c (list_dyna_interface): change dynamic
+	  interface lister to some try-and-error mechanizm.
+	* interface/*.txt: deleted. (not used any longer)
+
+2005-09-22  Mikhail Teterin <mi@aldan.algebra.com>
+
+	* timidity/playmidi.c (process_sysex_event): fix typo
+
+2005-09-22  Kentaro Sato <kentaro@ranvis.com>
+
+	* timidity/smplfile.c: Fixed possible crash when Sampler chunk's
+	  dwSamplePeriod is erroneously 0.
+
+2005-05-08  URABE Shyouhei <shyouhei@ice.uec.ac.jp>
+
+	* timidity/timidity.c (dynamic_interface_module): rewrite.
+	* timidity/dl_dyld.c (dl_find_symbol): fix potential buffer overflow
+	* timidity/dl_dyld.c (dl_free): implement of dl_free()
+
+2005-04-03  Kentaro Sato <kentaro@ranvis.com>
+
+	* timidity/sndfont.c: Fixed to compile cfgforsf.
+
+2004-12-22  Ed Catmur <ed@catmur.co.uk>
+
+	* interface/gtk_i.c (Launch_Gtk_Process): Fix assertion error in
+	  GTK-2.6.0
+
+2004-12-08  Kentaro Sato <kentaro@ranvis.com>
+
+	* libarc/arc.c:
+	  Fixed to skip the platform specific path separators right after #.
+
+2004-12-04  Henrique de Moraes Holschuh <hmh@debian.org>
+
+	* timidity/aRts_a.c (open_output): Fix for gcc >= 3.4.x
+	  [timidity-bugs-en:00025]
+
+2004-12-02  URABE Shyouhei <shyouhei@ice.uec.ac.jp>
+
+	* interface/ncurs_c.c: [timidity-bugs-ja:00118]
+	* timidity/timidity.c (list_dyna_interface): bug fix: cmp can be
+	  uninitialized
+
+2004-11-03  URABE Shyouhei <shyouhei@ice.uec.ac.jp>
+
+	* timidity/resample.c (rs_vib_bidir): disable PRECALC_LOOPS for
+	  this function
+
+2004-11-03  Henrique de Moraes Holschuh <hmh@debian.org>
+
+	* timidity/aRts_a.c: disable aRts auto-detection to avoid
+	  segmentation violation
+
+2004-11-03  URABE Shyouhei <shyouhei@ice.uec.ac.jp>
+
+	* timidity/timidity.c (list_dyna_interface): ditto
+	* interface/dynamic_c.c (ctl_open): fix compile error
+
+2004-11-03  Eric A. Welsh <ewelsh@ccb.wustl.edu>
+
+	* timidity/playmidi.c: fix to correctly handle non-linear velocity
+	  levels
+
+2004-10-27  TAMUKI Shoichi <tamuki@linet.gr.jp>
+
+	* configure, autoconf/utils.m4, doc/{C,ja_JP.eucJP}/readme.dl,
+	  interface/Makefile.{am,in}, interface/{dumb,ncurs,slang,motif,tk,
+	  emacs,vt100,xaw,xskin,dynamic,mac,gtk,server,alsaseq,w32g,winsyn,
+	  portmidisyn}_c.c, timidity/controls.h, timidity/timiidty.c:
+	  Fix to fit with case-insensitive file system
+	* interface/interface_[nsmkeTaigA].txt: Remove
+	* interface/if_{ncurses,slang,motif,tcltk,emacs,vt100,xaw,xskin,
+	  gtk,alsaseq}.txt: Add
+
+2004-10-21  Henrique de Moraes Holschuh <hmh@debian.org>
+
+	* timidity/mod2midi.c (Voice_Play, Voice_SetPeriod):
+	  improve the code path when period2note returns -1
+
+2004-10-21  Eric A. Welsh <ewelsh@ccb.wustl.edu>
+
+	* timidity/mod2midi.c (period2note):
+	  initialize *finetune when returning a bad period
+	* timidity/mod2midi.c (load_module_samples):
+	  samples without names were causing NULL pointer reads
+	* timidity/mod2midi.c (period2note):
+	  delete extra \n
+
+2004-10-18  Eric A. Welsh <ewelsh@ccb.wustl.edu>
+
+	* libunimod/mlutil.c (getAmigaPeriod): Avoid division by zero
+	* timidity/mod2midi.c: Change all VERB_NORMAL and VERB_VERBOSE
+	  messages to VERB_NOISY.
+
+2004-10-17  URABE Shyouhei <shyouhei@ice.uec.ac.jp>
+
+	* libunimod/mloader.c (SL_LoadSamples): too many arguments to
+	  function `FreeSampleList'
+	* timidity/common.c, timidiyt/timidiyt.c: avoid confliction of
+	  time.h and sys/time.h
+	* timidity/aq.c: fix wrong prototype (int -> void)
+	* timidity/wrd_read.c: #ifdef-out unknown pragma
+	* configure.in, timidity/timidity.c: no need of <stdbool.h>
+	* timidity/Makefile.am: bug fix
+
+2004-10-14  URABE Shyouhei <shyouhei@ice.uec.ac.jp>
+
+	* interface/w32g_i.c (MPanelMessageHaveMesssage): fix typo
+	* autoconf/alsa.m4, autoconf/ao.m4, autoconf/arts.m4,
+	  autoconf/esd.m4, autoconf/gtk-2.0.m4, autoconf/gtk.m4,
+	  autoconf/libFLAC.m4, autoconf/libOggFLAC.m4, autoconf/ogg.m4,
+	  autoconf/utils.m4, autoconf/vorbis.m4: Fixes for the
+	  underquoting problems in the M4 macros.
+
+2004-10-09  Kentaro Sato <kentaro@ranvis.com>
+
+	* interface/mac_c.c, interface/wrdt_mac.c, timidity/wrd.h,
+	  utils/support.c: Fixes to compile on Mac OS.
+
+2004-10-03  URABE Shyouhei <shyouhei@ice.uec.ac.jp>
+
+	* NEWS: Add new entry for 2.13.2
+	* configure.in: Change version to 2.13.2
+
+2004-10-02  URABE Shyouhei <shyouhei@ice.uec.ac.jp>
+
+	* interface/wrdt_wcon.c: Fix double definition of print_ecmd()
+	* timidity/timidity.c (main): s/strcat/strncat/;
+
+2004-09-29  URABE Shyouhei <shyouhei@ice.uec.ac.jp>
+
+	* NEWS: Add new entry for 2.13.1
+
+2004-09-28  URABE Shyouhei <shyouhei@ice.uec.ac.jp>
+
+	* configure.in: Change version to 2.13.1
+
+2004-09-27  URABE Shyouhei <shyouhei@ice.uec.ac.jp>
+
+	* utils/support.c (vsnprintf): ensure snpritnf() to return a
+	  \0-terminated string
+	* interface/mac_c.c, interface/server_c.c, interface/w32g_c.c,
+	  interface/w32g_i.c, interface/wrdt_dumb.c, interface/wrdt_mac.c,
+	  interface/wrdt_tty.c, interface/wrdt_w32g.c, interface/xaw_i.c,
+	  interface/xskin_i.c, libarc/arc.c, timidity/audriv_al.c,
+	  timidity/audriv_mme.c, timidity/common.c, timidity/mac_qt_a.c,
+	  timidity/sun_a.c, timidity/timidity.c, timidity/wrdt_read.c:
+	  Fix to use strn* functinos.
+
+2004-09-23  URABE Shyouhei <shyouhei@ice.uec.ac.jp>
+
+	* utils/support.h: ditto
+	* utils/support.c: ditto
+	* configure.in: add strlcpy and strlcat
+
+2004-09-15  Eric A. Welsh <ewelsh@ccb.wustl.edu>
+
+	* timidity/resample.c: Reimplement bounds cheking
+
+2004-09-09  URABE Shyouhei <shyouhei@ice.uec.ac.jp>
+
+	* interface/gtk_c.c (ctl_total_time): ditto.
+	* interface/gtk_i.c (handle_input): Fix counter overflow
+	  (fix for [timidity-bugs-en:00032])
+	* NEWS: Fix typo.
+
+2004-09-07  Eric A. Welsh <ewelsh@ccb.wustl.edu>
+
+	* freq.c: mostly rewritten
+	  New pitch and chord detection algorithm that is much more
+	  robust and accurate than before.
+	* sndfont.c (main): CFG_FOR_SF_SUPPORT_FFT related code
+	  modified to work with new freq.c
+
+2004-09-03  URABE Shyouhei <shyouhei@ice.uec.ac.jp>
+
+	* timidity/timidity.c: add null_play_mode
+	  (fix for [timidity-bugs-en:00031])
+	* timidity/timidity.c (parse_opt_h): add prototype for
+	  show_ao_device_info()
+	* timidity/readmidi.c (check_midi_file): Fix to recognize .rmi & .mfi
+	  (Fix for [timidity-bugs-en:00030])
+
+2004-09-01  URABE Shyouhei <shyouhei@ice.uec.ac.jp>
+
+	* timidity/timidity.c : Fix for linkage error in W32
+	* utils/support.h (S_ISDIR): define S_ISDIR for platforms without
+	  S_ISDIR
+	* interface/xaw_i.c: avoid all-black file selector when tracer is
+	  not enabled, thanks to hmh@debian.org
+
+2004-08-28  Eric A. Welsh <ewelsh@ccb.wustl.edu>
+
+	* playmidi.c (new_chorus_voice, new_chorus_voice_alternate):
+	  v1 and v2 are now swapped correctly
+	* playmidi.c (process_sysex_event):
+	  many fixes to XG SYSEX parsing
+	* readmidi.c: (parse_sysex_event_multi):
+	  many fixes to XG SYSEX parsing
+	* reverb.c (do_filter_lowpass1_stereo):
+	  p->x1l and p->x1r are now properly updated
+
+2004-08-22  Eric A. Welsh <ewelsh@ccb.wustl.edu>
+
+	* timidity/mix.c (next_stage):
+	  Added bounds checking after scaling envelope rates when
+	  opt_tva_attack and/or opt_tva_decay are enabled.  This fixes
+	  previous short/silent note problems when these options were
+	  enabled.
+
+2004-07-10  TAMUKI Shoichi <tamuki@linet.gr.jp>
+
+	* interface/alsaseq_c.c, interface/rtsyn_common.c,
+	  timidity/playmidi.c:
+	  Suppress force keysig transposition at the beginning of
+	  MIDI sequence
+
+2004-07-01  TAMUKI Shoichi <tamuki@linet.gr.jp>
+
+	* interface/alsaseq_c.c, interface/rtsyn_common.c,
+	  timidity/playmidi.c:
+	  Adjust force keysig transposition so that performance may
+	  feel it natural
+
+2004-06-30  TAMUKI Shoichi <tamuki@linet.gr.jp>
+
+	* interface/alsaseq_c.c, interface/rtsyn_common.c,
+	  timidity/playmidi.[ch], timidity/readmidi.c,
+	  timidity/timidity.[ch]:
+	  Reflect the result of -K and -T command option on interfaces
+	  Improve force keysig calculation
+	  Change the base number of measure (bar) counter as 1 (was 0)
+
+2004-06-14  TAMUKI Shoichi <tamuki@linet.gr.jp>
+
+	* timidity/loadtab.c, timidity/tables.[ch]:
+	  Fix bug in -Z command option
+
+2004-06-09 Keishi Suenaga <s_keishi@mutt.freemail.ne.jp>
+
+	* timidity/reverb.c, timidity/tables.c,
+	  doc/C/README.w32, doc/ja_JP.eucJP/README.w32:
+	  small fixes for CbuilderX.
+
+2004-06-02  Kentaro Sato <kentaro@ranvis.com>
+
+	* utils/support.[ch]: Implemented subset of stat() for Mac OS.
+
+2004-06-02  URABE Shyouhei <shyouhei@ice.uec.ac.jp>
+
+	* utils/support.h: add things to treat the case of no <sys/stat.h>
+	* timidity/common.c: rebirth of HAVE_SYS_STAT_H
+
+2004-06-01  URABE Shyouhei <shyouhei@ice.uec.ac.jp>
+
+	* timidity/timidity.c (canonicalize_path): fix typo
+	* timidity/common.c: fix compiling problem on VC6.
+
+2004-05-31 Keishi Suenaga <s_keishi@mutt.freemail.ne.jp>
+
+	* configure.in:
+	  dynamic linked runtime library must be used with Open Watcom.
+
+2004-05-31  URABE Shyouhei <shyouhei@ice.uec.ac.jp>
+
+	* timidity/common.c (open_file): ignore directories when searching
+	  a normal file
+	* timidity/timidity.c (main): suffix '/' is supplied to each argv
+	  elems when the path IS a directory but IS NOT suffixed by '/'.
+
+2004-05-31  Eric A. Welsh <ewelsh@ccb.wustl.edu>
+
+	* timidity/instrum.h, timidity/instrum.c, timidity/m2m.c,
+	  timidity/mod2midi.c, timidity/playmidi.c, timidity/sndfont.c:
+	  root_freq_detected, transpose_detected, and chord variables
+	  added to Sample type in instrum.h.  Pitch detection is applied
+	  to drum and MOD samples if surround chorus is enabled.  This
+	  allows the true pitch of the rendered voices to be determined,
+	  so that surround chorus voice cancellation can be avoided by
+	  choosing a chorus delay that is not close to half the period.
+	* playmidi.c (new_chorus_voice_alternate): Various fixes to
+	  surround chorus.  Uses pitch detection for drum and MOD samples.
+	  Multiple similar drum instruments (snare1 and snare2, kick1 and
+	  kick2) playing at once no longer cause voice cancellation and
+	  strange perceived pans.
+
+2004-05-31  Iwata <b6330015@ipc.kit.jp>
+
+	* interface/gtk_i.c (open_file_cb): Fix compiling problem
+
+2004-05-30  URABE Shyouhei <shyouhei@ice.uec.ac.jp>
+
+	* configure.in: ditto
+	* autoconf/Makefile.am (EXTRA_DIST): ditto
+	* autoconf/gtk-2.0.m4: add.
+
+2004-05-30  dai <dai@kip.iis.toyama-u.ac.jp>
+
+	* interface/gtk_i.c: GTK+ 2.x support
+
+2004-05-30  Keishi Suenaga <s_keishi@mutt.freemail.ne.jp>
+
+	* {interface,libarc,libunimod,timidity,utils}/Makefile.am,
+	  configure.in, interface.h.in, interface/ncurs_c.c,
+	  interface/vt100_c.c, libunimod/unimod_priv.h, timidity/common.c,
+	  timidity/gogo_a.c, timidity/sysdep.h, timidity/timidity.c,
+	  timidity/version.c, utils/support.h, utils/tmdy_getopt.h:
+	  Can compile OpenWatcom in Msys or Cygwin environment.
+	* doc/C/README.w32, doc/ja_JP.eucJP/README.w32, scripts/wcc386_w.sh:
+	  Add compile instructions for Mingw, Borland C, Watcom C and Visual C
+
+2004-05-24  Eric A. Welsh <ewelsh@ccb.wustl.edu>
+
+	* libunimod/load_mod.c (ConvertNote): Bug fix
+
+2004-05-24  Keishi Suenaga <s_keishi@mutt.freemail.ne.jp>
+
+	* {interface,libarc,libunimod,timidity,utils}/Makefile.am,
+	  configure.in, interface/wrdt_wcon.c, timidity/flac_a.c,
+	  timidity/sysdep.h, timidity/timidity.c, timidity/wrdt.c,
+	  utils/nkflib.c, utils/support.h:
+	  Can compile VCC or BCC in Msys or Cygwin environment.
+	* interface.h.in, timidity/timidity.c:
+	  Don't use ANOTHER_MAIN in timw32g and twsyn.
+
+2004-05-23  Kentaro Sato <kentaro@ranvis.com>
+
+	* timidity/timidity.c: Fixed to compile with MrC.
+
+2004-05-19  TAMUKI Shoichi <tamuki@linet.gr.jp>
+
+	* interface/w32g_syn.c: Fix to fit with case of "current" version
+	* timidity/timidity.c: Fix typo
+
+2004-05-18  Keishi Suenaga <s_keishi@mutt.freemail.ne.jp>
+
+	* configure.in:
+	  Add gcc option -mms-bitfield in windows.
+	  GOGO ditection for windows fix.
+	  Can use gccXXX in CYGWIN and MSYS.
+	  Enable dynamic linked portaudio DLLs with CYGWIN and MSYS.
+	  Enable dynamic linked FLAC DLL with CYGWIN and MSYS.
+	* interface/Makefile.am:
+	  Enable wrdt_wcon.c in MSYS.
+	  Make clean to remove *escaped.c *.res.
+	* interface/w32g_syn.c:
+	  Use PACKAGE_VERSION if TIMID_VERSION is not defined.
+	* timidity/portaudio_a.c:
+	  A hack for pa_asio.dll with timwin32g and kxdriver(SB Live!).
+
+2004-05-16  TAMUKI Shoichi <tamuki@linet.gr.jp>
+
+	* timidity/Makefile.{am,in}: Add new files for FLAC/OggFLAC
+
+2004-05-16  Saito <saito@intaa.net>
+
+	* configs/msc[67]-project.zip: Fix for FLAC/OggFLAC DLL.
+
+2004-05-16  Daisuke Aoki <dai@sweetparty.ne.jp>
+
+	* timidity/{flac_a.c,vorbis_a.c,w32_libFLAC_dll.c,w32_libFLAC_dll.h,
+	  w32_libFLAC_dll_g.h,w32_libFLAC_dll_i.h,w32_libOggFLAC_dll.c,
+	  w32_libOggFLAC_dll.h,w32_libOggFLAC_dll_g.h}:
+	  Support for FLAC/OggFLAC DLL.
+
+2004-05-16  Keishi Suenaga <s_keishi@mutt.freemail.ne.jp>
+
+	* interface/gogo_a.c:
+	  Support for MP3 GOGO output in Win32CUI interface.
+
+2004-05-14  TAMUKI Shoichi <tamuki@linet.gr.jp>
+
+	* configs/msc[67]-project.zip: Change version to "current"
+	* timidity/Makefile.{am,in}: Add w32_portaudio{.h,_dll.c}
+
+2004-05-14  Saito <saito@intaa.net>
+
+	* configs/msc[67]-project.zip: Fix for PortAudio DLL.
+	* timidity/w32g_pref.c: Fix typo.
+	* timidity/mix.c: Fix around envelope.
+
+2004-05-14  Daisuke Aoki <dai@sweetparty.ne.jp>
+
+	* timidity/{output.c,portaudio_a.c,w32_portaudio.h,
+	  w32_portaudio_dll.c}: Support for PortAudio DLL.
+
+2004-05-06  TAMUKI Shoichi <tamuki@linet.gr.jp>
+
+	* interface/tclIndex: Resume order
+
+2003-05-05  Chisato Yamauchi <cyamauch@hst.phyas.aichi-edu.ac.jp>
+
+	* TiMidity(-uj).ad.in, interface/xaw_i.c:
+	  Update app-defaults file for XAW interface
+
+2004-05-03  TAMUKI Shoichi <tamuki@linet.gr.jp>
+
+	* interface/ncurs_c.c, interface/server_c.c, interface/slang_c.c,
+	  interface/vt100_c.c, interface/w32g_{i,syn}.c, interface/xaw_i.c,
+	  timidity/timidity.c: Fix to fit with case of "current" version
+
+2004-05-02  URABE Shyouhei <shyouhei@ice.uec.ac.jp>
+
+	* timidity/timidity.c (parse_opt_h): ditto.
+	* timidity/timidity.h (DEFAULT_RESAMPLATION): ditto.
+	* configure.in: --enable-spline was not working
+
+2004-04-29  Saito <saito@intaa.net>
+
+	* timidity/reverb.c, timidity/optcode.h: Fix around Insertion Effect.
+
+2004-04-28  TAMUKI Shoichi <tamuki@linet.gr.jp>
+
+	* timidity/playmidi.c: Fix around temperament control
+
+2004-04-27  TAMUKI Shoichi <tamuki@linet.gr.jp>
+
+	* doc/C/timidity.1, doc/ja_JP.eucJP/timidity.1: Update
+
+2004-04-26  TAMUKI Shoichi <tamuki@linet.gr.jp>
+
+	* doc/C/timidity.1, doc/ja_JP.eucJP/timidity.1: Update
+	* timidity/timidity.c:
+	  Rename --flac-compression-level -> --flac-complevel
+
+2004-04-25  TAMUKI Shoichi <tamuki@linet.gr.jp>
+
+	* doc/C/timidity.1, doc/ja_JP.eucJP/timidity.1,
+	  doc/C/timidity.cfg.5, doc/ja_JP.eucJP/timidity.cfg.5: Update
+	* interface/ncurs_c.c: Fix a little
+
+2004-04-25  URABE Shyouhei <shyouhei@ice.uec.ac.jp>
+
+	* configure.in: Bug fix and autoreconf
+
+2004-04-23  Kentaro Sato <kentaro@ranvis.com>
+
+	* timidity/timidity.c: Fixed a bug dealing with a nameless var.
+
+2004-04-23  Saito <saito@intaa.net>
+
+	* timidity/reverb.c, timidity/optcode.h: Fix noises.
+
+2004-04-23  Iwata <b6330015@ipc.kit.jp>
+
+	* timidity/speex_a.c: Add
+	* configure.in, timidity/output.c, timidity/timidity.c,
+	  timidity/Makefile.am: Add OggSpeex support
+
+2004-04-21  Saito <saito@intaa.net>
+
+	* timidity/flac_a.c: Fix around filename at Win32GUI interface.
+
+2004-04-20  TAMUKI Shoichi <tamuki@linet.gr.jp>
+
+	* timidity/timidity.c: Fix a little
+
+2004-04-19  Saito <saito@intaa.net>
+
+	* timidity/flac_a.c: Fix for VC++ environments.
+
+2004-04-18  URABE Shyouhei <shyouhei@ice.uec.ac.jp>
+
+	* configure.in: fix for libAO detection
+	* autoconf/libFLAC.m4, autoconf/libOggFLAC.m4: Add.
+	* configure.in: Change to use above
+	* autoconf/Makefile.am: ditto
+
+2004-04-18  Iwata <b6330015@ipc.kit.jp>
+
+	* timidity/flac_a.c: Add
+	* configure.in, timidity/output.c, timidity/timidity.c,
+	  timidity/Makefile.am: Add libFLAC support
+
+2004-04-14  Kentaro Sato <kentaro@ranvis.com>
+
+	* libarc/arc.c, timidity/timidity.c:
+	  Removed trailing directory separator from $basedir.
+
+2004-04-13  URABE Shyouhei <shyouhei@ice.uec.ac.jp>
+
+	* autoconf/ao.m4: Add.
+	* configure.in: Change to use ao.m4
+	* autoconf/Makefile.am (EXTRA_DIST): ditto.
+
+2004-04-13  Iwata <b6330015@ipc.kit.jp>
+
+	* timidity/ao_a.c: Add.
+	* configure.in: Add libao support
+	* timidity/output.c: ditto.
+	* timidity/Makefile.am (EXTRA_timidity_SOURCES): ditto.
+	* timidity/timidity.c (parse_opt_h): ditto.
+
+2004-04-12  Kentaro Sato <kentaro@ranvis.com>
+
+	* timidity/common.[ch], timidity/timidity.c:
+	  New syntax of *.cfg: $VARIABLE / ${VARIABLE}
+	  They are replaced with the specific string before tokenizing.
+	  $basedir is the only implemented one, which represents the base
+	  directory of the cfg file being parsed.
+
+2004-03-31  URABE Shyouhei <shyouhei@ice.uec.ac.jp>
+
+	* configure.in: Change version to 'current' (timidity:3161)
+
+2004-03-29  URABE Shyouhei <shyouhei@ice.uec.ac.jp>
+
+	* Makefile.am (EXTRA_DIST): Add entry for ChangeLog.2
+	* configure.in: Change version to 'development'
+	* ChangeLog.2: Add
+	* ChangeLog: Wipe
+
+For the changes before 2.13.0, see ChangeLog.2
