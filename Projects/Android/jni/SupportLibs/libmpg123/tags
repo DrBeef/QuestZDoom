@@ -1,0 +1,592 @@
+AARCH64_DUP_2D	mangle.h	/^#define AARCH64_DUP_2D(dst, src, elem) dup.2d dst,/
+AARCH64_DUP_4S	mangle.h	/^#define AARCH64_DUP_4S(dst, src, elem) dup.4s dst,/
+AARCH64_PCREL_HI	mangle.h	/^#define AARCH64_PCREL_HI(label) label@PAGE$/
+AARCH64_PCREL_LO	mangle.h	/^#define AARCH64_PCREL_LO(label) label@PAGEOFF$/
+AARCH64_SQXTN2_8H	mangle.h	/^#define AARCH64_SQXTN2_8H(dst, src) sqxtn2.8h dst,/
+ADD_DITHER	synth.h	/^	#define ADD_DITHER(fr,sum) sum+=fr->dithernoise[f/
+ALIAS_NAME	lfs_alias.c	/^#define ALIAS_NAME(func) func$/
+ALIGNED	layer3.c	/^static ALIGNED(16) real win[4][36];$/
+ASM_NAME	mangle.h	/^#define ASM_NAME(a) MANGLE_MACROCAT(__USER_LABEL_P/
+ASM_VALUE	mangle.h	/^#define ASM_VALUE(a) MANGLE_MACROCAT($,ASM_NAME(a)/
+COMM	mangle.h	/^#define COMM(a,b,c) .comm a,b$/
+FIR16_1	synth_i486.c	/^#define FIR16_1(pos,c0,c1,c2,c3,c4,c5,c6,c7,c8,c9,/
+FIR16_2	synth_i486.c	/^#define FIR16_2(pos1,c0,c1,c2,c3,c4,c5,c6,c7,c8,c9/
+FI_NEXT	index.h	/^#define FI_NEXT(fi, framenum) ((fi).size && framen/
+FRAME_BUFFERCHECK	gapless.h	/^#define FRAME_BUFFERCHECK(mh) frame_buffercheck(mh/
+FULLPOINT	id3.c	/^#define FULLPOINT(f,s) ( (((f)&0x3ff)<<10) + ((s)&/
+HDR_BITRATE_VAL	mpeghead.h	/^#define HDR_BITRATE_VAL(h)    (((h)&HDR_BITRATE) >/
+HDR_CHANEX_VAL	mpeghead.h	/^#define HDR_CHANEX_VAL(h)     (((h)&HDR_CHANEX) >>/
+HDR_CHANNEL_VAL	mpeghead.h	/^#define HDR_CHANNEL_VAL(h)    (((h)&HDR_CHANNEL) >/
+HDR_COPYRIGHT_VAL	mpeghead.h	/^#define HDR_COPYRIGHT_VAL(h)  (((h)&HDR_COPYRIGHT)/
+HDR_CRC_VAL	mpeghead.h	/^#define HDR_CRC_VAL(h)        (((h)&HDR_CRC) >> 16/
+HDR_EMPHASIS_VAL	mpeghead.h	/^#define HDR_EMPHASIS_VAL(h)   (((h)&HDR_EMPHASIS) /
+HDR_FREE_FORMAT	mpeghead.h	/^#define HDR_FREE_FORMAT(head) (!(head & HDR_BITRAT/
+HDR_LAYER_VAL	mpeghead.h	/^#define HDR_LAYER_VAL(h)      (((h)&HDR_LAYER) >> /
+HDR_ORIGINAL_VAL	mpeghead.h	/^#define HDR_ORIGINAL_VAL(h)   (((h)&HDR_ORIGINAL) /
+HDR_PADDING_VAL	mpeghead.h	/^#define HDR_PADDING_VAL(h)    (((h)&HDR_PADDING) >/
+HDR_PRIVATE_VAL	mpeghead.h	/^#define HDR_PRIVATE_VAL(h)    (((h)&HDR_PRIVATE) >/
+HDR_SAMPLERATE_VAL	mpeghead.h	/^#define HDR_SAMPLERATE_VAL(h) (((h)&HDR_SAMPLERATE/
+HDR_SYNC_VAL	mpeghead.h	/^#define HDR_SYNC_VAL(h)       (((h)&HDR_SYNC) >> 2/
+HDR_VERSION_VAL	mpeghead.h	/^#define HDR_VERSION_VAL(h)    (((h)&HDR_VERSION) >/
+IF32	optimize.c	/^#define IF32(synth) synth$/
+IF8	optimize.c	/^#define IF8(synth) synth,$/
+IFREAL	optimize.c	/^#define IFREAL(synth) synth,$/
+III_antialias	layer3.c	/^static void III_antialias(real xr[SBLIMIT][SSLIMIT/
+III_dequantize_sample	layer3.c	/^static int III_dequantize_sample(mpg123_handle *fr/
+III_get_scale_factors_1	layer3.c	/^static int III_get_scale_factors_1(mpg123_handle */
+III_get_scale_factors_2	layer3.c	/^static int III_get_scale_factors_2(mpg123_handle */
+III_get_side_info	layer3.c	/^static int III_get_side_info(mpg123_handle *fr, st/
+III_hybrid	layer3.c	/^static void III_hybrid(real fsIn[SBLIMIT][SSLIMIT]/
+III_i_stereo	layer3.c	/^static void III_i_stereo(real xr_buf[2][SBLIMIT][S/
+II_select_table	layer2.c	/^static void II_select_table(mpg123_handle *fr)$/
+II_step_one	layer2.c	/^static void II_step_one(unsigned int *bit_alloc,in/
+II_step_two	layer2.c	/^static void II_step_two(unsigned int *bit_alloc,re/
+I_step_one	layer1.c	/^static int I_step_one(unsigned int balloc[], unsig/
+I_step_two	layer1.c	/^static void I_step_two(real fraction[2][SBLIMIT],u/
+JUMP_CONCLUSION	parse.c	/^#define JUMP_CONCLUSION(ret) \\$/
+Java_com_axelby_mp3decoders_MPG123_testStream	podax_MPG123.c	/^JNIEXPORT void JNICALL Java_com_axelby_mp3decoders/
+MACRO	layer3.c	/^#define MACRO(v) { \\$/
+MACRO0	layer3.c	/^#define MACRO0(v) { \\$/
+MACRO1	layer3.c	/^#define MACRO1(v) { \\$/
+MACRO2	layer3.c	/^#define MACRO2(v) { \\$/
+MACROCAT	lfs_alias.c	/^#define MACROCAT(a, b) MACROCAT_REALLY(a, b)$/
+MACROCAT_REALLY	lfs_alias.c	/^#define MACROCAT_REALLY(a, b) a ## b$/
+MANGLE_MACROCAT	mangle.h	/^#define MANGLE_MACROCAT(a, b) MANGLE_MACROCAT_REAL/
+MANGLE_MACROCAT_REALLY	mangle.h	/^#define MANGLE_MACROCAT_REALLY(a, b) a ## b$/
+MONO2STEREO_NAME	synth_8bit.h	/^int MONO2STEREO_NAME(real *bandPtr, mpg123_handle /
+MONO_NAME	synth_8bit.h	/^int MONO_NAME(real *bandPtr, mpg123_handle *fr)$/
+MP3File	com_axelby_mp3decoders_MPG123.c	/^} MP3File;$/
+MPG123_LARGENAME	mpg123.h	/^#define MPG123_LARGENAME(func) MPG123_MACROCAT(fun/
+MPG123_MACROCAT	mpg123.h	/^#define MPG123_MACROCAT(a, b) MPG123_MACROCAT_REAL/
+MPG123_MACROCAT_REALLY	mpg123.h	/^#define MPG123_MACROCAT_REALLY(a, b) a ## b$/
+MUL	dct64_i486.c	/^#define MUL(a,b) \\$/
+MULL	dct64_i486.c	/^#define MULL(a,b) (((long long)(a)*(long long)(b))/
+Micy2utf8	icy2utf8.c	/^main(void)$/
+Mtestcpu	testcpu.c	/^int main()$/
+NATIVE_NAME	lfs_alias.c	/^#define NATIVE_NAME(func) MACROCAT(func, NATIVE_SU/
+PVERB	mpg123lib_intern.h	/^#define PVERB(mp, level) (!((mp)->flags & MPG123_Q/
+SAMPLE_ADJUST	gapless.h	/^#define SAMPLE_ADJUST(mh,x)     sample_adjust(mh,x/
+SAMPLE_UNADJUST	gapless.h	/^#define SAMPLE_UNADJUST(mh,x)   sample_unadjust(mh/
+SEEKFRAME	libmpg123.c	/^#define SEEKFRAME(mh) ((mh)->ignoreframe < 0 ? 0 :/
+SETOUT	dct64_i486.c	/^#define SETOUT(out,n,expr) out[FIR_BUFFER_SIZE*(n)/
+SYNTH_ALTIVEC	synth_altivec.c	/^#define SYNTH_ALTIVEC(B0STEP) \\$/
+SYNTH_NAME	synth.h	/^int SYNTH_NAME(real *bandPtr, int channel, mpg123_/
+SYNTH_STEREO_ALTIVEC	synth_altivec.c	/^#define SYNTH_STEREO_ALTIVEC(B0STEP) \\$/
+TOINT	dct64_i486.c	/^#define TOINT(a) ((a) * 32768 \/ (int)REAL_FACTOR)/
+UTF8LEN	id3.c	/^#define UTF8LEN(x) ( (x)<0x80 ? 1 : ((x)<0x800 ? 2/
+WRITE_8BIT_SAMPLE	sample.h	/^#define WRITE_8BIT_SAMPLE(samples,sum,clip) \\$/
+WRITE_REAL_SAMPLE	sample.h	/^#define WRITE_REAL_SAMPLE(samples,sum,clip) *(samp/
+WRITE_S32_SAMPLE	sample.h	/^#define WRITE_S32_SAMPLE(samples,sum,clip) \\$/
+WRITE_SAMPLE	synth.c	/^#define WRITE_SAMPLE(samples,sum,clip) WRITE_SHORT/
+WRITE_SHORT_SAMPLE	sample.h	/^#define WRITE_SHORT_SAMPLE(samples,sum,clip) { \\$/
+WRITE_SHORT_SAMPLE_ACCURATE	sample.h	/^#define WRITE_SHORT_SAMPLE_ACCURATE(samples,sum,cl/
+absynth_1to1_i486	synth_i486.c	/^int absynth_1to1_i486(real *bandPtr, int channel, /
+add_comment	id3.c	/^#define add_comment(mh) add_id3_text(&((mh)->id3v2/
+add_extra	id3.c	/^#define add_extra(mh)   add_id3_text(&((mh)->id3v2/
+add_id3_picture	id3.c	/^static mpg123_picture *add_id3_picture(mpg123_pict/
+add_id3_text	id3.c	/^static mpg123_text *add_id3_text(mpg123_text **lis/
+add_picture	id3.c	/^#define add_picture(mh)   add_id3_picture(&((mh)->/
+add_text	id3.c	/^#define add_text(mh)    add_id3_text(&((mh)->id3v2/
+align_the_pointer	frame.c	/^static void *align_the_pointer(void *base, unsigne/
+aligned_pointer	frame.c	/^#define aligned_pointer(p, type, alignment) align_/
+backbits	getbits.h	/^#define backbits(fr,nob) ((void)( \\$/
+bad_fullread	readers.c	/^static ssize_t bad_fullread(mpg123_handle *mh, uns/
+bad_init	readers.c	/^static int bad_init(mpg123_handle *mh) bugger_off$/
+bc_add	readers.c	/^static int bc_add(struct bufferchain *bc, const un/
+bc_alloc	readers.c	/^static struct buffy* bc_alloc(struct bufferchain */
+bc_append	readers.c	/^static int bc_append(struct bufferchain *bc, ssize/
+bc_cleanup	readers.c	/^void bc_cleanup(struct bufferchain *bc)$/
+bc_fill	readers.c	/^size_t bc_fill(struct bufferchain *bc)$/
+bc_fill_pool	readers.c	/^static int bc_fill_pool(struct bufferchain *bc)$/
+bc_forget	readers.c	/^static void bc_forget(struct bufferchain *bc)$/
+bc_free	readers.c	/^static void bc_free(struct bufferchain *bc, struct/
+bc_give	readers.c	/^static ssize_t bc_give(struct bufferchain *bc, uns/
+bc_init	readers.c	/^static void bc_init(struct bufferchain *bc)$/
+bc_need_more	readers.c	/^static ssize_t bc_need_more(struct bufferchain *bc/
+bc_poolsize	readers.c	/^void bc_poolsize(struct bufferchain *bc, size_t po/
+bc_prepare	readers.c	/^void bc_prepare(struct bufferchain *bc, size_t poo/
+bc_reset	readers.c	/^static void bc_reset(struct bufferchain *bc)$/
+bc_seekback	readers.c	/^static ssize_t bc_seekback(struct bufferchain *bc,/
+bc_skip	readers.c	/^static ssize_t bc_skip(struct bufferchain *bc, ssi/
+bsbufid	parse.c	/^#define bsbufid(fr) (fr)->bsbuf==(fr)->bsspace[0] /
+buffered_forget	readers.c	/^static void buffered_forget(mpg123_handle *fr)$/
+buffered_fullread	readers.c	/^static ssize_t buffered_fullread(mpg123_handle *fr/
+buffy_del	readers.c	/^static void buffy_del(struct buffy* buf)$/
+buffy_del_chain	readers.c	/^static void buffy_del_chain(struct buffy* buf)$/
+buffy_new	readers.c	/^static struct buffy* buffy_new(size_t size, size_t/
+byte	compat.h	/^typedef unsigned char byte;$/
+bytes_to_long	id3.c	/^	#define bytes_to_long(buf,res) \\$/
+bytes_to_samples	format.c	/^off_t bytes_to_samples(mpg123_handle *fr , off_t b/
+cap_fit	format.c	/^static int cap_fit(mpg123_handle *fr, struct audio/
+check_balloc	layer1.c	/^static int check_balloc(mpg123_handle *fr, unsigne/
+check_bom	id3.c	/^static int check_bom(const unsigned char** source,/
+check_decoders	optimize.c	/^void check_decoders(void )$/
+check_lame_tag	parse.c	/^static int check_lame_tag(mpg123_handle *fr)$/
+chop_fourth_byte	format.c	/^static void chop_fourth_byte(struct outbuffer *buf/
+clear_icy	icy.c	/^void clear_icy(struct icy_meta *icy)$/
+compat_close	compat.c	/^int compat_close(int infd)$/
+compat_open	compat.c	/^int compat_open(const char *filename, int flags)$/
+compute_bpf	parse.c	/^double compute_bpf(mpg123_handle *fr)$/
+conv_s16_to_f32	format.c	/^static void conv_s16_to_f32(struct outbuffer *buf)/
+conv_s16_to_s32	format.c	/^static void conv_s16_to_s32(struct outbuffer *buf)/
+conv_s16_to_u16	format.c	/^static void conv_s16_to_u16(struct outbuffer *buf)/
+conv_s32_to_u32	format.c	/^static void conv_s32_to_u32(struct outbuffer *buf)/
+convert_latin1	id3.c	/^static void convert_latin1(mpg123_string *sb, cons/
+convert_utf16bom	id3.c	/^static void convert_utf16bom(mpg123_string *sb, co/
+convert_utf8	id3.c	/^static void convert_utf8(mpg123_string *sb, const /
+cpu_3dnow	optimize.c	/^#define cpu_3dnow(s)    1$/
+cpu_3dnowext	optimize.c	/^#define cpu_3dnowext(s) 1$/
+cpu_avx	optimize.c	/^#define cpu_avx(s)      1$/
+cpu_fast_sse	getcpuflags.h	/^#define cpu_fast_sse(s) ((((s.id & 0xf00)>>8) == 6/
+cpu_fpu	optimize.c	/^#define cpu_fpu(s)      1$/
+cpu_i586	optimize.c	/^#define cpu_i586(s)     1$/
+cpu_mmx	optimize.c	/^#define cpu_mmx(s)      1$/
+cpu_neon	optimize.c	/^#define cpu_neon(s)     1$/
+cpu_sse	optimize.c	/^#define cpu_sse(s)      1$/
+cpu_sse2	optimize.c	/^#define cpu_sse2(s)     1$/
+cpu_sse3	optimize.c	/^#define cpu_sse3(s)     1$/
+dct12	layer3.c	/^static void dct12(real *in,real *rawout1,real *raw/
+dct36	layer3.c	/^void dct36(real *inbuf,real *o1,real *o2,real *win/
+dct64	dct64.c	/^void dct64(real *out0,real *out1,real *samples)$/
+dct64_1	dct64_i386.c	/^static void dct64_1(real *out0,real *out1,real *b1/
+dct64_1_486	dct64_i486.c	/^void dct64_1_486(int *out0,int *out1,int *b1,int */
+dct64_altivec	dct64_altivec.c	/^void dct64_altivec(real *out0,real *out1,real *sam/
+dct64_i386	dct64_i386.c	/^void dct64_i386(real *a,real *b,real *c)$/
+dct64_i486	dct64_i486.c	/^void dct64_i486(int *a,int *b,real *samples)$/
+debug	debug.h	/^#define debug(s) fprintf(stderr, "[" __FILE__ ":%i/
+debug1	debug.h	/^#define debug1(s, a) fprintf(stderr, "[" __FILE__ /
+debug10	debug.h	/^#define debug10(s, a, b, c, d, e, f, g, h, i, j) f/
+debug11	debug.h	/^#define debug11(s, a, b, c, d, e, f, g, h, i, j, k/
+debug12	debug.h	/^#define debug12(s, a, b, c, d, e, f, g, h, i, j, k/
+debug13	debug.h	/^#define debug13(s, a, b, c, d, e, f, g, h, i, j, k/
+debug14	debug.h	/^#define debug14(s, a, b, c, d, e, f, g, h, i, j, k/
+debug15	debug.h	/^#define debug15(s, a, b, c, d, e, f, g, h, i, j, k/
+debug2	debug.h	/^#define debug2(s, a, b) fprintf(stderr, "[" __FILE/
+debug3	debug.h	/^#define debug3(s, a, b, c) fprintf(stderr, "[" __F/
+debug4	debug.h	/^#define debug4(s, a, b, c, d) fprintf(stderr, "[" /
+debug5	debug.h	/^#define debug5(s, a, b, c, d, e) fprintf(stderr, "/
+debug6	debug.h	/^#define debug6(s, a, b, c, d, e, f) fprintf(stderr/
+debug7	debug.h	/^#define debug7(s, a, b, c, d, e, f, g) fprintf(std/
+debug8	debug.h	/^#define debug8(s, a, b, c, d, e, f, g, h) fprintf(/
+debug9	debug.h	/^#define debug9(s, a, b, c, d, e, f, g, h, i) fprin/
+decclass	optimize.c	/^enum optcla decclass(const enum optdec type)$/
+decode_header	parse.c	/^static int decode_header(mpg123_handle *fr,unsigne/
+decode_the_frame	libmpg123.c	/^static void decode_the_frame(mpg123_handle *fr)$/
+decode_update	libmpg123.c	/^int decode_update(mpg123_handle *mh)$/
+decoder_synth_bytes	format.c	/^off_t decoder_synth_bytes(mpg123_handle *fr, off_t/
+dectype	optimize.c	/^enum optdec dectype(const char* decoder)$/
+default_init	readers.c	/^static int default_init(mpg123_handle *fr)$/
+defdec	optimize.c	/^enum optdec defdec(void){ return defopt; }$/
+dither_table_init	dither.c	/^void dither_table_init(float *dithertable)$/
+do_equalizer	equalizer.c	/^void do_equalizer(real *bandPtr,int channel, real /
+do_layer1	layer1.c	/^int do_layer1(mpg123_handle *fr)$/
+do_layer2	layer2.c	/^int do_layer2(mpg123_handle *fr)$/
+do_layer3	layer3.c	/^int do_layer3(mpg123_handle *fr)$/
+do_readahead	parse.c	/^static int do_readahead(mpg123_handle *fr, unsigne/
+do_rva	frame.c	/^void do_rva(mpg123_handle *fr)$/
+do_the_seek	libmpg123.c	/^static int do_the_seek(mpg123_handle *mh)$/
+double_to_long_rounded	mpg123lib_intern.h	/^static inline int32_t double_to_long_rounded(doubl/
+eax	synth_sse3d.h	/^	movl %eax,(%edx)$/
+enc2num	format.c	/^static int enc2num(int encoding)$/
+enc_name	id3.c	/^static const char *enc_name(unsigned char enc)$/
+ereturn	debug.h	/^#define ereturn(rv, s) do{ fprintf(stderr, "\\n[" /
+ereturn1	debug.h	/^#define ereturn1(rv, s, a) do{ fprintf(stderr, "\\/
+ereturn10	debug.h	/^#define ereturn10(rv, s, a, b, c, d, e, f, g, h, i/
+ereturn11	debug.h	/^#define ereturn11(rv, s, a, b, c, d, e, f, g, h, i/
+ereturn12	debug.h	/^#define ereturn12(rv, s, a, b, c, d, e, f, g, h, i/
+ereturn13	debug.h	/^#define ereturn13(rv, s, a, b, c, d, e, f, g, h, i/
+ereturn14	debug.h	/^#define ereturn14(rv, s, a, b, c, d, e, f, g, h, i/
+ereturn15	debug.h	/^#define ereturn15(rv, s, a, b, c, d, e, f, g, h, i/
+ereturn2	debug.h	/^#define ereturn2(rv, s, a, b) do{ fprintf(stderr, /
+ereturn3	debug.h	/^#define ereturn3(rv, s, a, b, c) do{ fprintf(stder/
+ereturn4	debug.h	/^#define ereturn4(rv, s, a, b, c, d) do{ fprintf(st/
+ereturn5	debug.h	/^#define ereturn5(rv, s, a, b, c, d, e) do{ fprintf/
+ereturn6	debug.h	/^#define ereturn6(rv, s, a, b, c, d, e, f) do{ fpri/
+ereturn7	debug.h	/^#define ereturn7(rv, s, a, b, c, d, e, f, g) do{ f/
+ereturn8	debug.h	/^#define ereturn8(rv, s, a, b, c, d, e, f, g, h) do/
+ereturn9	debug.h	/^#define ereturn9(rv, s, a, b, c, d, e, f, g, h, i)/
+error	debug.h	/^#define error(s) fprintf(stderr, "\\n[" __FILE__ "/
+error1	debug.h	/^#define error1(s, a) fprintf(stderr, "\\n[" __FILE/
+error10	debug.h	/^#define error10(s, a, b, c, d, e, f, g, h, i, j) f/
+error11	debug.h	/^#define error11(s, a, b, c, d, e, f, g, h, i, j, k/
+error12	debug.h	/^#define error12(s, a, b, c, d, e, f, g, h, i, j, k/
+error13	debug.h	/^#define error13(s, a, b, c, d, e, f, g, h, i, j, k/
+error14	debug.h	/^#define error14(s, a, b, c, d, e, f, g, h, i, j, k/
+error15	debug.h	/^#define error15(s, a, b, c, d, e, f, g, h, i, j, k/
+error2	debug.h	/^#define error2(s, a, b) fprintf(stderr, "\\n[" __F/
+error3	debug.h	/^#define error3(s, a, b, c) fprintf(stderr, "\\n[" /
+error4	debug.h	/^#define error4(s, a, b, c, d) fprintf(stderr, "\\n/
+error5	debug.h	/^#define error5(s, a, b, c, d, e) fprintf(stderr, "/
+error6	debug.h	/^#define error6(s, a, b, c, d, e, f) fprintf(stderr/
+error7	debug.h	/^#define error7(s, a, b, c, d, e, f, g) fprintf(std/
+error8	debug.h	/^#define error8(s, a, b, c, d, e, f, g, h) fprintf(/
+error9	debug.h	/^#define error9(s, a, b, c, d, e, f, g, h, i) fprin/
+exit_id3	id3.c	/^void exit_id3(mpg123_handle *fr)$/
+fallback_lseek	lfs_wrap.c	/^static long fallback_lseek(int fd, long offset, in/
+fallback_read	lfs_wrap.c	/^static ssize_t fallback_read(int fd, void *buf, si/
+feed_back_bytes	readers.c	/^static int feed_back_bytes(mpg123_handle *fr, off_/
+feed_init	readers.c	/^static int feed_init(mpg123_handle *fr)$/
+feed_more	readers.c	/^int feed_more(mpg123_handle *fr, const unsigned ch/
+feed_read	readers.c	/^static ssize_t feed_read(mpg123_handle *fr, unsign/
+feed_seek_frame	readers.c	/^static int feed_seek_frame(mpg123_handle *fr, off_/
+feed_set_pos	readers.c	/^off_t feed_set_pos(mpg123_handle *fr, off_t pos)$/
+feed_skip_bytes	readers.c	/^static off_t feed_skip_bytes(mpg123_handle *fr,off/
+fi_add	index.c	/^void fi_add(struct frame_index *fi, off_t pos)$/
+fi_exit	index.c	/^void fi_exit(struct frame_index *fi)$/
+fi_init	index.c	/^void fi_init(struct frame_index *fi)$/
+fi_next	index.c	/^static off_t fi_next(struct frame_index *fi)$/
+fi_reset	index.c	/^void fi_reset(struct frame_index *fi)$/
+fi_resize	index.c	/^int fi_resize(struct frame_index *fi, size_t newsi/
+fi_set	index.c	/^int fi_set(struct frame_index *fi, off_t *offsets,/
+fi_shrink	index.c	/^static void fi_shrink(struct frame_index *fi)$/
+find_dectype	optimize.c	/^static int find_dectype(mpg123_handle *fr)$/
+find_synth	optimize.c	/^static int find_synth(func_synth synth,  const fun/
+forget_head_shift	parse.c	/^static int forget_head_shift(mpg123_handle *fr, un/
+frame_bitrate	parse.c	/^int frame_bitrate(mpg123_handle *fr)$/
+frame_buffercheck	gapless.h	/^static void frame_buffercheck(mpg123_handle *fr)$/
+frame_buffers	frame.c	/^int frame_buffers(mpg123_handle *fr)$/
+frame_buffers_reset	frame.c	/^int frame_buffers_reset(mpg123_handle *fr)$/
+frame_cpu_opt	optimize.c	/^int frame_cpu_opt(mpg123_handle *fr, const char* c/
+frame_decode_buffers_reset	frame.c	/^static void frame_decode_buffers_reset(mpg123_hand/
+frame_default_pars	frame.c	/^static void frame_default_pars(mpg123_pars *mp)$/
+frame_dither_init	frame.c	/^int frame_dither_init(mpg123_handle *fr)$/
+frame_exit	frame.c	/^void frame_exit(mpg123_handle *fr)$/
+frame_expect_outsamples	frame.c	/^off_t frame_expect_outsamples(mpg123_handle *fr)$/
+frame_fill_toc	frame.c	/^int frame_fill_toc(mpg123_handle *fr, unsigned cha/
+frame_fixed_reset	frame.c	/^static void frame_fixed_reset(mpg123_handle *fr)$/
+frame_free_buffers	frame.c	/^static void frame_free_buffers(mpg123_handle *fr)$/
+frame_free_toc	frame.c	/^static void frame_free_toc(mpg123_handle *fr)$/
+frame_freq	parse.c	/^long frame_freq(mpg123_handle *fr)$/
+frame_fuzzy_find	frame.c	/^static off_t frame_fuzzy_find(mpg123_handle *fr, o/
+frame_gapless_init	frame.c	/^void frame_gapless_init(mpg123_handle *fr, off_t f/
+frame_gapless_realinit	frame.c	/^void frame_gapless_realinit(mpg123_handle *fr)$/
+frame_gapless_update	frame.c	/^void frame_gapless_update(mpg123_handle *fr, off_t/
+frame_icy_reset	frame.c	/^static void frame_icy_reset(mpg123_handle* fr)$/
+frame_index_find	frame.c	/^off_t frame_index_find(mpg123_handle *fr, off_t wa/
+frame_index_setup	frame.c	/^int frame_index_setup(mpg123_handle *fr)$/
+frame_init	frame.c	/^void frame_init(mpg123_handle *fr)$/
+frame_init_par	frame.c	/^void frame_init_par(mpg123_handle *fr, mpg123_pars/
+frame_ins2outs	frame.c	/^off_t frame_ins2outs(mpg123_handle *fr, off_t ins)/
+frame_offset	frame.c	/^off_t frame_offset(mpg123_handle *fr, off_t outs)$/
+frame_outbuffer	frame.c	/^int frame_outbuffer(mpg123_handle *fr)$/
+frame_output_format	format.c	/^int frame_output_format(mpg123_handle *fr)$/
+frame_outs	frame.c	/^off_t frame_outs(mpg123_handle *fr, off_t num)$/
+frame_reset	frame.c	/^int frame_reset(mpg123_handle* fr)$/
+frame_set_frameseek	frame.c	/^void frame_set_frameseek(mpg123_handle *fr, off_t /
+frame_set_seek	frame.c	/^void frame_set_seek(mpg123_handle *fr, off_t sp)$/
+frame_skip	frame.c	/^void frame_skip(mpg123_handle *fr)$/
+frame_types	id3.c	/^enum frame_types { unknown = -2, text = -1, commen/
+free_comment	id3.c	/^#define free_comment(mh) free_id3_text(&((mh)->id3/
+free_extra	id3.c	/^#define free_extra(mh)   free_id3_text(&((mh)->id3/
+free_id3_picture	id3.c	/^static void free_id3_picture(mpg123_picture **list/
+free_id3_text	id3.c	/^static void free_id3_text(mpg123_text **list, size/
+free_mpg123_picture	id3.c	/^static void free_mpg123_picture(mpg123_picture * p/
+free_mpg123_text	id3.c	/^static void free_mpg123_text(mpg123_text *txt)$/
+free_picture	id3.c	/^#define free_picture(mh) free_id3_picture(&((mh)->/
+free_text	id3.c	/^#define free_text(mh)    free_id3_text(&((mh)->id3/
+freq_fit	format.c	/^static int freq_fit(mpg123_handle *fr, struct audi/
+ftoi16	sample.h	/^static inline int16_t ftoi16(float x)$/
+generic_head_read	readers.c	/^static int generic_head_read(mpg123_handle *fr,uns/
+generic_head_shift	readers.c	/^static int generic_head_shift(mpg123_handle *fr,un/
+generic_read_frame_body	readers.c	/^static int generic_read_frame_body(mpg123_handle */
+generic_tell	readers.c	/^static off_t generic_tell(mpg123_handle *fr)$/
+get1bit	getbits.h	/^#define get1bit(fr) ( \\$/
+get_fileinfo	readers.c	/^static off_t get_fileinfo(mpg123_handle *fr)$/
+get_next_frame	libmpg123.c	/^static int get_next_frame(mpg123_handle *mh)$/
+get_rva	frame.c	/^static int get_rva(mpg123_handle *fr, double *peak/
+get_songlen	parse.c	/^int get_songlen(mpg123_handle *fr,int no)$/
+getbitoffset	getbits.h	/^#define getbitoffset(fr) ((-fr->bitindex)&0x7)$/
+getbits	getbits.h	/^static unsigned int getbits(mpg123_handle *fr, int/
+getbits_fast	getbits.h	/^#define getbits_fast(fr, nob) ( \\$/
+getbyte	getbits.h	/^#define getbyte(fr)      (*fr->wordpointer++)$/
+getcpuflags	getcpuflags_arm.c	/^unsigned int getcpuflags(struct cpuflags* cf)$/
+good_enc	format.c	/^static int good_enc(const int enc)$/
+guess_freeformat_framesize	parse.c	/^static int guess_freeformat_framesize(mpg123_handl/
+halfspeed_do	parse.c	/^static int halfspeed_do(mpg123_handle *fr)$/
+halfspeed_prepare	parse.c	/^static void halfspeed_prepare(mpg123_handle *fr)$/
+handle_id3v2	parse.c	/^static int handle_id3v2(mpg123_handle *fr, unsigne/
+head_check	parse.c	/^static int head_check(unsigned long head)$/
+head_compatible	parse.c	/^static int head_compatible(unsigned long fred, uns/
+header_mono	parse.c	/^static int header_mono(unsigned long newhead)$/
+highpass_tpdf_noise	dither.c	/^static void highpass_tpdf_noise(float *table, size/
+icy2utf8	icy2utf8.c	/^icy2utf8(const char *src, int force)$/
+icy_fullread	readers.c	/^static ssize_t icy_fullread(mpg123_handle *fr, uns/
+id3_link	id3.c	/^void id3_link(mpg123_handle *fr)$/
+id3_to_utf8	id3.c	/^void id3_to_utf8(mpg123_string *sb, unsigned char /
+idiv_signed_rounded	sample.h	/^static inline int16_t idiv_signed_rounded(int32_t /
+ignoreframe	frame.c	/^static off_t ignoreframe(mpg123_handle *fr)$/
+init_icy	icy.c	/^void init_icy(struct icy_meta *icy)$/
+init_id3	id3.c	/^void init_id3(mpg123_handle *fr)$/
+init_layer12	layer2.c	/^void init_layer12(void)$/
+init_layer12_stuff	layer2.c	/^void init_layer12_stuff(mpg123_handle *fr, real* (/
+init_layer12_table	layer2.c	/^real* init_layer12_table(mpg123_handle *fr, real */
+init_layer12_table_mmx	layer2.c	/^real* init_layer12_table_mmx(mpg123_handle *fr, re/
+init_layer3	layer3.c	/^void init_layer3(void)$/
+init_layer3_gainpow2	layer3.c	/^real init_layer3_gainpow2(mpg123_handle *fr, int i/
+init_layer3_gainpow2_mmx	layer3.c	/^real init_layer3_gainpow2_mmx(mpg123_handle *fr, i/
+init_layer3_stuff	layer3.c	/^void init_layer3_stuff(mpg123_handle *fr, real (*g/
+init_mpg123_picture	id3.c	/^static void init_mpg123_picture(mpg123_picture *pi/
+init_mpg123_text	id3.c	/^static void init_mpg123_text(mpg123_text *txt)$/
+init_track	libmpg123.c	/^static int init_track(mpg123_handle *mh)$/
+int	synths.h	/^typedef int (*func_synth)(real *,int, mpg123_handl/
+invalidate_format	format.c	/^void invalidate_format(struct audioformat *af)$/
+io_read	readers.c	/^static ssize_t io_read(struct reader_data *rdat, v/
+io_seek	readers.c	/^static off_t io_seek(struct reader_data *rdat, off/
+is_utf8	icy2utf8.c	/^is_utf8(const char* src)$/
+macro_getbits	getbits.h	/^#define macro_getbits(fr, nob) ( \\$/
+make_conv16to8_table	tabinit.c	/^int make_conv16to8_table(mpg123_handle *fr)$/
+make_decode_tables	tabinit.c	/^void make_decode_tables(mpg123_handle *fr)$/
+make_decode_tables_mmx	tabinit.c	/^void make_decode_tables_mmx(mpg123_handle *fr)$/
+make_long	parse.c	/^				#define make_long(a, o) ((((unsigned long) a[o/
+make_short	parse.c	/^				#define make_short(a,o) ((((unsigned short) a[/
+memmove	mpg123lib_intern.h	/^#define memmove(dst,src,size) bcopy(src,dst,size)$/
+mp3file_delete	com_axelby_mp3decoders_MPG123.c	/^void mp3file_delete(MP3File *mp3file) {$/
+mp3file_determineStats	podax_MPG123.c	/^int mp3file_determineStats(MP3File *mp3) {$/
+mp3file_init	com_axelby_mp3decoders_MPG123.c	/^MP3File* mp3file_init(mpg123_handle *handle) {$/
+mpg123_add_string	stringbuf.c	/^int attribute_align_arg mpg123_add_string(mpg123_s/
+mpg123_add_substring	stringbuf.c	/^int attribute_align_arg mpg123_add_substring(mpg12/
+mpg123_arm_catch_sigill	getcpuflags_arm.c	/^static void mpg123_arm_catch_sigill(int sig)$/
+mpg123_chomp_string	stringbuf.c	/^int attribute_align_arg mpg123_chomp_string(mpg123/
+mpg123_clip	libmpg123.c	/^long attribute_align_arg mpg123_clip(mpg123_handle/
+mpg123_close	libmpg123.c	/^int attribute_align_arg mpg123_close(mpg123_handle/
+mpg123_copy_string	stringbuf.c	/^int attribute_align_arg mpg123_copy_string(mpg123_/
+mpg123_current_decoder	optimize.c	/^const char* attribute_align_arg mpg123_current_dec/
+mpg123_decode	libmpg123.c	/^int attribute_align_arg mpg123_decode(mpg123_handl/
+mpg123_decode_frame	lfs_wrap.c	/^int attribute_align_arg mpg123_decode_frame(mpg123/
+mpg123_decoder	libmpg123.c	/^int attribute_align_arg mpg123_decoder(mpg123_hand/
+mpg123_decoders	optimize.c	/^const char attribute_align_arg **mpg123_decoders(v/
+mpg123_delete	libmpg123.c	/^void attribute_align_arg mpg123_delete(mpg123_hand/
+mpg123_delete_pars	frame.c	/^void attribute_align_arg mpg123_delete_pars(mpg123/
+mpg123_enc_from_id3	libmpg123.c	/^enum mpg123_text_encoding attribute_align_arg mpg1/
+mpg123_encodings	format.c	/^void attribute_align_arg mpg123_encodings(const in/
+mpg123_encsize	format.c	/^int attribute_align_arg mpg123_encsize(int encodin/
+mpg123_eq	libmpg123.c	/^int attribute_align_arg mpg123_eq(mpg123_handle *m/
+mpg123_errcode	libmpg123.c	/^int attribute_align_arg mpg123_errcode(mpg123_hand/
+mpg123_exit	libmpg123.c	/^void attribute_align_arg mpg123_exit(void)$/
+mpg123_feature	feature.c	/^int mpg123_feature(const enum mpg123_feature_set k/
+mpg123_feed	libmpg123.c	/^int attribute_align_arg mpg123_feed(mpg123_handle /
+mpg123_feedseek	lfs_wrap.c	/^long attribute_align_arg mpg123_feedseek(mpg123_ha/
+mpg123_flags	mpg123.h	/^enum mpg123_flags {$/
+mpg123_fmt	format.c	/^int attribute_align_arg mpg123_fmt(mpg123_pars *mp/
+mpg123_fmt_all	format.c	/^int attribute_align_arg mpg123_fmt_all(mpg123_pars/
+mpg123_fmt_none	format.c	/^int attribute_align_arg mpg123_fmt_none(mpg123_par/
+mpg123_fmt_support	format.c	/^int attribute_align_arg mpg123_fmt_support(mpg123_/
+mpg123_format	format.c	/^int attribute_align_arg mpg123_format(mpg123_handl/
+mpg123_format_all	format.c	/^int attribute_align_arg mpg123_format_all(mpg123_h/
+mpg123_format_none	format.c	/^int attribute_align_arg mpg123_format_none(mpg123_/
+mpg123_format_support	format.c	/^int attribute_align_arg mpg123_format_support(mpg1/
+mpg123_framebyframe_decode	lfs_wrap.c	/^int attribute_align_arg mpg123_framebyframe_decode/
+mpg123_framebyframe_next	libmpg123.c	/^int attribute_align_arg mpg123_framebyframe_next(m/
+mpg123_framedata	frame.c	/^int attribute_align_arg mpg123_framedata(mpg123_ha/
+mpg123_framepos	frame.c	/^off_t attribute_align_arg mpg123_framepos(mpg123_h/
+mpg123_free_string	stringbuf.c	/^void attribute_align_arg mpg123_free_string(mpg123/
+mpg123_geteq	libmpg123.c	/^double attribute_align_arg mpg123_geteq(mpg123_han/
+mpg123_getformat	libmpg123.c	/^int attribute_align_arg mpg123_getformat(mpg123_ha/
+mpg123_getpar	libmpg123.c	/^int attribute_align_arg mpg123_getpar(mpg123_pars /
+mpg123_getparam	libmpg123.c	/^int attribute_align_arg mpg123_getparam(mpg123_han/
+mpg123_getstate	libmpg123.c	/^int attribute_align_arg mpg123_getstate(mpg123_han/
+mpg123_getvolume	frame.c	/^int attribute_align_arg mpg123_getvolume(mpg123_ha/
+mpg123_grow_string	stringbuf.c	/^int attribute_align_arg mpg123_grow_string(mpg123_/
+mpg123_handle	lfs_alias.c	/^struct mpg123_handle_struct;$/
+mpg123_icy	libmpg123.c	/^int attribute_align_arg mpg123_icy(mpg123_handle */
+mpg123_icy2utf8	libmpg123.c	/^char* attribute_align_arg mpg123_icy2utf8(const ch/
+mpg123_id3	libmpg123.c	/^int attribute_align_arg mpg123_id3(mpg123_handle */
+mpg123_id3v1	mpg123.h	/^} mpg123_id3v1;$/
+mpg123_id3v2	mpg123.h	/^} mpg123_id3v2;$/
+mpg123_index	lfs_wrap.c	/^int attribute_align_arg mpg123_index(mpg123_handle/
+mpg123_info	libmpg123.c	/^int attribute_align_arg mpg123_info(mpg123_handle /
+mpg123_init	libmpg123.c	/^int attribute_align_arg mpg123_init(void)$/
+mpg123_init_string	stringbuf.c	/^void attribute_align_arg mpg123_init_string(mpg123/
+mpg123_length	lfs_wrap.c	/^long attribute_align_arg mpg123_length(mpg123_hand/
+mpg123_meta_check	libmpg123.c	/^int attribute_align_arg mpg123_meta_check(mpg123_h/
+mpg123_meta_free	libmpg123.c	/^void attribute_align_arg mpg123_meta_free(mpg123_h/
+mpg123_mode	mpg123.h	/^enum mpg123_mode {$/
+mpg123_new	libmpg123.c	/^mpg123_handle attribute_align_arg *mpg123_new(cons/
+mpg123_new_pars	frame.c	/^mpg123_pars attribute_align_arg *mpg123_new_pars(i/
+mpg123_noise	dither.c	/^void mpg123_noise(float* table, size_t count, enum/
+mpg123_open	lfs_wrap.c	/^int attribute_align_arg mpg123_open(mpg123_handle /
+mpg123_open_fd	lfs_wrap.c	/^int attribute_align_arg mpg123_open_fd(mpg123_hand/
+mpg123_open_feed	libmpg123.c	/^int attribute_align_arg mpg123_open_feed(mpg123_ha/
+mpg123_open_handle	lfs_wrap.c	/^int attribute_align_arg mpg123_open_handle(mpg123_/
+mpg123_outblock	libmpg123.c	/^size_t attribute_align_arg mpg123_outblock(mpg123_/
+mpg123_par	libmpg123.c	/^int attribute_align_arg mpg123_par(mpg123_pars *mp/
+mpg123_param	libmpg123.c	/^int attribute_align_arg mpg123_param(mpg123_handle/
+mpg123_parnew	libmpg123.c	/^mpg123_handle attribute_align_arg *mpg123_parnew(m/
+mpg123_pars	mpg123.h	/^typedef struct mpg123_pars_struct   mpg123_pars;$/
+mpg123_picture	mpg123.h	/^} mpg123_picture;$/
+mpg123_plain_strerror	libmpg123.c	/^const char* attribute_align_arg mpg123_plain_strer/
+mpg123_position	lfs_wrap.c	/^int attribute_align_arg mpg123_position(mpg123_han/
+mpg123_rates	format.c	/^void attribute_align_arg mpg123_rates(const long */
+mpg123_read	libmpg123.c	/^int attribute_align_arg mpg123_read(mpg123_handle /
+mpg123_replace_buffer	frame.c	/^int attribute_align_arg mpg123_replace_buffer(mpg1/
+mpg123_replace_reader	lfs_wrap.c	/^int attribute_align_arg mpg123_replace_reader(mpg1/
+mpg123_replace_reader_handle	lfs_wrap.c	/^int attribute_align_arg mpg123_replace_reader_hand/
+mpg123_reset_eq	frame.c	/^int attribute_align_arg mpg123_reset_eq(mpg123_han/
+mpg123_resize_string	stringbuf.c	/^int attribute_align_arg mpg123_resize_string(mpg12/
+mpg123_safe_buffer	libmpg123.c	/^size_t attribute_align_arg mpg123_safe_buffer(void/
+mpg123_scan	libmpg123.c	/^int attribute_align_arg mpg123_scan(mpg123_handle /
+mpg123_seek	lfs_wrap.c	/^long attribute_align_arg mpg123_seek(mpg123_handle/
+mpg123_seek_frame	lfs_wrap.c	/^long attribute_align_arg mpg123_seek_frame(mpg123_/
+mpg123_set_filesize	lfs_wrap.c	/^int attribute_align_arg mpg123_set_filesize(mpg123/
+mpg123_set_index	lfs_wrap.c	/^int attribute_align_arg mpg123_set_index(mpg123_ha/
+mpg123_set_string	stringbuf.c	/^int attribute_align_arg mpg123_set_string(mpg123_s/
+mpg123_set_substring	stringbuf.c	/^int attribute_align_arg mpg123_set_substring(mpg12/
+mpg123_spf	parse.c	/^int attribute_align_arg mpg123_spf(mpg123_handle */
+mpg123_store_utf8	libmpg123.c	/^int mpg123_store_utf8(mpg123_string *sb, enum mpg1/
+mpg123_strerror	libmpg123.c	/^const char* attribute_align_arg mpg123_strerror(mp/
+mpg123_string	mpg123.h	/^} mpg123_string;$/
+mpg123_strlen	stringbuf.c	/^size_t attribute_align_arg mpg123_strlen(mpg123_st/
+mpg123_supported_decoders	optimize.c	/^const char attribute_align_arg **mpg123_supported_/
+mpg123_tell	lfs_wrap.c	/^long attribute_align_arg mpg123_tell(mpg123_handle/
+mpg123_tell_stream	lfs_wrap.c	/^long attribute_align_arg mpg123_tell_stream(mpg123/
+mpg123_tellframe	lfs_wrap.c	/^long attribute_align_arg mpg123_tellframe(mpg123_h/
+mpg123_text	mpg123.h	/^} mpg123_text;$/
+mpg123_timeframe	lfs_wrap.c	/^long attribute_align_arg mpg123_timeframe(mpg123_h/
+mpg123_tpf	parse.c	/^double attribute_align_arg mpg123_tpf(mpg123_handl/
+mpg123_vbr	mpg123.h	/^enum mpg123_vbr {$/
+mpg123_version	mpg123.h	/^enum mpg123_version {$/
+mpg123_volume	frame.c	/^int attribute_align_arg mpg123_volume(mpg123_handl/
+mpg123_volume_change	frame.c	/^int attribute_align_arg mpg123_volume_change(mpg12/
+newhuff	huffman.h	/^struct newhuff $/
+next_text	id3.c	/^static unsigned char *next_text(unsigned char* pre/
+nix_lseek	readers.c	/^static off_t     nix_lseek(int fd, off_t offset, i/
+noquiet	id3.c	/^typedef void (*text_converter)(mpg123_string *sb, /
+ntom_frame_outsamples	ntom.c	/^off_t ntom_frame_outsamples(mpg123_handle *fr)$/
+ntom_frameoff	ntom.c	/^off_t ntom_frameoff(mpg123_handle *fr, off_t soff)/
+ntom_frmouts	ntom.c	/^off_t ntom_frmouts(mpg123_handle *fr, off_t frame)/
+ntom_ins2outs	ntom.c	/^off_t ntom_ins2outs(mpg123_handle *fr, off_t ins)$/
+ntom_set_ntom	ntom.c	/^void ntom_set_ntom(mpg123_handle *fr, off_t num)$/
+ntom_val	ntom.c	/^unsigned long ntom_val(mpg123_handle *fr, off_t fr/
+null_id3_links	id3.c	/^static void null_id3_links(mpg123_handle *fr)$/
+off_p	compat.h	/^typedef intmax_t off_p;$/
+open_bad	readers.c	/^void open_bad(mpg123_handle *mh)$/
+open_feed	readers.c	/^int open_feed(mpg123_handle *fr)$/
+open_finish	readers.c	/^static int open_finish(mpg123_handle *fr)$/
+open_stream	readers.c	/^int open_stream(mpg123_handle *fr, const char *bs_/
+open_stream_handle	readers.c	/^int open_stream_handle(mpg123_handle *fr, void *io/
+optcla	optimize.h	/^enum optcla { nocla=0, normal, mmxsse };$/
+outblock_bytes	format.c	/^off_t outblock_bytes(mpg123_handle *fr, off_t s)$/
+parse_new_id3	id3.c	/^int parse_new_id3(mpg123_handle *fr, unsigned long/
+plain_fullread	readers.c	/^static ssize_t plain_fullread(mpg123_handle *fr,un/
+plain_read	readers.c	/^static ssize_t plain_read(mpg123_handle *fr, void /
+pop_comment	id3.c	/^#define pop_comment(mh) pop_id3_text(&((mh)->id3v2/
+pop_extra	id3.c	/^#define pop_extra(mh)   pop_id3_text(&((mh)->id3v2/
+pop_id3_picture	id3.c	/^static void pop_id3_picture(mpg123_picture **list,/
+pop_id3_text	id3.c	/^static void pop_id3_text(mpg123_text **list, size_/
+pop_picture	id3.c	/^#define pop_picture(mh)   pop_id3_picture(&((mh)->/
+pop_text	id3.c	/^#define pop_text(mh)    pop_id3_text(&((mh)->id3v2/
+posix_lseek	readers.c	/^static off_t   posix_lseek(int fd, off_t offset, i/
+posix_read	readers.c	/^static ssize_t posix_read(int fd, void *buf, size_/
+postprocess_buffer	format.c	/^void postprocess_buffer(mpg123_handle *fr)$/
+prepare_decode_tables	tabinit.c	/^void prepare_decode_tables()$/
+printerr	podax_MPG123.c	/^void printerr(const char* message, int err) {$/
+process_comment	id3.c	/^static void process_comment(mpg123_handle *fr, enu/
+process_extra	id3.c	/^static void process_extra(mpg123_handle *fr, unsig/
+process_picture	id3.c	/^static void process_picture(mpg123_handle *fr, uns/
+process_text	id3.c	/^static void process_text(mpg123_handle *fr, unsign/
+promote_framename	id3.c	/^static int promote_framename(mpg123_handle *fr, ch/
+rand_xorshift32	dither.c	/^static float rand_xorshift32(uint32_t *seed)$/
+rate2num	format.c	/^static int rate2num(mpg123_pars *mp, long r)$/
+readBuffer	com_axelby_mp3decoders_MPG123.c	/^static inline int readBuffer(MP3File* mp3)$/
+read_frame	parse.c	/^int read_frame(mpg123_handle *fr)$/
+reset_icy	icy.c	/^void reset_icy(struct icy_meta *icy)$/
+reset_id3	id3.c	/^void reset_id3(mpg123_handle *fr)$/
+rounded	tabinit.c	/^static int rounded(double f)$/
+safe_realloc	compat.c	/^void *safe_realloc(void *ptr, size_t size)$/
+sample_adjust	gapless.h	/^static off_t sample_adjust(mpg123_handle *mh, off_/
+sample_unadjust	gapless.h	/^static off_t sample_unadjust(mpg123_handle *mh, of/
+samples_to_bytes	format.c	/^off_t samples_to_bytes(mpg123_handle *fr , off_t s/
+scale_rounded	mpg123lib_intern.h	/^static inline int32_t scale_rounded(int32_t x, int/
+set_pointer	parse.c	/^void set_pointer(mpg123_handle *fr, long backstep)/
+set_synth_functions	optimize.c	/^int set_synth_functions(mpg123_handle *fr)$/
+size_p	compat.h	/^typedef uintmax_t size_p;$/
+skip_junk	parse.c	/^static int skip_junk(mpg123_handle *fr, unsigned l/
+skipbits	getbits.h	/^#define skipbits(fr, nob) fr->ultmp = ( \\$/
+socklen_t	compat.h	/^typedef int socklen_t;$/
+sse_or_vintage	optimize.c	/^static enum optdec sse_or_vintage(mpg123_handle *f/
+ssize_p	compat.h	/^typedef intmax_t ssize_p;$/
+store_id3_text	id3.c	/^static void store_id3_text(mpg123_string *sb, unsi/
+strdup	compat.c	/^char *strdup(const char *src)$/
+stream_back_bytes	readers.c	/^static int stream_back_bytes(mpg123_handle *fr, of/
+stream_close	readers.c	/^static void stream_close(mpg123_handle *fr)$/
+stream_lseek	readers.c	/^static off_t stream_lseek(mpg123_handle *fr, off_t/
+stream_rewind	readers.c	/^static void stream_rewind(mpg123_handle *fr)$/
+stream_seek_frame	readers.c	/^static int stream_seek_frame(mpg123_handle *fr, of/
+stream_skip_bytes	readers.c	/^static off_t stream_skip_bytes(mpg123_handle *fr,o/
+strerror	compat.c	/^const char *strerror(int errnum)$/
+synchsafe_to_long	id3.c	/^	#define synchsafe_to_long(buf,res) \\$/
+synth_1to1_3dnow	synth.c	/^int synth_1to1_3dnow(real *bandPtr, int channel, m/
+synth_1to1_3dnowext	synth.c	/^int synth_1to1_3dnowext(real *bandPtr, int channel/
+synth_1to1_altivec	synth_altivec.c	/^int synth_1to1_altivec(real *bandPtr,int channel,m/
+synth_1to1_arm	synth.c	/^int synth_1to1_arm(real *bandPtr,int channel, mpg1/
+synth_1to1_avx	synth.c	/^int synth_1to1_avx(real *bandPtr,int channel, mpg1/
+synth_1to1_i586	synth.c	/^int synth_1to1_i586(real *bandPtr, int channel, mp/
+synth_1to1_i586_dither	synth.c	/^int synth_1to1_i586_dither(real *bandPtr, int chan/
+synth_1to1_mmx	synth.c	/^int synth_1to1_mmx(real *bandPtr, int channel, mpg/
+synth_1to1_neon	synth.c	/^int synth_1to1_neon(real *bandPtr,int channel, mpg/
+synth_1to1_neon64	synth.c	/^int synth_1to1_neon64(real *bandPtr,int channel, m/
+synth_1to1_real_altivec	synth_altivec.c	/^int synth_1to1_real_altivec(real *bandPtr,int chan/
+synth_1to1_real_avx	synth_real.c	/^int synth_1to1_real_avx(real *bandPtr,int channel,/
+synth_1to1_real_neon	synth_real.c	/^int synth_1to1_real_neon(real *bandPtr,int channel/
+synth_1to1_real_neon64	synth_real.c	/^int synth_1to1_real_neon64(real *bandPtr,int chann/
+synth_1to1_real_sse	synth_real.c	/^int synth_1to1_real_sse(real *bandPtr,int channel,/
+synth_1to1_real_stereo_altivec	synth_altivec.c	/^int synth_1to1_real_stereo_altivec(real *bandPtr_l/
+synth_1to1_real_stereo_avx	synth_real.c	/^int synth_1to1_real_stereo_avx(real *bandPtr_l, re/
+synth_1to1_real_stereo_neon	synth_real.c	/^int synth_1to1_real_stereo_neon(real *bandPtr_l, r/
+synth_1to1_real_stereo_neon64	synth_real.c	/^int synth_1to1_real_stereo_neon64(real *bandPtr_l,/
+synth_1to1_real_stereo_sse	synth_real.c	/^int synth_1to1_real_stereo_sse(real *bandPtr_l, re/
+synth_1to1_real_stereo_x86_64	synth_real.c	/^int synth_1to1_real_stereo_x86_64(real *bandPtr_l,/
+synth_1to1_real_x86_64	synth_real.c	/^int synth_1to1_real_x86_64(real *bandPtr,int chann/
+synth_1to1_s32_altivec	synth_altivec.c	/^int synth_1to1_s32_altivec(real *bandPtr,int chann/
+synth_1to1_s32_avx	synth_s32.c	/^int synth_1to1_s32_avx(real *bandPtr,int channel, /
+synth_1to1_s32_neon	synth_s32.c	/^int synth_1to1_s32_neon(real *bandPtr,int channel,/
+synth_1to1_s32_neon64	synth_s32.c	/^int synth_1to1_s32_neon64(real *bandPtr,int channe/
+synth_1to1_s32_sse	synth_s32.c	/^int synth_1to1_s32_sse(real *bandPtr,int channel, /
+synth_1to1_s32_stereo_altivec	synth_altivec.c	/^int synth_1to1_s32_stereo_altivec(real *bandPtr_l,/
+synth_1to1_s32_stereo_avx	synth_s32.c	/^int synth_1to1_s32_stereo_avx(real *bandPtr_l, rea/
+synth_1to1_s32_stereo_neon	synth_s32.c	/^int synth_1to1_s32_stereo_neon(real *bandPtr_l, re/
+synth_1to1_s32_stereo_neon64	synth_s32.c	/^int synth_1to1_s32_stereo_neon64(real *bandPtr_l, /
+synth_1to1_s32_stereo_sse	synth_s32.c	/^int synth_1to1_s32_stereo_sse(real *bandPtr_l, rea/
+synth_1to1_s32_stereo_x86_64	synth_s32.c	/^int synth_1to1_s32_stereo_x86_64(real *bandPtr_l, /
+synth_1to1_s32_x86_64	synth_s32.c	/^int synth_1to1_s32_x86_64(real *bandPtr,int channe/
+synth_1to1_sse	synth.c	/^int synth_1to1_sse(real *bandPtr,int channel, mpg1/
+synth_1to1_stereo_altivec	synth_altivec.c	/^int synth_1to1_stereo_altivec(real *bandPtr_l, rea/
+synth_1to1_stereo_avx	synth.c	/^int synth_1to1_stereo_avx(real *bandPtr_l, real *b/
+synth_1to1_stereo_neon	synth.c	/^int synth_1to1_stereo_neon(real *bandPtr_l, real */
+synth_1to1_stereo_neon64	synth.c	/^int synth_1to1_stereo_neon64(real *bandPtr_l, real/
+synth_1to1_stereo_sse	synth.c	/^int synth_1to1_stereo_sse(real *bandPtr_l, real *b/
+synth_1to1_stereo_x86_64	synth.c	/^int synth_1to1_stereo_x86_64(real *bandPtr_l, real/
+synth_1to1_x86_64	synth.c	/^int synth_1to1_x86_64(real *bandPtr,int channel, m/
+synth_channel	synths.h	/^enum synth_channel  { c_plain=0, c_stereo, c_m2s, /
+synth_ntom_set_step	ntom.c	/^int synth_ntom_set_step(mpg123_handle *fr)$/
+synth_stereo_wrap	optimize.c	/^static int synth_stereo_wrap(real *bandPtr_l, real/
+threebytes_to_long	id3.c	/^	#define threebytes_to_long(buf,res) \\$/
+timeout_read	readers.c	/^static ssize_t timeout_read(mpg123_handle *fr, voi/
+tpdf_noise	dither.c	/^static void tpdf_noise(float *table, size_t count)/
+track_need_init	libmpg123.c	/^#define track_need_init(mh) ((mh)->num < 0)$/
+warning	debug.h	/^#define warning(s) fprintf(stderr, "[" __FILE__ ":/
+warning1	debug.h	/^#define warning1(s, a) fprintf(stderr, "[" __FILE_/
+warning10	debug.h	/^#define warning10(s, a, b, c, d, e, f, g, h, i, j)/
+warning11	debug.h	/^#define warning11(s, a, b, c, d, e, f, g, h, i, j,/
+warning12	debug.h	/^#define warning12(s, a, b, c, d, e, f, g, h, i, j,/
+warning13	debug.h	/^#define warning13(s, a, b, c, d, e, f, g, h, i, j,/
+warning14	debug.h	/^#define warning14(s, a, b, c, d, e, f, g, h, i, j,/
+warning15	debug.h	/^#define warning15(s, a, b, c, d, e, f, g, h, i, j,/
+warning2	debug.h	/^#define warning2(s, a, b) fprintf(stderr, "[" __FI/
+warning3	debug.h	/^#define warning3(s, a, b, c) fprintf(stderr, "[" _/
+warning4	debug.h	/^#define warning4(s, a, b, c, d) fprintf(stderr, "[/
+warning5	debug.h	/^#define warning5(s, a, b, c, d, e) fprintf(stderr,/
+warning6	debug.h	/^#define warning6(s, a, b, c, d, e, f) fprintf(stde/
+warning7	debug.h	/^#define warning7(s, a, b, c, d, e, f, g) fprintf(s/
+warning8	debug.h	/^#define warning8(s, a, b, c, d, e, f, g, h) fprint/
+warning9	debug.h	/^#define warning9(s, a, b, c, d, e, f, g, h, i) fpr/
+wetwork	parse.c	/^static int wetwork(mpg123_handle *fr, unsigned lon/
+white_noise	dither.c	/^static void white_noise(float *table, size_t count/
+win32_utf8_wide	compat.c	/^int win32_utf8_wide(const char *const mbptr, wchar/
+win32_wide_utf8	compat.c	/^int win32_wide_utf8(const wchar_t * const wptr, ch/
+wrap_destroy	lfs_wrap.c	/^static void wrap_destroy(void *handle)$/
+wrap_get	lfs_wrap.c	/^static struct wrap_data* wrap_get(mpg123_handle *m/
+wrap_io_cleanup	lfs_wrap.c	/^static void wrap_io_cleanup(void *handle)$/
+wrap_lseek	lfs_wrap.c	/^off_t wrap_lseek(void *handle, off_t offset, int w/
+wrap_read	lfs_wrap.c	/^ssize_t wrap_read(void* handle, void *buf, size_t /
+zero_byte	libmpg123.c	/^static int zero_byte(mpg123_handle *fr)$/
