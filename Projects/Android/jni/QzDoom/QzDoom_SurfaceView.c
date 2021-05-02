@@ -878,7 +878,6 @@ void QzDoom_Vibrate(float duration, int channel, float intensity )
 
 void jni_haptic_event(const char* event, int position, int intensity, float angle, float yHeight);
 void jni_haptic_stopevent(const char* event);
-void jni_haptic_stopall();
 void jni_haptic_enable();
 void jni_haptic_disable();
 
@@ -888,11 +887,6 @@ void QzDoom_HapticEvent(const char* event, int position, int intensity, float an
     if (bHapticsEnabled) {
         jni_haptic_event(event, position, intensity, angle, yHeight);
     }
-}
-
-void QzDoom_HapticStopAll()
-{
-	jni_haptic_stopall();
 }
 
 void QzDoom_HapticStopEvent(const char* event)
@@ -1766,7 +1760,6 @@ Activity lifecycle
 jmethodID android_shutdown;
 jmethodID android_haptic_event;
 jmethodID android_haptic_stopevent;
-jmethodID android_haptic_stopall;
 jmethodID android_haptic_enable;
 jmethodID android_haptic_disable;
 static JavaVM *jVM;
@@ -1813,19 +1806,6 @@ void jni_haptic_stopevent(const char* event)
 	jstring StringArg1 = (*env)->NewStringUTF(env, event);
 
 	return (*env)->CallVoidMethod(env, jniCallbackObj, android_haptic_stopevent, StringArg1);
-}
-
-void jni_haptic_stopall()
-{
-	ALOGV("Calling: jni_haptic_stopall");
-	JNIEnv *env;
-	jobject tmp;
-	if (((*jVM)->GetEnv(jVM, (void**) &env, JNI_VERSION_1_4))<0)
-	{
-		(*jVM)->AttachCurrentThread(jVM,&env, NULL);
-	}
-
-	return (*env)->CallVoidMethod(env, jniCallbackObj, android_haptic_stopall);
 }
 
 void jni_haptic_enable()
@@ -1959,7 +1939,6 @@ JNIEXPORT void JNICALL Java_com_drbeef_questzdoom_GLES3JNILib_onStart( JNIEnv * 
     android_shutdown = (*env)->GetMethodID(env,callbackClass,"shutdown","()V");
 	android_haptic_event = (*env)->GetMethodID(env, callbackClass, "haptic_event", "(Ljava/lang/String;IIFF)V");
 	android_haptic_stopevent = (*env)->GetMethodID(env, callbackClass, "haptic_stopevent", "(Ljava/lang/String;)V");
-	android_haptic_stopall = (*env)->GetMethodID(env, callbackClass, "haptic_stopall", "()V");
 	android_haptic_enable = (*env)->GetMethodID(env, callbackClass, "haptic_enable", "()V");
 	android_haptic_disable = (*env)->GetMethodID(env, callbackClass, "haptic_disable", "()V");
 

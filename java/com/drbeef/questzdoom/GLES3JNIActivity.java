@@ -68,37 +68,11 @@ import java.io.OutputStream;
 		}
 	}
 
-	public void haptic_updateevent(String event, int intensity, float angle) {
-
-		if (externalHapticsServiceClient.hasService()) {
-			try {
-				externalHapticsServiceClient.getHapticsService().hapticUpdateEvent(APPLICATION, event, intensity, angle);
-			}
-			catch (RemoteException r)
-			{
-				Log.v(APPLICATION, r.toString());
-			}
-		}
-	}
-
 	public void haptic_stopevent(String event) {
 
 		if (externalHapticsServiceClient.hasService()) {
 			try {
 				externalHapticsServiceClient.getHapticsService().hapticStopEvent(APPLICATION, event);
-			}
-			catch (RemoteException r)
-			{
-				Log.v(APPLICATION, r.toString());
-			}
-		}
-	}
-
-	public void haptic_endframe() {
-
-		if (externalHapticsServiceClient.hasService()) {
-			try {
-				externalHapticsServiceClient.getHapticsService().hapticFrameTick();
 			}
 			catch (RemoteException r)
 			{
