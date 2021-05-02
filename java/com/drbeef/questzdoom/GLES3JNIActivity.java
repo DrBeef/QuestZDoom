@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.os.RemoteException;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
@@ -337,8 +338,6 @@ import java.io.OutputStream;
 	@Override protected void onDestroy()
 	{
 		Log.v(APPLICATION, "GLES3JNIActivity::onDestroy()" );
-
-		bHaptics.destroy();
 
 		if ( mSurfaceHolder != null )
 		{
