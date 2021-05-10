@@ -881,12 +881,9 @@ void jni_haptic_stopevent(const char* event);
 void jni_haptic_enable();
 void jni_haptic_disable();
 
-bool bHapticsEnabled = false; // local knowledge of whether bHaptics is enabled or not
 void QzDoom_HapticEvent(const char* event, int position, int intensity, float angle, float yHeight )
 {
-    if (bHapticsEnabled) {
-        jni_haptic_event(event, position, intensity, angle, yHeight);
-    }
+    jni_haptic_event(event, position, intensity, angle, yHeight);
 }
 
 void QzDoom_HapticStopEvent(const char* event)
@@ -896,13 +893,11 @@ void QzDoom_HapticStopEvent(const char* event)
 
 void QzDoom_HapticEnable()
 {
-    bHapticsEnabled = true;
 	jni_haptic_enable();
 }
 
 void QzDoom_HapticDisable()
 {
-    bHapticsEnabled = false;
 	jni_haptic_disable();
 }
 

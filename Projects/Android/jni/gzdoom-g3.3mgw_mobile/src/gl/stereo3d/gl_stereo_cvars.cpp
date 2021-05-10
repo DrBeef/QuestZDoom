@@ -76,16 +76,6 @@ CVAR(Bool, vr_momentum, false, CVAR_ARCHIVE | CVAR_GLOBALCONFIG) // Only used in
 
 CVAR(Float, vr_pickup_haptic_level, 0.2, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 CVAR(Float, vr_quake_haptic_level, 0.8, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
-CUSTOM_CVAR(Bool, vr_bhaptics, false, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
-{
-	if (self)
-	{
-		QzDoom_HapticEnable();
-	} else
-	{
-		QzDoom_HapticDisable();
-	}
-}
 
 //HUD control
 CVAR(Float, vr_hud_scale, 0.25f, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
