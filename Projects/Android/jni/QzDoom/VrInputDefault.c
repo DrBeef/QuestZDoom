@@ -23,7 +23,8 @@ int getMenuState();
 void Joy_GenerateButtonEvents(int oldbuttons, int newbuttons, int numbuttons, int base);
 float getViewpointYaw();
 
-void HandleInput_Default( int control_scheme, ovrInputStateTrackedRemote *pDominantTrackedRemoteNew, ovrInputStateTrackedRemote *pDominantTrackedRemoteOld, ovrTracking* pDominantTracking,
+void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackingNew, ovrInputStateGamepad *pFootTrackingOld,
+                        ovrInputStateTrackedRemote *pDominantTrackedRemoteNew, ovrInputStateTrackedRemote *pDominantTrackedRemoteOld, ovrTracking* pDominantTracking,
                           ovrInputStateTrackedRemote *pOffTrackedRemoteNew, ovrInputStateTrackedRemote *pOffTrackedRemoteOld, ovrTracking* pOffTracking,
                           int domButton1, int domButton2, int offButton1, int offButton2 )
 
@@ -243,8 +244,8 @@ void HandleInput_Default( int control_scheme, ovrInputStateTrackedRemote *pDomin
             //and we don't get movement jitter when the joystick doesn't quite center properly
             float dist = length(pSecondaryTrackedRemoteNew->Joystick.x, pSecondaryTrackedRemoteNew->Joystick.y);
             float nlf = nonLinearFilter(dist);
-            float x = nlf * pSecondaryTrackedRemoteNew->Joystick.x;
-            float y = nlf * pSecondaryTrackedRemoteNew->Joystick.y;
+            float x = nlf * pSecondaryTrackedRemoteNew->Joystick.x + pFootTrackingNew->LeftJoystick.x;
+            float y = nlf * pSecondaryTrackedRemoteNew->Joystick.y - pFootTrackingNew->LeftJoystick.y;
 
             //Apply a simple deadzone
             player_moving = (fabs(x) + fabs(y)) > 0.05f;

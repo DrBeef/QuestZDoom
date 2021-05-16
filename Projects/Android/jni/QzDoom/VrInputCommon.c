@@ -84,34 +84,51 @@ bool between(float min, float val, float max)
 
 void acquireTrackedRemotesData(const ovrMobile *Ovr, double displayTime) {//The amount of yaw changed by controller
     for ( int i = 0; ; i++ ) {
-        ovrInputCapabilityHeader cap;
-        ovrResult result = vrapi_EnumerateInputDevices(Ovr, i, &cap);
+        ovrInputCapabilityHeader capsHeader;
+        ovrResult result = vrapi_EnumerateInputDevices(Ovr, i, &capsHeader);
         if (result < 0) {
             break;
         }
 
-        if (cap.Type == ovrControllerType_TrackedRemote) {
+        if (capsHeader.Type == ovrControllerType_Gamepad) {
+
+            ovrInputGamepadCapabilities remoteCaps;
+            remoteCaps.Header = capsHeader;
+            if (vrapi_GetInputDeviceCapabilities(Ovr, &remoteCaps.Header) >= 0) {
+                // remote is connected
+                ovrInputStateGamepad remoteState;
+                remoteState.Header.ControllerType = ovrControllerType_Gamepad;
+                if ( vrapi_GetCurrentInputState( Ovr, capsHeader.DeviceID, &remoteState.Header ) >= 0 )
+                {
+                    // act on device state returned in remoteState
+                    footTrackedRemoteState_new = remoteState;
+                }
+            }
+        }
+        else if (capsHeader.Type == ovrControllerType_TrackedRemote) {
             ovrTracking remoteTracking;
-            ovrInputStateTrackedRemote trackedRemoteState;
-            trackedRemoteState.Header.ControllerType = ovrControllerType_TrackedRemote;
-            result = vrapi_GetCurrentInputState(Ovr, cap.DeviceID, &trackedRemoteState.Header);
+            ovrInputTrackedRemoteCapabilities remoteCaps;
+            remoteCaps.Header = capsHeader;
+            if ( vrapi_GetInputDeviceCapabilities( Ovr, &remoteCaps.Header ) >= 0 )
+            {
+                // remote is connected
+                ovrInputStateTrackedRemote remoteState;
+                remoteState.Header.ControllerType = ovrControllerType_TrackedRemote;
 
-            if (result == ovrSuccess) {
-                ovrInputTrackedRemoteCapabilities remoteCapabilities;
-                remoteCapabilities.Header = cap;
-                result = vrapi_GetInputDeviceCapabilities(Ovr, &remoteCapabilities.Header);
-
-                result = vrapi_GetInputTrackingState(Ovr, cap.DeviceID, displayTime,
-                                                     &remoteTracking);
-
-                if (remoteCapabilities.ControllerCapabilities & ovrControllerCaps_RightHand) {
-                    rightTrackedRemoteState_new = trackedRemoteState;
-                    rightRemoteTracking_new = remoteTracking;
-                    controllerIDs[1] = cap.DeviceID;
-                } else{
-                    leftTrackedRemoteState_new = trackedRemoteState;
-                    leftRemoteTracking_new = remoteTracking;
-                    controllerIDs[0] = cap.DeviceID;
+                if(vrapi_GetCurrentInputState(Ovr, capsHeader.DeviceID, &remoteState.Header) >= 0) {
+                    if (vrapi_GetInputTrackingState(Ovr, capsHeader.DeviceID, displayTime,
+                                                    &remoteTracking) >= 0) {
+                        // act on device state returned in remoteState
+                        if (remoteCaps.ControllerCapabilities & ovrControllerCaps_RightHand) {
+                            rightTrackedRemoteState_new = remoteState;
+                            rightRemoteTracking_new = remoteTracking;
+                            controllerIDs[1] = capsHeader.DeviceID;
+                        } else {
+                            leftTrackedRemoteState_new = remoteState;
+                            leftRemoteTracking_new = remoteTracking;
+                            controllerIDs[0] = capsHeader.DeviceID;
+                        }
+                    }
                 }
             }
         }
