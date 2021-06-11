@@ -109,7 +109,7 @@ bool FWeaponSlot::AddWeapon(PClassActor *type)
 	WeaponInfo info = { type, -1 };
 	Weapons.Push(info);
 
-	QzDoom_HapticEvent("pickup_weapon", 0, 100, 0, 0);
+	QzDoom_HapticEvent("pickup_weapon", 0, 100 * C_GetExternalHapticLevelValue("pickup_weapon"), 0, 0);
 
 	return true;
 }

@@ -135,7 +135,7 @@ void V_AddPlayerBlend (player_t *CPlayer, float blend[4], float maxinvalpha, int
 			QzDoom_Vibrate(50, 0, vr_pickup_haptic_level); // left
 			QzDoom_Vibrate(50, 1, vr_pickup_haptic_level); // right
 
-			QzDoom_HapticEvent("pickup", 0, 100, 0, 0);
+			QzDoom_HapticEvent("pickup", 0, 100 * C_GetExternalHapticLevelValue("pickup"), 0, 0);
 		}
 
 		// [SP] Allow player to tone down intensity of pickup flash.

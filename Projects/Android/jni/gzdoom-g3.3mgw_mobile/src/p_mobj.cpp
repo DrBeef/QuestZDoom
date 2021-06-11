@@ -924,7 +924,7 @@ bool P_GiveBody(AActor *actor, int num, int max)
 					QzDoom_Vibrate(100, 0, level); // left
 					QzDoom_Vibrate(100, 1, level); // right
 
-					QzDoom_HapticEvent("healstation", 0, 100 * level, 0, 0);
+					QzDoom_HapticEvent("healstation", 0, 100 * level * C_GetExternalHapticLevelValue("healstation"), 0, 0);
 				}
 
 				actor->health = player->health;
@@ -6859,11 +6859,11 @@ AActor *P_SpawnPlayerMissile (AActor *source, double x, double y, double z,
 			//Haptics
 			long rightHanded = vr_control_scheme < 10;
 			QzDoom_Vibrate(150, rightHanded ? 1 : 0, 0.8);
-			QzDoom_HapticEvent("fire_weapon", rightHanded ? 2 : 1, 100, 0, 0);
+			QzDoom_HapticEvent("fire_weapon", rightHanded ? 2 : 1, 100 * C_GetExternalHapticLevelValue("fire_weapon"), 0, 0);
 			if (weaponStabilised)
 			{
 				QzDoom_Vibrate(150, rightHanded ? 0 : 1, 0.6);
-				QzDoom_HapticEvent("fire_weapon", rightHanded ? 1 : 2, 100, 0, 0);
+				QzDoom_HapticEvent("fire_weapon", rightHanded ? 1 : 2, 100 * C_GetExternalHapticLevelValue("fire_weapon"), 0, 0);
 			}
 		}
 

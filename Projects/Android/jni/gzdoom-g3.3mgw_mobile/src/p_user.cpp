@@ -1266,13 +1266,13 @@ void P_PlayerThink (player_t *player)
     {
         if (player->health > previous_health)
         {
-            QzDoom_HapticEvent("healstation", 0, 100, 0, 0);
+            QzDoom_HapticEvent("healstation", 0, 100 * C_GetExternalHapticLevelValue("healstation"), 0, 0);
         }
     }
     else if (player->health > 0 && player->health <= 25)
     {
         //heartbeat is a special case that uses intensity for a different purpose
-        QzDoom_HapticEvent("heartbeat", 0, player->health, 0, 0);
+        QzDoom_HapticEvent("heartbeat", 0, player->health * C_GetExternalHapticLevelValue("heartbeat"), 0, 0);
     }
 
 

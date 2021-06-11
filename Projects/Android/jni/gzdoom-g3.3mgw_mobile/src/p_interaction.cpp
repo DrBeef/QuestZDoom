@@ -1362,13 +1362,13 @@ static int DamageMobj (AActor *target, AActor *inflictor, AActor *source, int da
 			if (mod == NAME_None)
             {
 				if (damage >= 15) {
-					QzDoom_HapticEvent("shotgun", 0, 100, attackAngle.Normalized360().Degrees, 0);
+					QzDoom_HapticEvent("shotgun", 0, 100 * C_GetExternalHapticLevelValue("damage_projectile"), attackAngle.Normalized360().Degrees, 0);
 				}
 				else {
-					QzDoom_HapticEvent("bullet", 0, 100, attackAngle.Normalized360().Degrees, 0);
+					QzDoom_HapticEvent("bullet", 0, 100 * C_GetExternalHapticLevelValue("damage_projectile"), attackAngle.Normalized360().Degrees, 0);
 				}
             } else {
-                QzDoom_HapticEvent(mod, 0, 100, attackAngle.Normalized360().Degrees, 0);
+                QzDoom_HapticEvent(mod, 0, 100 * C_GetExternalHapticLevelValue("damage_projectile"), attackAngle.Normalized360().Degrees, 0);
             }
 		}
 	}
@@ -1786,7 +1786,7 @@ void P_PoisonDamage (player_t *player, AActor *source, int damage, bool playPain
 		QzDoom_Vibrate(500, 0, level); // left
 		QzDoom_Vibrate(500, 1, level); // right
 
-		QzDoom_HapticEvent(player->poisontype, 0, 100, 0, 0);
+		QzDoom_HapticEvent(player->poisontype, 0, 100 * C_GetExternalHapticLevelValue("poison"), 0, 0);
 	}
 
 	if (player->health < 50 && !deathmatch)

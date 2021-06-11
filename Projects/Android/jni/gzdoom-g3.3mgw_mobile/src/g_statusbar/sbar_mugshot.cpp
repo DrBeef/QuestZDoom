@@ -357,7 +357,7 @@ int FMugShot::UpdateState(player_t *player, StateFlags stateflags)
 					QzDoom_Vibrate(80, 0, vr_pickup_haptic_level); // left
 					QzDoom_Vibrate(80, 1, vr_pickup_haptic_level); // right
 
-					QzDoom_HapticEvent("pickup", 0, 100, 0, 0);
+					QzDoom_HapticEvent("pickup", 0, 100 * C_GetExternalHapticLevelValue("pickup"), 0, 0);
 				}
 
 				SetState("grin", false);

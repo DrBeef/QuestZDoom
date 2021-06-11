@@ -181,7 +181,8 @@ private:
 	friend void C_BackupCVars (void);
 	friend FBaseCVar *FindCVar (const char *var_name, FBaseCVar **prev);
 	friend FBaseCVar *FindCVarSub (const char *var_name, int namelen);
-	friend void UnlatchCVars (void);
+	friend float C_GetExternalHapticLevelValue(const char *haptic_name);
+    friend void UnlatchCVars (void);
 	friend void DestroyCVarsFlagged (uint32_t flags);
 	friend void C_ArchiveCVars (FConfigFile *f, uint32_t filter);
 	friend void C_SetCVarsToDefaults (void);
@@ -209,6 +210,10 @@ void C_BackupCVars (void);
 // Finds a named cvar
 FBaseCVar *FindCVar (const char *var_name, FBaseCVar **prev);
 FBaseCVar *FindCVarSub (const char *var_name, int namelen);
+
+//Returns the configured level (0-1.0, 1.0 if not defined) for any given haptic
+//to use set a value in the config file like:  haptic_level_shotgun
+float C_GetExternalHapticLevelValue(const char *haptic_name);
 
 // Used for ACS and DECORATE.
 FBaseCVar *GetCVar(int playernum, const char *cvarname);

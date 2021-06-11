@@ -104,6 +104,17 @@ FRandom pr_cajump("CustomJump");
 
 CVAR(Bool, vr_recoil, false, CVAR_ARCHIVE|CVAR_GLOBALCONFIG)
 
+//External Haptics Level CVARs
+CVAR(Float, ext_haptic_level_damage_projectile, 1.0, CVAR_ARCHIVE|CVAR_GLOBALCONFIG)
+CVAR(Float, ext_haptic_level_pickup_weapon, 1.0, CVAR_ARCHIVE|CVAR_GLOBALCONFIG)
+CVAR(Float, ext_haptic_level_pickup, 1.0, CVAR_ARCHIVE|CVAR_GLOBALCONFIG)
+CVAR(Float, ext_haptic_level_fire_weapon, 1.0, CVAR_ARCHIVE|CVAR_GLOBALCONFIG)
+CVAR(Float, ext_haptic_level_poison, 1.0, CVAR_ARCHIVE|CVAR_GLOBALCONFIG)
+CVAR(Float, ext_haptic_level_healstation, 1.0, CVAR_ARCHIVE|CVAR_GLOBALCONFIG)
+CVAR(Float, ext_haptic_level_heartbeat, 1.0, CVAR_ARCHIVE|CVAR_GLOBALCONFIG)
+CVAR(Float, ext_haptic_level_rumble, 1.0, CVAR_ARCHIVE|CVAR_GLOBALCONFIG)
+
+
 //==========================================================================
 //
 // ACustomInventory :: CallStateChain
