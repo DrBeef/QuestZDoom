@@ -883,7 +883,15 @@ void jni_haptic_disable();
 
 void QzDoom_HapticEvent(const char* event, int position, int intensity, float angle, float yHeight )
 {
-    jni_haptic_event(event, position, intensity, angle, yHeight);
+    static char buffer[256];
+
+    memset(buffer, 0, 256);
+    for(int i = 0; event[i]; i++)
+    {
+        buffer[i] = tolower(event[i]);
+    }
+
+    jni_haptic_event(buffer, position, intensity, angle, yHeight);
 }
 
 void QzDoom_HapticStopEvent(const char* event)
@@ -2060,15 +2068,13 @@ JNIEXPORT void JNICALL Java_com_drbeef_questzdoom_GLES3JNILib_onSurfaceChanged( 
 	}
 }
 
-JNIEXPORT void JNICALL Java_com_drbeef_questzdoom_GLES3JNILib_onSurfaceDestroyed( JNIEnv * env, jobject obj, jlong handle )
-{
-	ALOGV( "    GLES3JNILib::onSurfaceDestroyed()" );
-	ovrAppThread * appThread = (ovrAppThread *)((size_t)handle);
-	ovrMessage message;
-	ovrMessage_Init( &message, MESSAGE_ON_SURFACE_DESTROYED, MQ_WAIT_PROCESSED );
-	ovrMessageQueue_PostMessage( &appThread->MessageQueue, &message );
-	ALOGV( "        ANativeWindow_release( NativeWindow )" );
-	ANativeWindow_release( appThread->NativeWindow );
-	appThread->NativeWindow = NULL;
+JNIEXPORT void JNICALL Java_com_drbeef_questzdoom_GLES3JNILib_onSurfaceDestroyed( JNIEnv * env, jobject obj, jlong handle ) {
+    ALOGV("    GLES3JNILib::onSurfaceDestroyed()");
+    ovrAppThread *appThread = (ovrAppThread *) ((size_t) handle);
+    ovrMessage message;
+    ovrMessage_Init(&message, MESSAGE_ON_SURFACE_DESTROYED, MQ_WAIT_PROCESSED);
+    ovrMessageQueue_PostMessage(&appThread->MessageQueue, &message);
+    ALOGV("        ANativeWindow_release( NativeWindow )");
+    ANativeWindow_release(appThread->NativeWindow);
+    appThread->NativeWindow = NULL;
 }
-
