@@ -1359,7 +1359,8 @@ static int DamageMobj (AActor *target, AActor *inflictor, AActor *source, int da
 
 			DAngle attackAngle = (source != NULL) ? (target->AngleTo(source) - player->mo->Angles.Yaw) : angle;
 
-			if (mod == NAME_None)
+			if (mod == NAME_None ||
+                    mod == NAME_Hitscan)
             {
 				if (damage >= 15) {
 					QzDoom_HapticEvent("shotgun", 0, 100 * C_GetExternalHapticLevelValue("damage_projectile"), attackAngle.Normalized360().Degrees, 0);
