@@ -79,7 +79,7 @@ const char *GetVersionString();
 #define SAVEGAME_EXT "zds"
 
 // MINSAVEVER is the minimum level snapshot version that can be loaded.
-#define MINSAVEVER	4555
+#define MINSAVEVER 4555
 
 // Use 4500 as the base git save version, since it's higher than the
 // SVN revision ever got.
@@ -98,7 +98,10 @@ const char *GetVersionString();
 
 // More stuff that needs to be different for derivatives.
 #define GAMENAME "QZDoom"
+#define WGAMENAME L"QZDoom"
 #define GAMENAMELOWERCASE "qzdoom"
+#define FORUM_URL "http://forum.zdoom.org/"
+#define BUGS_FORUM_URL	"http://forum.zdoom.org/viewforum.php?f=2"
 
 #if defined(__APPLE__) || defined(_WIN32)
 #define GAME_DIR GAMENAME

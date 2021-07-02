@@ -202,9 +202,9 @@ struct InputEvent native play version("2.4")
         Key_Mouse8 = 0x107,
 
         Key_FirstJoyButton = 0x108,
-		Key_FirstJoy2Button = 0x128,
-		Key_FirstJoy3Button = 0x148,
-		Key_FirstJoy4Button = 0x168,
+        Key_FirstJoy2Button = 0x128,
+        Key_FirstJoy3Button = 0x148,
+        Key_FirstJoy4Button = 0x168,
         Key_Joy1 = (Key_FirstJoyButton+0),
         Key_Joy2 = (Key_FirstJoyButton+1),
         Key_Joy3 = (Key_FirstJoyButton+2),

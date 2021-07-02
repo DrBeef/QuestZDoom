@@ -366,10 +366,10 @@ class Weapon : StateProvider
 			let pspr = player.GetPSprite(PSP_WEAPON);
 			if (pspr)
 			{
-			pspr.x = 0;
-			pspr.y = WEAPONTOP;
+				pspr.x = 0;
+				pspr.y = WEAPONTOP;
+			}
 		}
-	}
 	}
 
 	static int GetButtonStateFlags(int flags)
@@ -877,9 +877,9 @@ class Weapon : StateProvider
 		let pspr = p.GetPSprite(PSP_WEAPON);
 		if (pspr)
 		{
-		pspr.y = WEAPONBOTTOM;
-		pspr.ResetInterpolation();
-		pspr.SetState(GetUpState());
+			pspr.y = WEAPONBOTTOM;
+			pspr.ResetInterpolation();
+			pspr.SetState(GetUpState());
 		}
 	}
 
