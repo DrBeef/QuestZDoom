@@ -310,6 +310,7 @@ void GLSceneDrawer::RenderScene(int recursion)
 
 	gl_RenderState.SetCameraPos(r_viewpoint.Pos.X, r_viewpoint.Pos.Y, r_viewpoint.Pos.Z);
 
+	GLRenderer->mLights->BindBase();
 	gl_RenderState.EnableFog(true);
 	gl_RenderState.BlendFunc(GL_ONE,GL_ZERO);
 
