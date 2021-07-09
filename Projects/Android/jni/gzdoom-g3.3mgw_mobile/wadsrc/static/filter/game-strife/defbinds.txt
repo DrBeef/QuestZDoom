@@ -1,8 +1,0 @@
-/* Default keybindings for Strife */
-
-backspace invdrop
-z "showpop 3"
-q invquery
-
-; not done
-; h - use health
