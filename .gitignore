@@ -12,7 +12,7 @@ $RECYCLE.BIN/
 *.lnk
 
 # build files
-*.o
+# *.o
 *.d
 
 #binaries
