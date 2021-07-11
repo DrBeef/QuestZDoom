@@ -212,7 +212,8 @@ void gl_LoadExtensions()
         gl.glslversion = 3.3;
         gl.flags |= RFL_NO_CLIP_PLANES;
         gl.flags |= RFL_UINT_IDX;
-		gl.flags |= RFL_SHADER_STORAGE_BUFFER;
+		if (gl_light_buffer_type == 1)
+			gl.flags |= RFL_SHADER_STORAGE_BUFFER;
     }
 #else
 

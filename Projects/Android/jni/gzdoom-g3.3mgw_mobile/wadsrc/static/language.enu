@@ -2762,6 +2762,7 @@ GLLIGHTMNU_LIGHTPARTICLES			= "Lights affect particles";
 GLLIGHTMNU_LIGHTSHADOWMAP			= "Light shadowmaps";
 GLLIGHTMNU_LIGHTSHADOWMAPQUALITY	= "Shadowmap quality";
 GLLIGHTMNU_LIGHTSHADOWMAPFILTER		= "Shadowmap filter";
+GLLIGHTMNU_LIGHTBUFFERTYPE			= "Light buffer type";
 
 // OpenGL Preferences
 GLPREFMNU_TITLE 				= "OPENGL PREFERENCES";
@@ -2882,6 +2883,8 @@ OPTVAL_CLASSICZ				= "Classic ZDoom";
 OPTVAL_MODERN				= "Modern (WASD)";
 OPTVAL_MODERN2				= "Modern (ESDF)";
 OPTVAL_MODERN3				= "Modern (OKL;)";
+OPTVAL_UBO					= "UBO (faster, unstable)";
+OPTVAL_SSBO					= "SSBO (slower)";
 
 // QZDoom exclusive:
 

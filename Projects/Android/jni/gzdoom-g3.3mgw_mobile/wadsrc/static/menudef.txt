@@ -2588,6 +2588,12 @@ OptionValue "FogMode"
 	2, "$OPTVAL_RADIAL"
 }
 
+OptionValue "LightBuffer"
+{
+	0, "$OPTVAL_UBO"
+	1, "$OPTVAL_SSBO"
+}
+
 OptionValue "FuzzStyle"
 {
 	0, "$OPTVAL_SHADOW"
@@ -2669,6 +2675,7 @@ OptionMenu "GLLightOptions" protected
 	Option "$GLLIGHTMNU_LIGHTSPRITES",			gl_light_sprites,		"YesNo"
 	Option "$GLLIGHTMNU_LIGHTPARTICLES",		gl_light_particles,		"YesNo"
 	Option "$GLLIGHTMNU_LIGHTSHADOWMAP",		gl_light_shadowmap,		"YesNo"
+	Option "$GLLIGHTMNU_LIGHTBUFFERTYPE",		gl_light_buffer_type,	"LightBuffer"
 	Option "$GLLIGHTMNU_LIGHTSHADOWMAPQUALITY", gl_shadowmap_quality,	"ShadowMapQuality"
 	Option "$GLLIGHTMNU_LIGHTSHADOWMAPFILTER", 	gl_shadowmap_filter,	"ShadowMapFilter"
 }

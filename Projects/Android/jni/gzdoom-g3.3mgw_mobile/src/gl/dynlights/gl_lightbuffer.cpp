@@ -25,6 +25,8 @@
 **
 **/
 
+#include "version.h"
+
 #include "gl/system/gl_system.h"
 #include "gl/shaders/gl_shader.h"
 #include "gl/dynlights/gl_lightbuffer.h"
@@ -35,6 +37,10 @@
 static const int ELEMENTS_PER_LIGHT = 4;			// each light needs 4 vec4's.
 static const int ELEMENT_SIZE = (4*sizeof(float));
 
+CUSTOM_CVAR (Int, gl_light_buffer_type, 0, CVAR_ARCHIVE | CVAR_GLOBALCONFIG | CVAR_NOINITCALL)
+{
+	Printf("You must restart " GAMENAME " to switch the light buffer\n");
+}
 
 FLightBuffer::FLightBuffer()
 {
