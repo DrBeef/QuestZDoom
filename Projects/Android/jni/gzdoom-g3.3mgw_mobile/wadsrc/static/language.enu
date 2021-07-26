@@ -1919,6 +1919,7 @@ DSPLYMNU_GPUSWITCH				= "Notebook Switchable GPU";
 DSPLYMNU_CUSTOMINVERTMAP		= "Custom Inverse Map";
 DSPLYMNU_CUSTOMINVERTC1			= "Custom Inverse Color Dark";
 DSPLYMNU_CUSTOMINVERTC2			= "Custom Inverse Color Light";
+DSPLYMNU_RENDERSKYDOME			= "Render the skydome";
 
 // HUD Options
 HUDMNU_TITLE					= "HUD Options";

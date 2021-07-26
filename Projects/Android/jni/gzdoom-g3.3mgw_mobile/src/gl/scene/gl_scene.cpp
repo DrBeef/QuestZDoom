@@ -839,9 +839,6 @@ void GLSceneDrawer::SetFixedColormap (player_t *player)
 sector_t * GLSceneDrawer::RenderViewpoint (AActor * camera, GL_IRECT * bounds, float fov, float ratio, float fovratio, bool mainview, bool toscreen)
 {       
 	sector_t * lviewsector;
-	GLRenderer->mSceneClearColor[0] = 0.0f;
-	GLRenderer->mSceneClearColor[1] = 0.0f;
-	GLRenderer->mSceneClearColor[2] = 0.0f;
 	R_SetupFrame (r_viewpoint, r_viewwindow, camera);
 	SetViewArea();
 

@@ -78,12 +78,13 @@
 
 //-----------------------------------------------------------------------------
 //
-// Shamelessly lifted from Doomsday (written by Jaakko Keränen)
+// Shamelessly lifted from Doomsday (written by Jaakko Ker?en)
 // also shamelessly lifted from ZDoomGL! ;)
 //
 //-----------------------------------------------------------------------------
 
 CVAR(Float, skyoffset, 0, 0)	// for testing
+CVAR(Bool, gl_skydome, true, CVAR_GLOBALCONFIG|CVAR_ARCHIVE)
 
 //-----------------------------------------------------------------------------
 //
@@ -227,8 +228,8 @@ void FSkyVertexBuffer::CreateDome()
 	mVertices[10].Set(-1.0f, 0.0f, -1.0f);
 	mVertices[11].Set(0.0f, 0.0f, 1.0f);
 
-	mColumns = 128;
-	mRows = 4;
+	mColumns = 32;
+	mRows = 2;
 	CreateSkyHemisphere(SKYHEMI_UPPER);
 	CreateSkyHemisphere(SKYHEMI_LOWER);
 	mPrimStart.Push(mVertices.Size());
@@ -499,6 +500,15 @@ static void RenderBox(FTextureID texno, FMaterial * gltex, float x_offset, bool 
 //-----------------------------------------------------------------------------
 void GLSkyPortal::DrawContents()
 {
+	if (!gl_skydome && origin->texture[0])
+	{
+		PalEntry pe = origin->texture[0]->tex->GetSkyCapColor(false);
+		GLRenderer->mSceneClearColor[0] = pe.r / 255.f;
+		GLRenderer->mSceneClearColor[1] = pe.g / 255.f;
+		GLRenderer->mSceneClearColor[2] = pe.b / 255.f;
+		return;
+	}
+	
 	bool drawBoth = false;
 
 	// We have no use for Doom lighting special handling here, so disable it for this function.
