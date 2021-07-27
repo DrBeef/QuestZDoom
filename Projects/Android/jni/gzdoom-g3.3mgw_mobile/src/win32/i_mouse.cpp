@@ -43,11 +43,8 @@
 #include "i_system.h"
 #include "d_event.h"
 #include "d_gui.h"
-#include "c_cvars.h"
-#include "doomdef.h"
 #include "doomstat.h"
 #include "win32iface.h"
-#include "rawinput.h"
 #include "menu/menu.h"
 #include "events.h"
 
@@ -550,21 +547,17 @@ bool FRawMouse::GetDevice()
 {
 	RAWINPUTDEVICE rid;
 
-	if (MyRegisterRawInputDevices == NULL)
-	{
-		return false;
-	}
 	rid.usUsagePage = HID_GENERIC_DESKTOP_PAGE;
 	rid.usUsage = HID_GDP_MOUSE;
 	rid.dwFlags = 0;
 	rid.hwndTarget = Window;
-	if (!MyRegisterRawInputDevices(&rid, 1, sizeof(rid)))
+	if (!RegisterRawInputDevices(&rid, 1, sizeof(rid)))
 	{
 		return false;
 	}
 	rid.dwFlags = RIDEV_REMOVE;
 	rid.hwndTarget = NULL;	// Must be NULL for RIDEV_REMOVE.
-	MyRegisterRawInputDevices(&rid, 1, sizeof(rid));
+	RegisterRawInputDevices(&rid, 1, sizeof(rid));
 	return true;
 }
 
@@ -584,7 +577,7 @@ void FRawMouse::Grab()
 		rid.usUsage = HID_GDP_MOUSE;
 		rid.dwFlags = RIDEV_CAPTUREMOUSE | RIDEV_NOLEGACY;
 		rid.hwndTarget = Window;
-		if (MyRegisterRawInputDevices(&rid, 1, sizeof(rid)))
+		if (RegisterRawInputDevices(&rid, 1, sizeof(rid)))
 		{
 			GetCursorPos(&UngrabbedPointerPos);
 			Grabbed = true;
@@ -613,7 +606,7 @@ void FRawMouse::Ungrab()
 		rid.usUsage = HID_GDP_MOUSE;
 		rid.dwFlags = RIDEV_REMOVE;
 		rid.hwndTarget = NULL;
-		if (MyRegisterRawInputDevices(&rid, 1, sizeof(rid)))
+		if (RegisterRawInputDevices(&rid, 1, sizeof(rid)))
 		{
 			Grabbed = false;
 			ClearButtonState();
@@ -1189,18 +1182,6 @@ void I_StartupMouse ()
 
 	switch(in_mouse)
 	{
-	case 0:
-	default:
-		if (MyRegisterRawInputDevices != NULL)
-		{
-			new_mousemode = MM_RawInput;
-		}
-		else
-		{
-			new_mousemode = MM_DInput;
-		}
-		break;
-
 	case 1:
 		new_mousemode = MM_Win32;
 		break;
@@ -1209,6 +1190,7 @@ void I_StartupMouse ()
 		new_mousemode = MM_DInput;
 		break;
 
+	default:
 	case 3:
 		new_mousemode = MM_RawInput;
 		break;

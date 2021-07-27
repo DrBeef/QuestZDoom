@@ -74,8 +74,8 @@ extend class StateProvider
 				if (psp) 
 				{
 					State cur = psp.CurState;
-				int theflash = atk == cur? 0:1;
-				player.SetSafeFlash(weap, flash, theflash);
+					int theflash = atk == cur? 0:1;
+					player.SetSafeFlash(weap, flash, theflash);
 				}
 			}
 		}

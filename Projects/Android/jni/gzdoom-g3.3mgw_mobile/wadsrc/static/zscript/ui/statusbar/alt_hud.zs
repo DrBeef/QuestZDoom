@@ -148,7 +148,7 @@ class AltHud ui
 	//
 	//---------------------------------------------------------------------------
 
-	 void DrawHudNumber(Font fnt, int color, int num, int x, int y, double trans = 0.75)
+	void DrawHudNumber(Font fnt, int color, int num, int x, int y, double trans = 0.75)
 	{
 		DrawHudText(fnt, color, String.Format("%d", num), x, y, trans);
 	}
@@ -748,14 +748,14 @@ class AltHud ui
 
 		if (withmapname)
 		{
-		screen.DrawText(SmallFont, hudcolor_titl, hudwidth - 6 - SmallFont.StringWidth(level.MapName), ypos, level.MapName,
-			DTA_KeepRatio, true,
-			DTA_VirtualWidth, hudwidth, DTA_VirtualHeight, hudheight);
+			screen.DrawText(SmallFont, hudcolor_titl, hudwidth - 6 - SmallFont.StringWidth(level.MapName), ypos, level.MapName,
+				DTA_KeepRatio, true,
+				DTA_VirtualWidth, hudwidth, DTA_VirtualHeight, hudheight);
 
-		screen.DrawText(SmallFont, hudcolor_titl, hudwidth - 6 - SmallFont.StringWidth(level.LevelName), ypos + h, level.LevelName,
-			DTA_KeepRatio, true,
-			DTA_VirtualWidth, hudwidth, DTA_VirtualHeight, hudheight);
-
+			screen.DrawText(SmallFont, hudcolor_titl, hudwidth - 6 - SmallFont.StringWidth(level.LevelName), ypos + h, level.LevelName,
+				DTA_KeepRatio, true,
+				DTA_VirtualWidth, hudwidth, DTA_VirtualHeight, hudheight);
+	
 			ypos += 3 * h;
 		}
 		

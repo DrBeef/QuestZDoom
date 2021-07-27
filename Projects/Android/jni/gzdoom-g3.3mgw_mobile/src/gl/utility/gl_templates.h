@@ -61,7 +61,7 @@ public:
 			if (!memcmp(t, Array[i], sizeof(T))) return Array[i];
 		}
 		T * newo=TheFreeList.GetNew();
-
+		memset(newo, 0, sizeof(T));
 		*newo=*t;
 		Array.Push(newo);
 		return newo;
