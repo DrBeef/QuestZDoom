@@ -1357,19 +1357,64 @@ static int DamageMobj (AActor *target, AActor *inflictor, AActor *source, int da
 			QzDoom_Vibrate(200, 0, level); // left
 			QzDoom_Vibrate(200, 1, level); // right
 
-			DAngle attackAngle = (source != NULL) ? (target->AngleTo(source) - player->mo->Angles.Yaw) : angle;
-
-			if (mod == NAME_None ||
-                    mod == NAME_Hitscan)
+			if (source == NULL)
             {
-				if (damage >= 15) {
-					QzDoom_HapticEvent("shotgun", 0, 100 * C_GetExternalHapticLevelValue("damage_projectile"), attackAngle.Normalized360().Degrees, 0);
-				}
-				else {
-					QzDoom_HapticEvent("bullet", 0, 100 * C_GetExternalHapticLevelValue("damage_projectile"), attackAngle.Normalized360().Degrees, 0);
-				}
-            } else {
-                QzDoom_HapticEvent(mod, 0, 100 * C_GetExternalHapticLevelValue("damage_projectile"), attackAngle.Normalized360().Degrees, 0);
+                if (strcasestr(mod.GetChars(), "slime"))
+                {
+                    QzDoom_HapticEvent("slime", 0,
+                                       100 * C_GetExternalHapticLevelValue("poison"),
+                                       0, 0);
+                }
+                else if (strcasestr(mod.GetChars(), "fire"))
+                {
+                    QzDoom_HapticEvent("fire", 0,
+                                       100 * C_GetExternalHapticLevelValue("poison"),
+                                       0, 0);
+                }
+                else {
+                    //No source - just use poison
+                    QzDoom_HapticEvent("poison", 0,
+                                       100 * C_GetExternalHapticLevelValue("poison"),
+                                       0, 0);
+                }
+            }
+			else {
+                DAngle attackAngle = (target->AngleTo(source) - player->mo->Angles.Yaw);
+
+                if (strcasestr(mod.GetChars(), "melee") ||
+                        strcasestr(mod.GetChars(), "strike") ||
+                        strcasestr(mod.GetChars(), "rip") ||
+                        strcasestr(mod.GetChars(), "tear") ||
+                        strcasestr(mod.GetChars(), "slice") ||
+                        strcasestr(mod.GetChars(), "claw"))
+                {
+                    QzDoom_HapticEvent("melee", 0,
+                                       100 * C_GetExternalHapticLevelValue("damage_projectile"),
+                                       attackAngle.Normalized360().Degrees, 0);
+                }
+                else if (strcasestr(mod.GetChars(), "burn") ||
+                        strcasestr(mod.GetChars(), "flame"))
+                {
+                    QzDoom_HapticEvent("fireball", 0,
+                                       100 * C_GetExternalHapticLevelValue("damage_projectile"),
+                                       attackAngle.Normalized360().Degrees, 0);
+                }
+                else  // Just pick on based on damage intensity
+                {
+                    if (damage >= 20) {
+                        QzDoom_HapticEvent("fireball", 0,
+                                           100 * C_GetExternalHapticLevelValue("damage_projectile"),
+                                           attackAngle.Normalized360().Degrees, 0);
+                    } else if (damage >= 10) {
+                        QzDoom_HapticEvent("shotgun", 0,
+                                           100 * C_GetExternalHapticLevelValue("damage_projectile"),
+                                           attackAngle.Normalized360().Degrees, 0);
+                    } else {
+                        QzDoom_HapticEvent("bullet", 0,
+                                           100 * C_GetExternalHapticLevelValue("damage_projectile"),
+                                           attackAngle.Normalized360().Degrees, 0);
+                    }
+                }
             }
 		}
 	}
