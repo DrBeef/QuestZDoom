@@ -139,8 +139,8 @@ class Mauler2 : Mauler
 			PSprite psp = player.GetPSprite(PSP_WEAPON);
 			if (psp)
 			{
-			psp.x += Random2[Mauler2]() / 64.;
-			psp.y += Random2[Mauler2]() / 64.;
+				psp.x += Random2[Mauler2]() / 64.;
+				psp.y += Random2[Mauler2]() / 64.;
 			}
 		}
 	}
