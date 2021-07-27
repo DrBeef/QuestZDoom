@@ -500,14 +500,14 @@ static void RenderBox(FTextureID texno, FMaterial * gltex, float x_offset, bool 
 //-----------------------------------------------------------------------------
 void GLSkyPortal::DrawContents()
 {
-	if (!gl_skydome && origin->texture[0])
+	if (origin->texture[0])
 	{
 		PalEntry pe = origin->texture[0]->tex->GetSkyCapColor(false);
 		GLRenderer->mSceneClearColor[0] = pe.r / 255.f;
 		GLRenderer->mSceneClearColor[1] = pe.g / 255.f;
 		GLRenderer->mSceneClearColor[2] = pe.b / 255.f;
-		return;
 	}
+	if (!gl_skydome) return;
 	
 	bool drawBoth = false;
 
