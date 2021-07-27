@@ -1866,7 +1866,7 @@ JNIEXPORT jlong JNICALL Java_com_drbeef_questzdoom_GLES3JNILib_onCreate( JNIEnv 
             gpu   = arg_int0("g", "gpu", "<int>", "GPU perf index 1-4 (default: 3)"),
             msaa   = arg_int0("m", "msaa", "<int>", "MSAA 1-4 (default: 1)"),
             ffr   = arg_int0("f", "ffr", "<int>", "FFR 0-4 (default: 0)"),
-            refresh   = arg_int0("r", "refresh", "<int>", "Display Refresh 60 or 72 (default: 72)"),
+            refresh   = arg_int0("r", "refresh", "<int>", "Display Refresh 60, 72 or 90 (default: 72)"),
 			end     = arg_end(20)
 	};
 
