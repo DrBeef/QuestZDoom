@@ -198,7 +198,7 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
             vec3_t rotation = {0};
             QuatToYawPitchRoll(pOffTracking->HeadPose.Pose.Orientation, rotation, offhandangles);
 
-            if (vr_moveuseoffhand != 0) {
+            if (vr_moveuseoffhand) {
                 controllerYawHeading = offhandangles[YAW] - hmdorientation[YAW];
             } else {
                 controllerYawHeading = 0.0f;
@@ -303,6 +303,20 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
                 }
             }
         }
+
+        Joy_GenerateButtonEvents((pSecondaryTrackedRemoteOld->Joystick.x > 0.7f ? 1 : 0), (pSecondaryTrackedRemoteNew->Joystick.x > 0.7f ? 1 : 0), 1, KEY_JOYAXIS1PLUS);
+        Joy_GenerateButtonEvents((pSecondaryTrackedRemoteOld->Joystick.x < -0.7f ? 1 : 0), (pSecondaryTrackedRemoteNew->Joystick.x < -0.7f ? 1 : 0), 1, KEY_JOYAXIS1MINUS);
+
+        Joy_GenerateButtonEvents((pPrimaryTrackedRemoteOld->Joystick.x > 0.7f ? 1 : 0), (pPrimaryTrackedRemoteNew->Joystick.x > 0.7f ? 1 : 0), 1, KEY_JOYAXIS2PLUS);
+        Joy_GenerateButtonEvents((pPrimaryTrackedRemoteOld->Joystick.x < -0.7f ? 1 : 0), (pPrimaryTrackedRemoteNew->Joystick.x < -0.7f ? 1 : 0), 1, KEY_JOYAXIS2MINUS);
+
+        Joy_GenerateButtonEvents((pSecondaryTrackedRemoteOld->Joystick.y < -0.7f ? 1 : 0), (pSecondaryTrackedRemoteNew->Joystick.y < -0.7f ? 1 : 0), 1, KEY_JOYAXIS3PLUS);
+        Joy_GenerateButtonEvents((pSecondaryTrackedRemoteOld->Joystick.y > 0.7f ? 1 : 0), (pSecondaryTrackedRemoteNew->Joystick.y > 0.7f ? 1 : 0), 1, KEY_JOYAXIS3MINUS);
+        
+        Joy_GenerateButtonEvents((pPrimaryTrackedRemoteOld->Joystick.y < -0.7f ? 1 : 0), (pPrimaryTrackedRemoteNew->Joystick.y < -0.7f ? 1 : 0), 1, KEY_JOYAXIS4PLUS);
+        Joy_GenerateButtonEvents((pPrimaryTrackedRemoteOld->Joystick.y > 0.7f ? 1 : 0), (pPrimaryTrackedRemoteNew->Joystick.y > 0.7f ? 1 : 0), 1, KEY_JOYAXIS4MINUS);
+
+        // in level
     }
 
     {
@@ -318,18 +332,18 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
                          between(-1.0f, pPrimaryTrackedRemoteNew->Joystick.y, -0.8f))) {
                         if (itemSwitched == 0) {
                             if (between(0.8f, pPrimaryTrackedRemoteNew->Joystick.y, 1.0f)) {
-                                Joy_GenerateButtonEvents(0, 1, 1, KEY_MWHEELDOWN);
+                                Joy_GenerateButtonEvents(0, 1, 1, KEY_MWHEELUP);
                                 itemSwitched = 1;
                             } else {
-                                Joy_GenerateButtonEvents(0, 1, 1, KEY_MWHEELUP);
+                                Joy_GenerateButtonEvents(0, 1, 1, KEY_MWHEELDOWN);
                                 itemSwitched = 2;
                             }
                         }
                     } else {
                         if (itemSwitched == 1) {
-                            Joy_GenerateButtonEvents(1, 0, 1, KEY_MWHEELDOWN);
-                        } else if (itemSwitched == 2) {
                             Joy_GenerateButtonEvents(1, 0, 1, KEY_MWHEELUP);
+                        } else if (itemSwitched == 2) {
+                            Joy_GenerateButtonEvents(1, 0, 1, KEY_MWHEELDOWN);
                         }
                         itemSwitched = 0;
                     }
@@ -385,7 +399,10 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
                                      ((pDominantTrackedRemoteNew->Buttons & ovrButton_Joystick) != 0) && !dominantGripPushedNew ? 1 : 0,
                                      1, KEY_ENTER);
 
-
+            //No Default Binding
+            Joy_GenerateButtonEvents(((pDominantTrackedRemoteOld->Touches & ovrTouch_ThumbRest) != 0) && !dominantGripPushedOld ? 1 : 0,
+                                     ((pDominantTrackedRemoteNew->Touches & ovrTouch_ThumbRest) != 0) && !dominantGripPushedNew ? 1 : 0,
+                                     1, KEY_JOY5);
 
             if (vr_secondarybuttonmappings) {
                 //Dominant Hand - Secondary keys (grip pushed)
@@ -418,6 +435,13 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
                         ((pDominantTrackedRemoteNew->Buttons & ovrButton_Joystick) != 0) &&
                         dominantGripPushedNew ? 1 : 0,
                         1, KEY_TAB);
+
+                //No Default Binding
+                Joy_GenerateButtonEvents(
+                        ((pDominantTrackedRemoteOld->Touches & ovrTouch_ThumbRest) != 0) && dominantGripPushedOld ? 1 : 0,
+                        ((pDominantTrackedRemoteNew->Touches & ovrTouch_ThumbRest) != 0) && dominantGripPushedNew ? 1 : 0,
+                        1, KEY_JOY6);
+
             } else {
                 //Use grip as an extra button
                 //Alt-Fire
@@ -450,6 +474,11 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
             Joy_GenerateButtonEvents(((pOffTrackedRemoteOld->Buttons & ovrButton_Joystick) != 0) && !dominantGripPushedOld ? 1 : 0,
                                      ((pOffTrackedRemoteNew->Buttons & ovrButton_Joystick) != 0) && !dominantGripPushedNew ? 1 : 0,
                                      1, KEY_SPACE);
+
+            //No Default Binding
+            Joy_GenerateButtonEvents(((pOffTrackedRemoteOld->Touches & ovrTouch_ThumbRest) != 0) && !dominantGripPushedOld ? 1 : 0,
+                                     ((pOffTrackedRemoteNew->Touches & ovrTouch_ThumbRest) != 0) && !dominantGripPushedNew ? 1 : 0,
+                                     1, KEY_JOY7);
 
             if (!vr_twohandedweapons)
             {
@@ -495,6 +524,12 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
                         ((pOffTrackedRemoteNew->Buttons & ovrButton_Joystick) != 0) &&
                         dominantGripPushedNew ? 1 : 0,
                         1, KEY_HOME);
+
+                //No Default Binding
+                Joy_GenerateButtonEvents(
+                        ((pOffTrackedRemoteOld->Touches & ovrTouch_ThumbRest) != 0) && dominantGripPushedOld ? 1 : 0,
+                        ((pOffTrackedRemoteNew->Touches & ovrTouch_ThumbRest) != 0) && dominantGripPushedNew ? 1 : 0,
+                        1, KEY_JOY8);
 
                 if (!vr_twohandedweapons)
                 {
