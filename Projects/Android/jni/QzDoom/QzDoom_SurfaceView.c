@@ -1940,7 +1940,7 @@ JNIEXPORT jlong JNICALL Java_com_drbeef_questzdoom_GLES3JNILib_onCreate( JNIEnv 
 			FFR = ffr->ival[0];
         }
 
-        if (refresh->count > 0 && (refresh->ival[0] == 60 || refresh->ival[0] == 72 || refresh->ival[0] == 90))
+        if (refresh->count > 0 && (refresh->ival[0] == 60 || refresh->ival[0] == 72 || refresh->ival[0] == 90 || refresh->ival[0] == 120))
         {
 			DISPLAY_REFRESH = refresh->ival[0];
         }
