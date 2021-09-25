@@ -145,15 +145,11 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
             weaponoffset[1] = pDominantTracking->HeadPose.Pose.Position.y - hmdPosition[1];
             weaponoffset[2] = pDominantTracking->HeadPose.Pose.Position.z - hmdPosition[2];
 
-            {
-                vec2_t v;
-                float yawRotation = cinemamode ? getViewpointYaw() - hmdorientation[YAW] :
-                        doomYaw - hmdorientation[YAW];
-                rotateAboutOrigin(weaponoffset[0], weaponoffset[2],
-                                  -yawRotation, v);
-                weaponoffset[0] = v[1];
-                weaponoffset[2] = v[0];
-            }
+            vec2_t v;
+            float yawRotation = getViewpointYaw() - hmdorientation[YAW];
+            rotateAboutOrigin(weaponoffset[0], weaponoffset[2], -yawRotation, v);
+            weaponoffset[0] = v[1];
+            weaponoffset[2] = v[0];
 
             //Set gun angles
             const ovrQuatf quatRemote = pDominantTracking->HeadPose.Pose.Orientation;
@@ -187,8 +183,8 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
             offhandoffset[2] = pOffTracking->HeadPose.Pose.Position.z - hmdPosition[2];
 
             vec2_t v;
-            rotateAboutOrigin(offhandoffset[0], offhandoffset[2], -(doomYaw - hmdorientation[YAW]),
-                              v);
+            float yawRotation = getViewpointYaw() - hmdorientation[YAW];
+            rotateAboutOrigin(offhandoffset[0], offhandoffset[2], -yawRotation, v);
             offhandoffset[0] = v[1];
             offhandoffset[2] = v[0];
 
