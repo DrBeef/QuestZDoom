@@ -701,7 +701,7 @@ void ovrRenderer_Create( int width, int height, ovrRenderer * renderer, const ov
 	renderer->NumBuffers = VRAPI_FRAME_LAYER_EYE_MAX;
 
 	//Now using a symmetrical render target, based on the horizontal FOV
-	QzDoom_GetFOV();
+	//QzDoom_GetFOV();
 
 	// Create the render Textures.
 	for ( int eye = 0; eye < VRAPI_FRAME_LAYER_EYE_MAX; eye++ )
@@ -1335,6 +1335,29 @@ int QzDoom_GetRefresh()
 	return vrapi_GetSystemPropertyInt(&gAppState.Java, VRAPI_SYS_PROP_DISPLAY_REFRESH_RATE);
 }
 
+int QzDoom_SetRefreshRate(int refreshRate)
+{
+	return vrapi_SetDisplayRefreshRate(gAppState.Ovr, (float)refreshRate);
+}
+
+bool QzDoom_IsRefreshSupported(int refreshRate)
+{
+	int size = vrapi_GetSystemPropertyInt(&gAppState.Java, VRAPI_SYS_PROP_NUM_SUPPORTED_DISPLAY_REFRESH_RATES);
+	float supported_rates[size];
+	int elements = vrapi_GetSystemPropertyFloatArray(&gAppState.Java,
+			VRAPI_SYS_PROP_SUPPORTED_DISPLAY_REFRESH_RATES,
+			 supported_rates, size);
+	for (int i = 0; i < size; i++)
+	{
+		if (refreshRate == (int)supported_rates[i])
+		{
+			return true;
+		}
+	}
+	ALOGV("Refresh rate not supported: %dHz", refreshRate);
+	return false;
+}
+
 float QzDoom_GetFOV()
 {
 	vrFOV = vrapi_GetSystemPropertyInt(&gAppState.Java, VRAPI_SYS_PROP_SUGGESTED_EYE_FOV_DEGREES_Y);
@@ -1499,6 +1522,10 @@ void * AppThreadFunction(void * parm ) {
 		return NULL;
 	}
 
+	if (QzDoom_IsRefreshSupported(DISPLAY_REFRESH)) {
+		QzDoom_SetRefreshRate(DISPLAY_REFRESH);
+	}
+
 	// Create the scene if not yet created.
 	ovrScene_Create( m_width, m_height, &gAppState.Scene, &java );
 
@@ -1530,11 +1557,6 @@ void QzDoom_FrameSetup()
 {
 	//Use floor based tracking space
 	vrapi_SetTrackingSpace(gAppState.Ovr, VRAPI_TRACKING_SPACE_LOCAL_FLOOR);
-
-    //Set the screen refresh - repeat this every frame so VrApi doesn't try changing it on us
-    if (DISPLAY_REFRESH != -1) {
-        vrapi_SetDisplayRefreshRate(gAppState.Ovr, DISPLAY_REFRESH);
-    }
 }
 
 void QzDoom_processHaptics() {//Handle haptics
@@ -1866,7 +1888,7 @@ JNIEXPORT jlong JNICALL Java_com_drbeef_questzdoom_GLES3JNILib_onCreate( JNIEnv 
             gpu   = arg_int0("g", "gpu", "<int>", "GPU perf index 1-4 (default: 3)"),
             msaa   = arg_int0("m", "msaa", "<int>", "MSAA 1-4 (default: 1)"),
             ffr   = arg_int0("f", "ffr", "<int>", "FFR 0-4 (default: 0)"),
-            refresh   = arg_int0("r", "refresh", "<int>", "Display Refresh 60 or 72 (default: 72)"),
+            refresh   = arg_int0("r", "refresh", "<int>", "Display Refresh 60, 72 or 90 (default: 72)"),
 			end     = arg_end(20)
 	};
 
@@ -1918,7 +1940,7 @@ JNIEXPORT jlong JNICALL Java_com_drbeef_questzdoom_GLES3JNILib_onCreate( JNIEnv 
 			FFR = ffr->ival[0];
         }
 
-        if (refresh->count > 0 && (refresh->ival[0] == 60 || refresh->ival[0] == 72))
+        if (refresh->count > 0 && (refresh->ival[0] == 60 || refresh->ival[0] == 72 || refresh->ival[0] == 90 || refresh->ival[0] == 120))
         {
 			DISPLAY_REFRESH = refresh->ival[0];
         }
