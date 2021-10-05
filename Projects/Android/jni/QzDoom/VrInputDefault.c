@@ -189,6 +189,7 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
             offhandoffset[2] = v[0];
 
             vec3_t rotation = {0};
+            rotation[PITCH] = vr_weapon_pitchadjust;
             QuatToYawPitchRoll(pOffTracking->HeadPose.Pose.Orientation, rotation, offhandangles);
 
             if (vr_moveuseoffhand) {
