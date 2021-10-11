@@ -90,18 +90,6 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
         secondaryButton2 = offButton2;
     }
 
-    Joy_GenerateButtonEvents((pSecondaryTrackedRemoteOld->Joystick.x > 0.7f ? 1 : 0), (pSecondaryTrackedRemoteNew->Joystick.x > 0.7f ? 1 : 0), 1, KEY_JOYAXIS1PLUS);
-    Joy_GenerateButtonEvents((pSecondaryTrackedRemoteOld->Joystick.x < -0.7f ? 1 : 0), (pSecondaryTrackedRemoteNew->Joystick.x < -0.7f ? 1 : 0), 1, KEY_JOYAXIS1MINUS);
-
-    Joy_GenerateButtonEvents((pPrimaryTrackedRemoteOld->Joystick.x > 0.7f ? 1 : 0), (pPrimaryTrackedRemoteNew->Joystick.x > 0.7f ? 1 : 0), 1, KEY_JOYAXIS3PLUS);
-    Joy_GenerateButtonEvents((pPrimaryTrackedRemoteOld->Joystick.x < -0.7f ? 1 : 0), (pPrimaryTrackedRemoteNew->Joystick.x < -0.7f ? 1 : 0), 1, KEY_JOYAXIS3MINUS);
-
-    Joy_GenerateButtonEvents((pSecondaryTrackedRemoteOld->Joystick.y < -0.7f ? 1 : 0), (pSecondaryTrackedRemoteNew->Joystick.y < -0.7f ? 1 : 0), 1, KEY_JOYAXIS2MINUS);
-    Joy_GenerateButtonEvents((pSecondaryTrackedRemoteOld->Joystick.y > 0.7f ? 1 : 0), (pSecondaryTrackedRemoteNew->Joystick.y > 0.7f ? 1 : 0), 1, KEY_JOYAXIS2PLUS);
-    
-    Joy_GenerateButtonEvents((pPrimaryTrackedRemoteOld->Joystick.y < -0.7f ? 1 : 0), (pPrimaryTrackedRemoteNew->Joystick.y < -0.7f ? 1 : 0), 1, KEY_JOYAXIS4MINUS);
-    Joy_GenerateButtonEvents((pPrimaryTrackedRemoteOld->Joystick.y > 0.7f ? 1 : 0), (pPrimaryTrackedRemoteNew->Joystick.y > 0.7f ? 1 : 0), 1, KEY_JOYAXIS4PLUS);
-
     //In cinema mode, right-stick controls mouse
     const float mouseSpeed = 3.0f;
     if (cinemamode)
@@ -304,6 +292,30 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
             //Now handle all the buttons - irrespective of menu state - we might be trying to remap stuff
             {
                 {
+                    static int secondaryItemSwitched = 0;
+                    if (between(-0.2f, pPrimaryTrackedRemoteNew->Joystick.x, 0.2f) &&
+                        (between(0.8f, pPrimaryTrackedRemoteNew->Joystick.y, 1.0f) ||
+                         between(-1.0f, pPrimaryTrackedRemoteNew->Joystick.y, -0.8f))) {
+                        if (secondaryItemSwitched == 0) {
+                            if (between(0.8f, pPrimaryTrackedRemoteNew->Joystick.y, 1.0f)) {
+                                Joy_GenerateButtonEvents(0, dominantGripPushedNew, 1, KEY_JOYAXIS5PLUS);
+                                secondaryItemSwitched = 1;
+                            } else {
+                                Joy_GenerateButtonEvents(0, dominantGripPushedNew, 1, KEY_JOYAXIS5MINUS);
+                                secondaryItemSwitched = 2;
+                            }
+                        }
+                    } else {
+                        if (secondaryItemSwitched == 1) {
+                            Joy_GenerateButtonEvents(dominantGripPushedOld, 0, 1, KEY_JOYAXIS5PLUS);
+                        } else if (secondaryItemSwitched == 2) {
+                            Joy_GenerateButtonEvents(dominantGripPushedOld, 0, 1, KEY_JOYAXIS5MINUS);
+                        }
+                        secondaryItemSwitched = 0;
+                    }
+                }
+
+                {
                     //Default this is Weapon Chooser - This _could_ be remapped
                     static int itemSwitched = 0;
                     if (between(-0.2f, pPrimaryTrackedRemoteNew->Joystick.x, 0.2f) &&
@@ -311,18 +323,18 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
                          between(-1.0f, pPrimaryTrackedRemoteNew->Joystick.y, -0.8f))) {
                         if (itemSwitched == 0) {
                             if (between(0.8f, pPrimaryTrackedRemoteNew->Joystick.y, 1.0f)) {
-                                Joy_GenerateButtonEvents(0, 1, 1, KEY_MWHEELUP);
+                                Joy_GenerateButtonEvents(0, !dominantGripPushedNew, 1, KEY_MWHEELUP);
                                 itemSwitched = 1;
                             } else {
-                                Joy_GenerateButtonEvents(0, 1, 1, KEY_MWHEELDOWN);
+                                Joy_GenerateButtonEvents(0, !dominantGripPushedNew, 1, KEY_MWHEELDOWN);
                                 itemSwitched = 2;
                             }
                         }
                     } else {
                         if (itemSwitched == 1) {
-                            Joy_GenerateButtonEvents(1, 0, 1, KEY_MWHEELUP);
+                            Joy_GenerateButtonEvents(!dominantGripPushedOld, 0, 1, KEY_MWHEELUP);
                         } else if (itemSwitched == 2) {
-                            Joy_GenerateButtonEvents(1, 0, 1, KEY_MWHEELDOWN);
+                            Joy_GenerateButtonEvents(!dominantGripPushedOld, 0, 1, KEY_MWHEELDOWN);
                         }
                         itemSwitched = 0;
                     }
@@ -383,7 +395,7 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
                                      ((pDominantTrackedRemoteNew->Touches & ovrTouch_ThumbRest) != 0) && !dominantGripPushedNew ? 1 : 0,
                                      1, KEY_JOY5);
 
-            if (vr_secondarybuttonmappings) {
+            {
                 //Dominant Hand - Secondary keys (grip pushed)
                 //Alt-Fire
                 Joy_GenerateButtonEvents(
@@ -421,12 +433,11 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
                         ((pDominantTrackedRemoteNew->Touches & ovrTouch_ThumbRest) != 0) && dominantGripPushedNew ? 1 : 0,
                         1, KEY_JOY6);
 
-            } else {
                 //Use grip as an extra button
                 //Alt-Fire
                 Joy_GenerateButtonEvents(
-                        ((pDominantTrackedRemoteOld->Buttons & ovrButton_GripTrigger) != 0) ? 1 : 0,
-                        ((pDominantTrackedRemoteNew->Buttons & ovrButton_GripTrigger) != 0) ? 1 : 0,
+                        ((pDominantTrackedRemoteOld->Buttons & ovrButton_GripTrigger) != 0) && !dominantGripPushedOld ? 1 : 0,
+                        ((pDominantTrackedRemoteNew->Buttons & ovrButton_GripTrigger) != 0) && !dominantGripPushedNew ? 1 : 0,
                         1, KEY_PAD_LTRIGGER);
             }
 
@@ -471,7 +482,7 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
 
 
             //Off Hand - Secondary keys (grip pushed)
-            if (vr_secondarybuttonmappings) {
+            {
                 //No Default Binding
                 Joy_GenerateButtonEvents(
                         ((pOffTrackedRemoteOld->Buttons & ovrButton_Trigger) != 0) &&
@@ -522,6 +533,18 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
             }
         }
     }
+
+    Joy_GenerateButtonEvents((pSecondaryTrackedRemoteOld->Joystick.x > 0.7f ? 1 : 0), (pSecondaryTrackedRemoteNew->Joystick.x > 0.7f ? 1 : 0), 1, KEY_JOYAXIS1PLUS);
+    Joy_GenerateButtonEvents((pSecondaryTrackedRemoteOld->Joystick.x < -0.7f ? 1 : 0), (pSecondaryTrackedRemoteNew->Joystick.x < -0.7f ? 1 : 0), 1, KEY_JOYAXIS1MINUS);
+
+    Joy_GenerateButtonEvents((pPrimaryTrackedRemoteOld->Joystick.x > 0.7f ? 1 : 0), (pPrimaryTrackedRemoteNew->Joystick.x > 0.7f ? 1 : 0), 1, KEY_JOYAXIS3PLUS);
+    Joy_GenerateButtonEvents((pPrimaryTrackedRemoteOld->Joystick.x < -0.7f ? 1 : 0), (pPrimaryTrackedRemoteNew->Joystick.x < -0.7f ? 1 : 0), 1, KEY_JOYAXIS3MINUS);
+
+    Joy_GenerateButtonEvents((pSecondaryTrackedRemoteOld->Joystick.y < -0.7f ? 1 : 0), (pSecondaryTrackedRemoteNew->Joystick.y < -0.7f ? 1 : 0), 1, KEY_JOYAXIS2MINUS);
+    Joy_GenerateButtonEvents((pSecondaryTrackedRemoteOld->Joystick.y > 0.7f ? 1 : 0), (pSecondaryTrackedRemoteNew->Joystick.y > 0.7f ? 1 : 0), 1, KEY_JOYAXIS2PLUS);
+    
+    Joy_GenerateButtonEvents((pPrimaryTrackedRemoteOld->Joystick.y < -0.7f ? 1 : 0), (pPrimaryTrackedRemoteNew->Joystick.y < -0.7f ? 1 : 0), 1, KEY_JOYAXIS4MINUS);
+    Joy_GenerateButtonEvents((pPrimaryTrackedRemoteOld->Joystick.y > 0.7f ? 1 : 0), (pPrimaryTrackedRemoteNew->Joystick.y > 0.7f ? 1 : 0), 1, KEY_JOYAXIS4PLUS);
 
     //Save state
     rightTrackedRemoteState_old = rightTrackedRemoteState_new;
