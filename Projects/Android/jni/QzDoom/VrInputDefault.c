@@ -244,7 +244,7 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
                   remote_movementForward);
 
 
-            if (!cinemamode)
+            if (!cinemamode && !dominantGripPushedNew)
             {
                 // Turning logic
                 static int increaseSnap = true;
