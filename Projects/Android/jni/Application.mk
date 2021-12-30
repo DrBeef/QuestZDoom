@@ -6,7 +6,7 @@ NDK_MODULE_PATH := $(ROOT_DIR)
 
 APP_PLATFORM := android-19
 
-APP_CFLAGS += -Wl,--no-undefined
+APP_CFLAGS += -Wl,--no-undefined, -march=armv8+crc
 
 APPLICATIONMK_PATH = $(call my-dir)
 
