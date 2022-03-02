@@ -72,6 +72,30 @@ bool ready_teleport;
 bool trigger_teleport;
 bool cinemamode;
 
+extern ovrInputStateTrackedRemote leftTrackedRemoteState_old;
+extern ovrInputStateTrackedRemote leftTrackedRemoteState_new;
+extern ovrTracking leftRemoteTracking_new;
+
+extern ovrInputStateTrackedRemote rightTrackedRemoteState_old;
+extern ovrInputStateTrackedRemote rightTrackedRemoteState_new;
+extern ovrTracking rightRemoteTracking_new;
+
+extern ovrInputStateGamepad footTrackedRemoteState_old;
+extern ovrInputStateGamepad footTrackedRemoteState_new;
+
+
+extern ovrDeviceID controllerIDs[2];
+
+extern float remote_movementSideways;
+extern float remote_movementForward;
+extern float remote_movementUp;
+extern float positional_movementSideways;
+extern float positional_movementForward;
+extern float snapTurn;
+
+extern float cinemamodeYaw;
+extern float cinemamodePitch;
+
 #if !defined( EGL_OPENGL_ES3_BIT_KHR )
 #define EGL_OPENGL_ES3_BIT_KHR		0x0040
 #endif
@@ -1049,6 +1073,8 @@ static void ovrApp_HandleVrModeChanges( ovrApp * app )
 				vrapi_SetPerfThread( app->Ovr, VRAPI_PERF_THREAD_TYPE_RENDERER, app->RenderThreadTid );
 
 				ALOGV( "		vrapi_SetPerfThread( RENDERER, %d )", app->RenderThreadTid );
+
+				vrapi_SetExtraLatencyMode(app->Ovr, VRAPI_EXTRA_LATENCY_MODE_ON);
 			}
 		}
 	}
@@ -1557,6 +1583,12 @@ void QzDoom_FrameSetup()
 {
 	//Use floor based tracking space
 	vrapi_SetTrackingSpace(gAppState.Ovr, VRAPI_TRACKING_SPACE_LOCAL_FLOOR);
+
+	//Ensure extra latency mode is enabled always
+    vrapi_SetExtraLatencyMode(gAppState.Ovr, VRAPI_EXTRA_LATENCY_MODE_ON);
+
+    //Ensure we are running at configure "power"
+    vrapi_SetClockLevels( gAppState.Ovr, gAppState.CpuLevel, gAppState.GpuLevel );
 }
 
 void QzDoom_processHaptics() {//Handle haptics

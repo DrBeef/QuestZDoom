@@ -18,6 +18,30 @@ Authors		:	Simon Brown
 
 #include "doomkeys.h"
 
+extern ovrInputStateTrackedRemote leftTrackedRemoteState_old;
+extern ovrInputStateTrackedRemote leftTrackedRemoteState_new;
+extern ovrTracking leftRemoteTracking_new;
+
+extern ovrInputStateTrackedRemote rightTrackedRemoteState_old;
+extern ovrInputStateTrackedRemote rightTrackedRemoteState_new;
+extern ovrTracking rightRemoteTracking_new;
+
+extern ovrInputStateGamepad footTrackedRemoteState_old;
+extern ovrInputStateGamepad footTrackedRemoteState_new;
+
+
+extern ovrDeviceID controllerIDs[2];
+
+extern float remote_movementSideways;
+extern float remote_movementForward;
+extern float remote_movementUp;
+extern float positional_movementSideways;
+extern float positional_movementForward;
+extern float snapTurn;
+
+extern float cinemamodeYaw;
+extern float cinemamodePitch;
+
 int getGameState();
 int getMenuState();
 void Joy_GenerateButtonEvents(int oldbuttons, int newbuttons, int numbuttons, int base);

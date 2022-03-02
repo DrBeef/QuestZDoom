@@ -15,6 +15,30 @@ Authors		:	Simon Brown
 
 #include "VrInput.h"
 
+ovrInputStateTrackedRemote leftTrackedRemoteState_old;
+ovrInputStateTrackedRemote leftTrackedRemoteState_new;
+ovrTracking leftRemoteTracking_new;
+
+ovrInputStateTrackedRemote rightTrackedRemoteState_old;
+ovrInputStateTrackedRemote rightTrackedRemoteState_new;
+ovrTracking rightRemoteTracking_new;
+
+ovrInputStateGamepad footTrackedRemoteState_old;
+ovrInputStateGamepad footTrackedRemoteState_new;
+
+
+ovrDeviceID controllerIDs[2];
+
+float remote_movementSideways;
+float remote_movementForward;
+float remote_movementUp;
+float positional_movementSideways;
+float positional_movementForward;
+float snapTurn;
+
+float cinemamodeYaw;
+float cinemamodePitch;
+
 void Joy_GenerateButtonEvents(int oldbuttons, int newbuttons, int numbuttons, int base);
 
 void handleTrackedControllerButton(ovrInputStateTrackedRemote * trackedRemoteState, ovrInputStateTrackedRemote * prevTrackedRemoteState, uint32_t button, int key)
