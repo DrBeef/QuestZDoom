@@ -447,8 +447,8 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
             1, KEY_JOY7);
 
         Joy_GenerateButtonEvents(
-            ((pOffTrackedRemoteOld->Buttons & ovrButton_GripTrigger) != 0) && !dominantGripPushedOld && !vr_twohandedweapons ? 1 : 0,
-            ((pOffTrackedRemoteNew->Buttons & ovrButton_GripTrigger) != 0) && !dominantGripPushedNew && !vr_twohandedweapons ? 1 : 0,
+            ((pOffTrackedRemoteOld->Buttons & ovrButton_GripTrigger) != 0) && !dominantGripPushedOld ? 1 : 0,
+            ((pOffTrackedRemoteNew->Buttons & ovrButton_GripTrigger) != 0) && !dominantGripPushedNew ? 1 : 0,
             1, KEY_PAD_RTHUMB);
     }
 
