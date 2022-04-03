@@ -173,7 +173,7 @@ import java.io.OutputStream;
 		new File("/sdcard/QuestZDoom/res").mkdirs();
 		new File("/sdcard/QuestZDoom/mods").mkdirs();
 		new File("/sdcard/QuestZDoom/wads").mkdirs();
-		new File("/sdcard/QuestZDoom/audiopack/snd_fluidsynth").mkdirs();
+		new File("/sdcard/QuestZDoom/soundfonts").mkdirs();
 
 		copy_asset("/sdcard/QuestZDoom", "res/lzdoom.pk3", true);
 		copy_asset("/sdcard/QuestZDoom", "res/lz_game_support.pk3", true);
@@ -183,7 +183,10 @@ import java.io.OutputStream;
 		copy_asset("/sdcard/QuestZDoom", "mods/Ultimate-Cheat-Menu.zip", true);
 		copy_asset("/sdcard/QuestZDoom", "mods/laser-sight-0.5.5-vr.pk3", true);
 
-		copy_asset("/sdcard/QuestZDoom/audiopack", "snd_fluidsynth/fluidsynth.sf2", false);
+		copy_asset("/sdcard/QuestZDoom/soundfonts", "qzdoom.sf2", false);
+		copy_asset("/sdcard/QuestZDoom/fm_banks", "GENMIDI.GS.wopl", false);
+		copy_asset("/sdcard/QuestZDoom/fm_banks", "gs-by-papiezak-and-sneakernets.wopn", false);
+		//copy_asset("/sdcard/QuestZDoom/audiopack", "snd_fluidsynth/fluidsynth.sf2", false);
 
 		//Read these from a file and pass through
 		commandLineParams = new String("qzdoom");

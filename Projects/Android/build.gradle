@@ -38,7 +38,7 @@ android {
       java.srcDirs = ['../../java']
       jniLibs.srcDir 'libs'
       res.srcDirs = ['../../res']
-      assets.srcDirs = ['../../assets']
+      assets.srcDirs = ['../../assets', 'jni/gzdoom-g3.3mgw_mobile/fm_banks', 'jni/gzdoom-g3.3mgw_mobile/soundfont']
     }
   }
     compileOptions {
