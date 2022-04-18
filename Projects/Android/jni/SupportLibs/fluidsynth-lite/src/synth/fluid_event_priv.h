@@ -3,16 +3,16 @@
  * Copyright (C) 2003  Peter Hanappe and others.
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public License
- * as published by the Free Software Foundation; either version 2 of
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 2.1 of
  * the License, or (at your option) any later version.
  *
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Library General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA
@@ -28,19 +28,19 @@
 /* Private data for event */
 /* ?? should be optimized in size, using unions */
 struct _fluid_event_t {
-    unsigned int time;
-    int type;
-    short src;
-    short dest;
-    int channel;
-    short key;
-    short vel;
-    short control;
-    short value;
-    short id; //?? unused ?
-    int pitch;
-    unsigned int duration;
-    void* data;
+	unsigned int time;
+	int type;
+	fluid_seq_id_t src;
+	fluid_seq_id_t dest;
+	int channel;
+	short key;
+	short vel;
+	short control;
+	short value;
+	short id; //?? unused ?
+	int pitch;
+	unsigned int duration;
+	void* data;
 };
 
 unsigned int fluid_event_get_time(fluid_event_t* evt);
@@ -50,15 +50,15 @@ void fluid_event_clear(fluid_event_t* evt);
 
 /* private data for sorter + heap */
 enum fluid_evt_entry_type {
-    FLUID_EVT_ENTRY_INSERT = 0,
-    FLUID_EVT_ENTRY_REMOVE
+  FLUID_EVT_ENTRY_INSERT = 0,
+  FLUID_EVT_ENTRY_REMOVE
 };
 
 typedef struct _fluid_evt_entry fluid_evt_entry;
 struct _fluid_evt_entry {
-    fluid_evt_entry *next;
-    short entryType;
-    fluid_event_t evt;
+	fluid_evt_entry *next;
+	short entryType;
+	fluid_event_t evt;
 };
 
 #define HEAP_WITH_DYNALLOC 1
@@ -66,12 +66,12 @@ struct _fluid_evt_entry {
 
 typedef struct _fluid_evt_heap_t {
 #ifdef HEAP_WITH_DYNALLOC
-    fluid_evt_entry* freelist;
-    fluid_mutex_t mutex;
+  fluid_evt_entry* freelist;
+  fluid_mutex_t mutex;
 #else
-    fluid_evt_entry* head;
-    fluid_evt_entry* tail;
-    fluid_evt_entry pool;
+	fluid_evt_entry* head;
+	fluid_evt_entry* tail;
+	fluid_evt_entry pool;
 #endif
 } fluid_evt_heap_t;
 

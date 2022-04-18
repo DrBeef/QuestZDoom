@@ -91,12 +91,6 @@
 /* Define to 1 if you have the <stdint.h> header file. */
 #cmakedefine HAVE_STDINT_H @HAVE_STDINT_H@
 
-/* Define to 1 if you have the <stdbool.h> header file. */
-#cmakedefine HAVE_STDBOOL_H @HAVE_STDBOOL_H@
-
-/* Define to 1 if you have the <stdatomic.h> header file. */
-#cmakedefine HAVE_STDATOMIC_H @HAVE_STDATOMIC_H@
-
 /* Define to 1 if you have the <stdio.h> header file. */
 #cmakedefine HAVE_STDIO_H @HAVE_STDIO_H@
 
@@ -106,14 +100,20 @@
 /* Define to 1 if you have the <strings.h> header file. */
 #cmakedefine HAVE_STRINGS_H @HAVE_STRINGS_H@
 
-/* Define to 1 if you have the <threads.h> header file. */
-#cmakedefine HAVE_THREADS_H @HAVE_THREADS_H@
-
 /* Define to 1 if you have the <string.h> header file. */
 #cmakedefine HAVE_STRING_H @HAVE_STRING_H@
 
 /* Define to 1 if you have the <sys/ioctl.h> header file. */
 #cmakedefine HAVE_SYS_IOCTL_H @HAVE_SYS_IOCTL_H@
+
+/* Define to 1 if you have the <sys/mman.h> header file. */
+#cmakedefine HAVE_SYS_MMAN_H @HAVE_SYS_MMAN_H@
+
+/* Define to 1 if you have the <sys/socket.h> header file. */
+#cmakedefine HAVE_SYS_SOCKET_H @HAVE_SYS_SOCKET_H@
+
+/* Define to 1 if you have the <sys/soundcard.h> header file. */
+#cmakedefine HAVE_SYS_SOUNDCARD_H @HAVE_SYS_SOUNDCARD_H@
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #cmakedefine HAVE_SYS_STAT_H @HAVE_SYS_STAT_H@
@@ -133,14 +133,35 @@
 /* Define to 1 if you have the <getopt.h> header file. */
 #cmakedefine HAVE_GETOPT_H @HAVE_GETOPT_H@
 
-/* Define to 1 if you have the <pthread.h> header file. */
-#cmakedefine HAVE_PTHREAD_H @HAVE_PTHREAD_H@
+/* Define to 1 if you have the inet_ntop() function. */
+#cmakedefine HAVE_INETNTOP @HAVE_INETNTOP@
+
+/* Define to enable JACK driver */
+#cmakedefine JACK_SUPPORT @JACK_SUPPORT@
+
+/* Include the LADSPA Fx unit */
+#cmakedefine LADSPA @LADSPA_SUPPORT@
+
+/* Define to enable IPV6 support */
+#cmakedefine IPV6_SUPPORT @IPV6_SUPPORT@
+
+/* libsndfile has ogg vorbis support */
+#cmakedefine LIBSNDFILE_HASVORBIS @LIBSNDFILE_HASVORBIS@
+
+/* Define to enable libsndfile support */
+#cmakedefine LIBSNDFILE_SUPPORT @LIBSNDFILE_SUPPORT@
+
+/* Define to enable MidiShare driver */
+#cmakedefine MIDISHARE_SUPPORT @MIDISHARE_SUPPORT@
 
 /* Define if using the MinGW32 environment */
 #cmakedefine MINGW32 @MINGW32@
 
 /* Define to 1 if your C compiler doesn't accept -c and -o together. */
 #cmakedefine NO_MINUS_C_MINUS_O @NO_MINUS_C_MINUS_O@
+
+/* Define to enable OSS driver */
+#cmakedefine OSS_SUPPORT @OSS_SUPPORT@
 
 /* Name of package */
 #cmakedefine PACKAGE "@PACKAGE@"

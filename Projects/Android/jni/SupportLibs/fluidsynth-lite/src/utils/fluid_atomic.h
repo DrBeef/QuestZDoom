@@ -73,13 +73,20 @@ typedef volatile ULONG atomic_uint;
 typedef volatile LONG atomic_float;
 
 #define fluid_atomic_int_inc(atomic) InterlockedIncrement((atomic))
-#define fluid_atomic_int_add(atomic, val) InterlockedAdd((atomic), (val))
 #define fluid_atomic_int_get(atomic) (*(LONG*)(atomic))
 #define fluid_atomic_int_set(atomic, val) InterlockedExchange((atomic), (val))
 #define fluid_atomic_int_exchange_and_add(atomic, add)  \
     InterlockedExchangeAdd((atomic), (add))
 
 #define fluid_atomic_float_get(atomic) (*(FLOAT*)(atomic))
+
+static inline LONG 
+fluid_atomic_int_add(atomic_int *atomic, float val)
+{
+    LONG tmp = *atomic;
+    InterlockedAdd((atomic), (val));
+    return tmp;
+}
 
 static inline float
 fluid_atomic_float_set(atomic_float *atomic, float val)

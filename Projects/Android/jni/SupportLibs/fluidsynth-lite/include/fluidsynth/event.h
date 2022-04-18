@@ -3,16 +3,16 @@
  * Copyright (C) 2003  Peter Hanappe and others.
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public License
- * as published by the Free Software Foundation; either version 2 of
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 2.1 of
  * the License, or (at your option) any later version.
  *
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
+ * Lesser General Public License for more details.
  *  
- * You should have received a copy of the GNU Library General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA
@@ -53,12 +53,12 @@ enum fluid_seq_event_type {
   FLUID_SEQ_VOLUME,		/**< Volume set event */
   FLUID_SEQ_REVERBSEND,		/**< Reverb send set event */
   FLUID_SEQ_CHORUSSEND,		/**< Chorus send set event */
-  FLUID_SEQ_TIMER,		/**< Timer event (DOCME) */
-  FLUID_SEQ_ANYCONTROLCHANGE,	/**< DOCME (used for remove_events only) */
+  FLUID_SEQ_TIMER,		/**< Timer event (useful for giving a callback at a certain time) */
+  FLUID_SEQ_ANYCONTROLCHANGE,	/**< Any control change message (only internally used for remove_events) */
   FLUID_SEQ_CHANNELPRESSURE,    /**< Channel aftertouch event @since 1.1.0 */
   FLUID_SEQ_SYSTEMRESET,        /**< System reset event @since 1.1.0 */
   FLUID_SEQ_UNREGISTERING,      /**< Called when a sequencer client is being unregistered. @since 1.1.0 */
-  FLUID_SEQ_LASTEVENT		/**< Defines the count of event enums */
+  FLUID_SEQ_LASTEVENT		/**< Defines the count of event enums @deprecated As of 1.1.7 this enum value is deprecated and will be removed in a future release, because it prevents adding new enum values without breaking ABI compatibility. */
 };
 
 #define FLUID_SEQ_PITCHWHHELSENS        FLUID_SEQ_PITCHWHEELSENS        /**< Old deprecated misspelling of #FLUID_SEQ_PITCHWHEELSENS */
@@ -68,8 +68,8 @@ FLUIDSYNTH_API fluid_event_t* new_fluid_event(void);
 FLUIDSYNTH_API void delete_fluid_event(fluid_event_t* evt);
 
 /* Initializing events */
-FLUIDSYNTH_API void fluid_event_set_source(fluid_event_t* evt, short src);
-FLUIDSYNTH_API void fluid_event_set_dest(fluid_event_t* evt, short dest);
+FLUIDSYNTH_API void fluid_event_set_source(fluid_event_t* evt, fluid_seq_id_t src);
+FLUIDSYNTH_API void fluid_event_set_dest(fluid_event_t* evt, fluid_seq_id_t dest);
 
 /* Timer events */
 FLUIDSYNTH_API void fluid_event_timer(fluid_event_t* evt, void* data);
@@ -115,8 +115,8 @@ FLUIDSYNTH_API void fluid_event_unregistering(fluid_event_t* evt);
 
 /* Accessing event data */
 FLUIDSYNTH_API int fluid_event_get_type(fluid_event_t* evt);
-FLUIDSYNTH_API short fluid_event_get_source(fluid_event_t* evt);
-FLUIDSYNTH_API short fluid_event_get_dest(fluid_event_t* evt);
+FLUIDSYNTH_API fluid_seq_id_t fluid_event_get_source(fluid_event_t* evt);
+FLUIDSYNTH_API fluid_seq_id_t fluid_event_get_dest(fluid_event_t* evt);
 FLUIDSYNTH_API int fluid_event_get_channel(fluid_event_t* evt);
 FLUIDSYNTH_API short fluid_event_get_key(fluid_event_t* evt);
 FLUIDSYNTH_API short fluid_event_get_velocity(fluid_event_t* evt);

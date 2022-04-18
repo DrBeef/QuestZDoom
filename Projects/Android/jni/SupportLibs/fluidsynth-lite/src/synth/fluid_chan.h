@@ -3,16 +3,16 @@
  * Copyright (C) 2003  Peter Hanappe and others.
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public License
- * as published by the Free Software Foundation; either version 2 of
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 2.1 of
  * the License, or (at your option) any later version.
  *
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Library General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA
@@ -31,56 +31,57 @@
  * Mutual exclusion notes (as of 1.1.2):
  * None - everything should have been synchronized by the synth.
  */
-struct _fluid_channel_t {
-    fluid_mutex_t mutex;                  /* Lock for thread sensitive parameters */
+struct _fluid_channel_t
+{
+  fluid_mutex_t mutex;                  /* Lock for thread sensitive parameters */
 
-    fluid_synth_t* synth;                 /**< Parent synthesizer instance */
-    int channum;                          /**< MIDI channel number */
+  fluid_synth_t* synth;                 /**< Parent synthesizer instance */
+  int channum;                          /**< MIDI channel number */
 
-    int sfont_bank_prog;                  /**< SoundFont ID (bit 21-31), bank (bit 7-20), program (bit 0-6) */
-    fluid_preset_t* preset;               /**< Selected preset */
+  int sfont_bank_prog;                  /**< SoundFont ID (bit 21-31), bank (bit 7-20), program (bit 0-6) */
+  fluid_preset_t* preset;               /**< Selected preset */
 
-    int key_pressure;                     /**< MIDI key pressure */
-    int channel_pressure;                 /**< MIDI channel pressure */
-    int pitch_bend;                       /**< Current pitch bend value */
-    int pitch_wheel_sensitivity;          /**< Current pitch wheel sensitivity */
+  int key_pressure;                     /**< MIDI key pressure */
+  int channel_pressure;                 /**< MIDI channel pressure */
+  int pitch_bend;                       /**< Current pitch bend value */
+  int pitch_wheel_sensitivity;          /**< Current pitch wheel sensitivity */
 
-    int cc[128];                          /**< MIDI controller values */
+  int cc[128];                          /**< MIDI controller values */
 
-    /* Sostenuto order id gives the order of SostenutoOn event.
-       This value is useful to known when the sostenuto pedal is depressed
-       (before or after a key note). We need to compare SostenutoOrderId with voice id.
-     */
-    unsigned int  sostenuto_orderid;
-    int interp_method;                    /**< Interpolation method (enum fluid_interp) */
-    fluid_tuning_t* tuning;               /**< Micro tuning */
-    int tuning_bank;                      /**< Current tuning bank number */
-    int tuning_prog;                      /**< Current tuning program number */
+  /* Sostenuto order id gives the order of SostenutoOn event.
+     This value is useful to known when the sostenuto pedal is depressed
+     (before or after a key note). We need to compare SostenutoOrderId with voice id.
+   */
+  unsigned int  sostenuto_orderid;
+  int interp_method;                    /**< Interpolation method (enum fluid_interp) */
+  fluid_tuning_t* tuning;               /**< Micro tuning */
+  int tuning_bank;                      /**< Current tuning bank number */
+  int tuning_prog;                      /**< Current tuning program number */
 
-    /* NRPN system */
-    int nrpn_select;      /* Generator ID of SoundFont NRPN message */
-    int nrpn_active;      /* 1 if data entry CCs are for NRPN, 0 if RPN */
+  /* NRPN system */
+  int nrpn_select;      /* Generator ID of SoundFont NRPN message */
+  int nrpn_active;      /* 1 if data entry CCs are for NRPN, 0 if RPN */
 
-    /* The values of the generators, set by NRPN messages, or by
-     * fluid_synth_set_gen(), are cached in the channel so they can be
-     * applied to future notes. They are copied to a voice's generators
-     * in fluid_voice_init(), which calls fluid_gen_init().  */
-    fluid_real_t gen[GEN_LAST];
+  /* The values of the generators, set by NRPN messages, or by
+   * fluid_synth_set_gen(), are cached in the channel so they can be
+   * applied to future notes. They are copied to a voice's generators
+   * in fluid_voice_init(), which calls fluid_gen_init().  */
+  fluid_real_t gen[GEN_LAST];
 
-    /* By default, the NRPN values are relative to the values of the
-     * generators set in the SoundFont. For example, if the NRPN
-     * specifies an attack of 100 msec then 100 msec will be added to the
-     * combined attack time of the sound font and the modulators.
-     *
-     * However, it is useful to be able to specify the generator value
-     * absolutely, completely ignoring the generators of the SoundFont
-     * and the values of modulators. The gen_abs field, is a boolean
-     * flag indicating whether the NRPN value is absolute or not.
-     */
-    char gen_abs[GEN_LAST];
+  /* By default, the NRPN values are relative to the values of the
+   * generators set in the SoundFont. For example, if the NRPN
+   * specifies an attack of 100 msec then 100 msec will be added to the
+   * combined attack time of the sound font and the modulators.
+   *
+   * However, it is useful to be able to specify the generator value
+   * absolutely, completely ignoring the generators of the SoundFont
+   * and the values of modulators. The gen_abs field, is a boolean
+   * flag indicating whether the NRPN value is absolute or not.
+   */
+  char gen_abs[GEN_LAST];
 
-    /* Drum channel flag, CHANNEL_TYPE_MELODIC, or CHANNEL_TYPE_DRUM. */
-    int channel_type;
+  /* Drum channel flag, CHANNEL_TYPE_MELODIC, or CHANNEL_TYPE_DRUM. */
+  int channel_type;
 
 };
 

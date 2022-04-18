@@ -3,16 +3,16 @@
  * Copyright (C) 2003  Peter Hanappe and others.
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public License
- * as published by the Free Software Foundation; either version 2 of
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 2.1 of
  * the License, or (at your option) any later version.
  *
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
+ * Lesser General Public License for more details.
  *  
- * You should have received a copy of the GNU Library General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA
@@ -131,9 +131,16 @@ FLUIDSYNTH_API int fluid_player_join(fluid_player_t* player);
 FLUIDSYNTH_API int fluid_player_set_loop(fluid_player_t* player, int loop);
 FLUIDSYNTH_API int fluid_player_set_midi_tempo(fluid_player_t* player, int tempo);
 FLUIDSYNTH_API int fluid_player_set_bpm(fluid_player_t* player, int bpm);
-FLUIDSYNTH_API int fluid_player_get_status(fluid_player_t* player);
 FLUIDSYNTH_API int fluid_player_set_playback_callback(fluid_player_t* player, handle_midi_event_func_t handler, void* handler_data);
 
+FLUIDSYNTH_API int fluid_player_get_status(fluid_player_t* player);
+FLUIDSYNTH_API int fluid_player_get_current_tick(fluid_player_t * player);
+FLUIDSYNTH_API int fluid_player_get_total_ticks(fluid_player_t * player);
+FLUIDSYNTH_API int fluid_player_get_bpm(fluid_player_t * player);
+FLUIDSYNTH_API int fluid_player_get_midi_tempo(fluid_player_t * player);
+    
+///
+    
 #ifdef __cplusplus
 }
 #endif

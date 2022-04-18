@@ -3,16 +3,16 @@
  * Copyright (C) 2003  Peter Hanappe and others.
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public License
- * as published by the Free Software Foundation; either version 2 of
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 2.1 of
  * the License, or (at your option) any later version.
  *
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
+ * Lesser General Public License for more details.
  *  
- * You should have received a copy of the GNU Library General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA
@@ -99,7 +99,7 @@ enum fluid_gen_type {
    * is used, however, as the destination for the default pitch wheel
    * modulator. */
   GEN_PITCH,			/**< Pitch (NOTE: Not a real SoundFont generator) */
-  GEN_LAST			/**< Value defines the count of generators (#fluid_gen_type) */
+  GEN_LAST			/**< Value defines the count of generators (#fluid_gen_type) @deprecated As of 1.1.7 this enum value is deprecated and will be removed in a future release, because it prevents adding new enum values without breaking ABI compatibility. */
 };
 
 
@@ -124,7 +124,7 @@ enum fluid_gen_flags
   GEN_ABS_NRPN		/**< Generator is an absolute value */
 };
 
-FLUIDSYNTH_API int fluid_gen_set_default_values(fluid_gen_t* gen);
+FLUIDSYNTH_API FLUID_DEPRECATED int fluid_gen_set_default_values(fluid_gen_t* gen);
 
 
 

@@ -3,16 +3,16 @@
  * Copyright (C) 2003  Peter Hanappe and others.
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public License
- * as published by the Free Software Foundation; either version 2 of
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 2.1 of
  * the License, or (at your option) any later version.
  *
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Library General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA
@@ -60,6 +60,7 @@ void fluid_time_config(void);
 #define FLUID_POINTER_TO_UINT(x)            ((size_t)(x))
 #define FLUID_POINTER_TO_INT(x)             ((intptr_t)(x))
 #define FLUID_N_ELEMENTS(struct)            (sizeof (struct) / sizeof (struct[0]))
+#define FLUID_MEMBER_SIZE(struct, member)  ( sizeof (((struct *)0)->member) )
 
 // TODO: Add proper big endianess check
 #define FLUID_IS_BIG_ENDIAN                 false // (G_BYTE_ORDER == G_BIG_ENDIAN)
@@ -81,7 +82,7 @@ extern unsigned int fluid_debug_flags;
 #if DEBUG
 
 enum fluid_debug_level {
-    FLUID_DBG_DRIVER = 1
+  FLUID_DBG_DRIVER = 1
 };
 
 int fluid_debug(int level, char * fmt, ...);
@@ -364,16 +365,16 @@ int fluid_ostream_printf (fluid_ostream_t out, char* format, ...);
  * fluid_sys.c
  */
 enum {
-    FLUID_PROF_WRITE,
-    FLUID_PROF_ONE_BLOCK,
-    FLUID_PROF_ONE_BLOCK_CLEAR,
-    FLUID_PROF_ONE_BLOCK_VOICE,
-    FLUID_PROF_ONE_BLOCK_VOICES,
-    FLUID_PROF_ONE_BLOCK_REVERB,
-    FLUID_PROF_ONE_BLOCK_CHORUS,
-    FLUID_PROF_VOICE_NOTE,
-    FLUID_PROF_VOICE_RELEASE,
-    FLUID_PROF_LAST
+  FLUID_PROF_WRITE,
+  FLUID_PROF_ONE_BLOCK,
+  FLUID_PROF_ONE_BLOCK_CLEAR,
+  FLUID_PROF_ONE_BLOCK_VOICE,
+  FLUID_PROF_ONE_BLOCK_VOICES,
+  FLUID_PROF_ONE_BLOCK_REVERB,
+  FLUID_PROF_ONE_BLOCK_CHORUS,
+  FLUID_PROF_VOICE_NOTE,
+  FLUID_PROF_VOICE_RELEASE,
+  FLUID_PROF_LAST
 };
 
 
@@ -385,10 +386,10 @@ void fluid_profiling_print(void);
 /** Profiling data. Keep track of min/avg/max values to execute a
     piece of code. */
 typedef struct _fluid_profile_data_t {
-    int num;
-    char* description;
-    double min, max, total;
-    unsigned int count;
+  int num;
+  char* description;
+  double min, max, total;
+  unsigned int count;
 } fluid_profile_data_t;
 
 extern fluid_profile_data_t fluid_profile_data[];
