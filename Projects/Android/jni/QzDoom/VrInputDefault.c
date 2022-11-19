@@ -371,6 +371,12 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
             ((pDominantTrackedRemoteNew->Touches & ovrTouch_ThumbRest) != 0) && !dominantGripPushedNew ? 1 : 0,
             1, KEY_JOY5);
 
+        //Use grip as an extra button
+        //Alt-Fire
+        Joy_GenerateButtonEvents(
+            ((pDominantTrackedRemoteOld->Buttons & ovrButton_GripTrigger) != 0) && !dominantGripPushedOld ? 1 : 0,
+            ((pDominantTrackedRemoteNew->Buttons & ovrButton_GripTrigger) != 0) && !dominantGripPushedNew ? 1 : 0,
+            1, KEY_PAD_LTRIGGER);
     }
     
     //Dominant Hand - Secondary keys (grip pushed)
@@ -391,7 +397,7 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
         Joy_GenerateButtonEvents(
             ((primaryButtonsOld & primaryButton2) != 0) && dominantGripPushedOld ? 1 : 0,
             ((primaryButtonsNew & primaryButton2) != 0) && dominantGripPushedNew ? 1 : 0,
-            1, KEY_RSHIFT);
+            1, KEY_BACKSPACE);
 
         //No Binding
         Joy_GenerateButtonEvents(
@@ -405,12 +411,6 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
             ((pDominantTrackedRemoteNew->Touches & ovrTouch_ThumbRest) != 0) && dominantGripPushedNew ? 1 : 0,
             1, KEY_JOY6);
 
-        //Use grip as an extra button
-        //Alt-Fire
-        Joy_GenerateButtonEvents(
-            ((pDominantTrackedRemoteOld->Buttons & ovrButton_GripTrigger) != 0) && !dominantGripPushedOld ? 1 : 0,
-            ((pDominantTrackedRemoteNew->Buttons & ovrButton_GripTrigger) != 0) && !dominantGripPushedNew ? 1 : 0,
-            1, KEY_PAD_LTRIGGER);
     }
 
 
