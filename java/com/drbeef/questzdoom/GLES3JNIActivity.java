@@ -180,8 +180,8 @@ import java.io.OutputStream;
 		copy_asset("/sdcard/QuestZDoom", "res/lights.pk3", true);
 		copy_asset("/sdcard/QuestZDoom", "res/brightmaps.pk3", true);
 
-		copy_asset("/sdcard/QuestZDoom", "mods/Ultimate-Cheat-Menu.zip", false);
-		copy_asset("/sdcard/QuestZDoom", "mods/laser-sight-0.5.5-vr.pk3", false);
+		copy_asset("/sdcard/QuestZDoom", "mods/Ultimate-Cheat-Menu.zip", true);
+		copy_asset("/sdcard/QuestZDoom", "mods/laser-sight-0.5.5-vr.pk3", true);
 
 		copy_asset("/sdcard/QuestZDoom/soundfonts", "qzdoom.sf2", false);
 		copy_asset("/sdcard/QuestZDoom/fm_banks", "GENMIDI.GS.wopl", false);
