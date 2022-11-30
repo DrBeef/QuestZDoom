@@ -38,3 +38,4 @@ Projects/Android/.externalNativeBuild/*
 Projects/Android/.idea/*
 Projects/Android/.gradle/*
 Projects/Android/Android.iml
+Projects/Android/local.properties
