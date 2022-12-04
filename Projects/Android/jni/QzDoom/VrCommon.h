@@ -52,6 +52,9 @@ extern vec3_t weaponoffset;
 
 extern bool weaponStabilised;
 extern float vr_weapon_pitchadjust;
+extern float vr_weapon_offset_x;
+extern float vr_weapon_offset_y;
+extern float vr_weapon_offset_z;
 extern bool vr_moveuseoffhand;
 extern bool vr_switchsticks;
 extern bool vr_secondarybuttonmappings;

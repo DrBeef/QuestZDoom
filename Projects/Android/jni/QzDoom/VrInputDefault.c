@@ -153,9 +153,9 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
         //dominant hand stuff first
         {
             ///Weapon location relative to view
-            weaponoffset[0] = pDominantTracking->HeadPose.Pose.Position.x - hmdPosition[0];
-            weaponoffset[1] = pDominantTracking->HeadPose.Pose.Position.y - hmdPosition[1];
-            weaponoffset[2] = pDominantTracking->HeadPose.Pose.Position.z - hmdPosition[2];
+            weaponoffset[0] = pDominantTracking->HeadPose.Pose.Position.x - hmdPosition[0] + vr_weapon_offset_x;
+            weaponoffset[1] = pDominantTracking->HeadPose.Pose.Position.y - hmdPosition[1] + vr_weapon_offset_y;
+            weaponoffset[2] = pDominantTracking->HeadPose.Pose.Position.z - hmdPosition[2] + vr_weapon_offset_z;
 
             vec2_t v;
             float yawRotation = getViewpointYaw() - hmdorientation[YAW];
@@ -190,9 +190,9 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
 
         //off-hand stuff
         {
-            offhandoffset[0] = pOffTracking->HeadPose.Pose.Position.x - hmdPosition[0];
-            offhandoffset[1] = pOffTracking->HeadPose.Pose.Position.y - hmdPosition[1];
-            offhandoffset[2] = pOffTracking->HeadPose.Pose.Position.z - hmdPosition[2];
+            offhandoffset[0] = pOffTracking->HeadPose.Pose.Position.x - hmdPosition[0] + vr_weapon_offset_x;
+            offhandoffset[1] = pOffTracking->HeadPose.Pose.Position.y - hmdPosition[1] + vr_weapon_offset_y;
+            offhandoffset[2] = pOffTracking->HeadPose.Pose.Position.z - hmdPosition[2] + vr_weapon_offset_z;
 
             vec2_t v;
             float yawRotation = getViewpointYaw() - hmdorientation[YAW];
