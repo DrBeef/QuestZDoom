@@ -151,8 +151,13 @@ import java.io.OutputStream;
 	@Override
 	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] results) {
 		if (requestCode == WRITE_EXTERNAL_STORAGE_PERMISSION_ID) {
-			finish();
-			System.exit(0);
+			if (results.length > 0 && results[0] == PackageManager.PERMISSION_GRANTED) {
+				create();
+			}
+			else {
+				finish();
+				System.exit(0);
+			}
 		}
 	}
 
