@@ -39,6 +39,7 @@
 			<!-- This filter lets the apk show up as a launchable icon. -->
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
+				<category android:name="android.intent.category.DEFAULT" />
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>

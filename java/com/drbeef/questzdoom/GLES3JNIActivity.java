@@ -5,13 +5,16 @@ package com.drbeef.questzdoom;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.RemoteException;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
-import android.os.RemoteException;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
@@ -20,7 +23,6 @@ import com.drbeef.externalhapticsservice.HapticServiceClient;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -50,7 +52,19 @@ import java.io.OutputStream;
 	private long mNativeHandle;
 
 	public void shutdown() {
-		System.exit(0);
+		if (Build.VERSION.SDK_INT >= 21) {
+			// If yes, run the fancy new function to end the app and
+			//  remove it from the task list.
+			finishAndRemoveTask();
+		} else {
+			// If not, then just end the app without removing it from
+			//  the task list.
+			finish();
+		}
+	}
+
+	public void reload() {
+		restartApplication(this);
 	}
 
 	public void haptic_event(String event, int position, int intensity, float angle, float yHeight)  {
@@ -63,7 +77,7 @@ import java.io.OutputStream;
 			}
 			catch (RemoteException r)
 			{
-				Log.v(APPLICATION, r.toString());
+				Log.e(APPLICATION, r.toString());
 			}
 		}
 	}
@@ -76,7 +90,7 @@ import java.io.OutputStream;
 			}
 			catch (RemoteException r)
 			{
-				Log.v(APPLICATION, r.toString());
+				Log.e(APPLICATION, r.toString());
 			}
 		}
 	}
@@ -89,7 +103,7 @@ import java.io.OutputStream;
 			}
 			catch (RemoteException r)
 			{
-				Log.v(APPLICATION, r.toString());
+				Log.e(APPLICATION, r.toString());
 			}
 		}
 	}
@@ -102,7 +116,7 @@ import java.io.OutputStream;
 			}
 			catch (RemoteException r)
 			{
-				Log.v(APPLICATION, r.toString());
+				Log.e(APPLICATION, r.toString());
 			}
 		}
 	}
@@ -209,12 +223,10 @@ import java.io.OutputStream;
 				br.close();
 
 				commandLineParams = new String(sb.toString());
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Log.e(APPLICATION, e.toString());
+				finish();
+				return;
 			}
 		}
 
@@ -365,6 +377,32 @@ import java.io.OutputStream;
 			GLES3JNILib.onSurfaceDestroyed( mNativeHandle );
 			mSurfaceHolder = null;
 		}
+	}
+
+	/**
+	 * Working method for restarting the activity
+	 * @param activity
+	 */
+	private void restartApplication(final @NonNull Activity activity) {
+		// Systems at 29/Q and later don't allow relaunch, but System.exit(0) on
+		// all supported systems will relaunch ... but by killing the process, then
+		// restarting the process with the back stack intact. We must make sure that
+		// the launch activity is the only thing in the back stack before exiting.
+		final PackageManager pm = activity.getPackageManager();
+		final Intent intent = pm.getLaunchIntentForPackage(activity.getPackageName());
+		activity.finishAffinity(); // Finishes all activities.
+		activity.startActivity(intent);    // Start the launch activity
+		System.exit(0);    // System finishes and automatically relaunches us.
+	}
+
+	/**
+	 * Working method for restarting the activity
+	 */
+	private void restartApplicationSecondMethod() {
+		Intent intent = getIntent();
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+		startActivity(intent);
+		Runtime.getRuntime().exit(0);
 	}
 
 }

@@ -24,7 +24,6 @@ Copyright	:	Copyright 2015 Oculus VR, LLC. All Rights reserved.
 #include <android/input.h>
 
 #include "argtable3.h"
-#include "VrInput.h"
 
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
@@ -1497,6 +1496,7 @@ bool QzDoom_processMessageQueue() {
 
 void showLoadingIcon();
 void jni_shutdown();
+void jni_reload();
 
 void * AppThreadFunction(void * parm ) {
 	gAppThread = (ovrAppThread *) parm;
@@ -1618,6 +1618,12 @@ void QzDoom_processHaptics() {//Handle haptics
 			vrapi_SetHapticVibrationSimple(gAppState.Ovr, controllerIDs[i], 0.0f);
 		}
 	}
+}
+
+void QzDoom_Restart()
+{
+	//Ask Java to restart the app
+	jni_reload();
 }
 
 void showLoadingIcon()
@@ -1822,6 +1828,7 @@ Activity lifecycle
 */
 
 jmethodID android_shutdown;
+jmethodID android_reload;
 jmethodID android_haptic_event;
 jmethodID android_haptic_stopevent;
 jmethodID android_haptic_enable;
@@ -1839,6 +1846,18 @@ void jni_shutdown()
         (*jVM)->AttachCurrentThread(jVM,&env, NULL);
     }
     return (*env)->CallVoidMethod(env, jniCallbackObj, android_shutdown);
+}
+
+void jni_reload()
+{
+	ALOGV("Calling: jni_reload");
+    JNIEnv *env;
+    jobject tmp;
+    if (((*jVM)->GetEnv(jVM, (void**) &env, JNI_VERSION_1_4))<0)
+    {
+        (*jVM)->AttachCurrentThread(jVM,&env, NULL);
+    }
+    return (*env)->CallVoidMethod(env, jniCallbackObj, android_reload);
 }
 
 
@@ -2001,6 +2020,7 @@ JNIEXPORT void JNICALL Java_com_drbeef_questzdoom_GLES3JNILib_onStart( JNIEnv * 
     jclass callbackClass = (*env)->GetObjectClass(env, jniCallbackObj);
 
     android_shutdown = (*env)->GetMethodID(env,callbackClass,"shutdown","()V");
+	android_reload = (*env)->GetMethodID(env,callbackClass,"reload","()V");
 	android_haptic_event = (*env)->GetMethodID(env, callbackClass, "haptic_event", "(Ljava/lang/String;IIFF)V");
 	android_haptic_stopevent = (*env)->GetMethodID(env, callbackClass, "haptic_stopevent", "(Ljava/lang/String;)V");
 	android_haptic_enable = (*env)->GetMethodID(env, callbackClass, "haptic_enable", "()V");
