@@ -194,6 +194,9 @@ static bool useVirtualScreen = true;
 static bool hasIWADs = false;
 static bool hasLauncher = false;
 
+void PrepareEnvironment(const char* path);
+const char* M_GetActiveProfile();
+
 void QzDoom_setUseScreenLayer(bool use)
 {
 	useVirtualScreen = use;
@@ -1496,7 +1499,7 @@ bool QzDoom_processMessageQueue() {
 
 void showLoadingIcon();
 void jni_shutdown();
-void jni_reload();
+void jni_reload(const char* profile);
 
 void * AppThreadFunction(void * parm ) {
 	gAppThread = (ovrAppThread *) parm;
@@ -1557,8 +1560,6 @@ void * AppThreadFunction(void * parm ) {
 
 	// Create the scene if not yet created.
 	ovrScene_Create( m_width, m_height, &gAppState.Scene, &java );
-
-	chdir("/sdcard/QuestZDoom");
 
 	//Run loading loop until we are ready to start QzDoom
 	while (!destroyed && !qzdoom_initialised) {
@@ -1622,8 +1623,9 @@ void QzDoom_processHaptics() {//Handle haptics
 
 void QzDoom_Restart()
 {
+	const char* profile = M_GetActiveProfile();
 	//Ask Java to restart the app
-	jni_reload();
+	jni_reload(profile);
 }
 
 void showLoadingIcon()
@@ -1848,7 +1850,7 @@ void jni_shutdown()
     return (*env)->CallVoidMethod(env, jniCallbackObj, android_shutdown);
 }
 
-void jni_reload()
+void jni_reload(const char* profile)
 {
 	ALOGV("Calling: jni_reload");
     JNIEnv *env;
@@ -1857,7 +1859,8 @@ void jni_reload()
     {
         (*jVM)->AttachCurrentThread(jVM,&env, NULL);
     }
-    return (*env)->CallVoidMethod(env, jniCallbackObj, android_reload);
+	jstring jprofile = (*env)->NewStringUTF(env, profile);
+    return (*env)->CallVoidMethod(env, jniCallbackObj, android_reload, jprofile);
 }
 
 
@@ -2020,7 +2023,7 @@ JNIEXPORT void JNICALL Java_com_drbeef_questzdoom_GLES3JNILib_onStart( JNIEnv * 
     jclass callbackClass = (*env)->GetObjectClass(env, jniCallbackObj);
 
     android_shutdown = (*env)->GetMethodID(env,callbackClass,"shutdown","()V");
-	android_reload = (*env)->GetMethodID(env,callbackClass,"reload","()V");
+	android_reload = (*env)->GetMethodID(env,callbackClass,"reload","(Ljava/lang/String;)V");
 	android_haptic_event = (*env)->GetMethodID(env, callbackClass, "haptic_event", "(Ljava/lang/String;IIFF)V");
 	android_haptic_stopevent = (*env)->GetMethodID(env, callbackClass, "haptic_stopevent", "(Ljava/lang/String;)V");
 	android_haptic_enable = (*env)->GetMethodID(env, callbackClass, "haptic_enable", "()V");
@@ -2154,4 +2157,8 @@ JNIEXPORT void JNICALL Java_com_drbeef_questzdoom_GLES3JNILib_onSurfaceDestroyed
     ALOGV("        ANativeWindow_release( NativeWindow )");
     ANativeWindow_release(appThread->NativeWindow);
     appThread->NativeWindow = NULL;
+}
+
+JNIEXPORT void JNICALL Java_com_drbeef_questzdoom_GLES3JNILib_prepareEnvironment(JNIEnv * env, jobject obj, jstring path) {
+	PrepareEnvironment((*env)->GetStringUTFChars(env, path, NULL));
 }

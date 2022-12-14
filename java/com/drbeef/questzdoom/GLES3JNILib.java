@@ -20,4 +20,6 @@ public class GLES3JNILib
 	public static native void onSurfaceCreated( long handle, Surface s );
 	public static native void onSurfaceChanged( long handle, Surface s );
 	public static native void onSurfaceDestroyed( long handle );
+
+	public static native void prepareEnvironment(String path);
 }

@@ -21,8 +21,11 @@ import android.view.WindowManager;
 
 import com.drbeef.externalhapticsservice.HapticServiceClient;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -46,6 +49,7 @@ import java.io.OutputStream;
 	private static final int WRITE_EXTERNAL_STORAGE_PERMISSION_ID = 2;
 
 	private String commandLineParams;
+	private String progdir = "/sdcard/QuestZDoom";
 
 	private SurfaceView mView;
 	private SurfaceHolder mSurfaceHolder;
@@ -63,7 +67,11 @@ import java.io.OutputStream;
 		}
 	}
 
-	public void reload() {
+	public void reload(String profile) {
+		if (profile != null && !profile.isEmpty()) {
+			copy_file(progdir + "/commandline-" + profile + ".txt", progdir + "/commandline.txt");
+			copy_file(progdir + "/commandline_" + profile + ".txt", progdir + "/commandline.txt");
+		}
 		restartApplication(this);
 	}
 
@@ -185,41 +193,43 @@ import java.io.OutputStream;
 	}
 
 	public void create() {
-
-		copy_asset("/sdcard/QuestZDoom", "commandline.txt", false);
+		copy_asset(progdir, "commandline.txt", false);
 
 		//Create all required folders
-		new File("/sdcard/QuestZDoom/res").mkdirs();
-		new File("/sdcard/QuestZDoom/mods").mkdirs();
-		new File("/sdcard/QuestZDoom/wads").mkdirs();
-		new File("/sdcard/QuestZDoom/soundfonts").mkdirs();
+		new File(progdir, "res").mkdirs();
+		new File(progdir, "mods").mkdirs();
+		new File(progdir, "wads").mkdirs();
+		new File(progdir, "soundfonts").mkdirs();
 
-		copy_asset("/sdcard/QuestZDoom", "res/lzdoom.pk3", true);
-		copy_asset("/sdcard/QuestZDoom", "res/lz_game_support.pk3", true);
-		copy_asset("/sdcard/QuestZDoom", "res/lights.pk3", true);
-		copy_asset("/sdcard/QuestZDoom", "res/brightmaps.pk3", true);
+		copy_asset(progdir, "res/lzdoom.pk3", true);
+		copy_asset(progdir, "res/lz_game_support.pk3", true);
+		copy_asset(progdir, "res/lights.pk3", true);
+		copy_asset(progdir, "res/brightmaps.pk3", true);
 
-		copy_asset("/sdcard/QuestZDoom", "mods/Ultimate-Cheat-Menu.zip", true);
-		copy_asset("/sdcard/QuestZDoom", "mods/laser-sight-0.5.5-vr.pk3", true);
+		copy_asset(progdir, "mods/Ultimate-Cheat-Menu.zip", true);
+		copy_asset(progdir, "mods/laser-sight-0.5.5-vr.pk3", true);
 
-		copy_asset("/sdcard/QuestZDoom/soundfonts", "qzdoom.sf2", false);
-		copy_asset("/sdcard/QuestZDoom/fm_banks", "GENMIDI.GS.wopl", false);
-		copy_asset("/sdcard/QuestZDoom/fm_banks", "gs-by-papiezak-and-sneakernets.wopn", false);
-		//copy_asset("/sdcard/QuestZDoom/audiopack", "snd_fluidsynth/fluidsynth.sf2", false);
+		copy_asset(progdir + "/soundfonts", "qzdoom.sf2", false);
+		copy_asset(progdir + "/fm_banks", "GENMIDI.GS.wopl", false);
+		copy_asset(progdir + "/fm_banks", "gs-by-papiezak-and-sneakernets.wopn", false);
 
 		//Read these from a file and pass through
 		commandLineParams = new String("qzdoom");
 
 		//See if user is trying to use command line params
-		if(new File("/sdcard/QuestZDoom/commandline.txt").exists()) // should exist!
+		String commandLineFilePath = progdir + "/commandline.txt";
+		GLES3JNILib.prepareEnvironment(progdir);
+		if(new File(commandLineFilePath).exists()) // should exist!
 		{
 			BufferedReader br;
 			try {
-				br = new BufferedReader(new FileReader("/sdcard/QuestZDoom/commandline.txt"));
+				br = new BufferedReader(new FileReader(commandLineFilePath));
 				String s;
 				StringBuilder sb=new StringBuilder(0);
-				while ((s=br.readLine())!=null)
+				while ((s=br.readLine())!=null) {
+					if (s.indexOf("#", 0) == 0) continue;
 					sb.append(s + " ");
+				}
 				br.close();
 
 				commandLineParams = new String(sb.toString());
@@ -239,12 +249,12 @@ import java.io.OutputStream;
 		//If there are no IWADS, then should exit after creating the folders
 		//to allow the launcher app to do its thing, otherwise it would crash anyway
 		//Check that launcher is installed too
-        boolean hasIWADs = ((new File("/sdcard/QuestZDoom/wads").listFiles().length) > 0);
-		boolean hasLauncher = //(new File("/sdcard/QuestZDoom/no_launcher").exists()) || //Allow users to run without launcher if they _really_ want to
+        boolean hasIWADs = ((new File(progdir, "wads").listFiles().length) > 0);
+		boolean hasLauncher = //(new File(progdir, "no_launcher").exists()) || //Allow users to run without launcher if they _really_ want to
 				isPackageInstalled("com.Baggyg.QuestZDoom_Launcher", this.getPackageManager());
 		mNativeHandle = GLES3JNILib.onCreate( this, commandLineParams, hasIWADs, hasLauncher );
 	}
-	
+
 	public void copy_asset(String path, String name, boolean force) {
 		File f = new File(path + "/" + name);
 		if (!f.exists() || force) {
@@ -274,6 +284,22 @@ import java.io.OutputStream;
 			e.printStackTrace();
 		}
 
+	}
+
+	public void copy_file(String path_in, String path_out)
+	{
+		File file_in = new File(path_in);
+		if (file_in.exists()) {
+			File file_out = new File(path_out);
+			try (
+					InputStream in = new BufferedInputStream(new FileInputStream(file_in));
+					OutputStream out = new BufferedOutputStream(new FileOutputStream(file_out)))
+			{
+				copy_stream(in, out);
+			} catch (IOException e) {
+				Log.e(APPLICATION, e.toString());
+			}
+		}
 	}
 
 	public static void copy_stream(InputStream in, OutputStream out)
