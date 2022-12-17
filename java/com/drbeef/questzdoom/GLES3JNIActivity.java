@@ -205,10 +205,10 @@ import java.io.OutputStream;
 		copy_asset(progdir, "res/lz_game_support.pk3", true);
 		copy_asset(progdir, "res/lights.pk3", true);
 		copy_asset(progdir, "res/brightmaps.pk3", true);
+		copy_asset(progdir, "res/merrychristmas.pk3", true);
 
 		copy_asset(progdir, "mods/Ultimate-Cheat-Menu.zip", true);
 		copy_asset(progdir, "mods/laser-sight-0.5.5-vr.pk3", true);
-		copy_asset(progdir, "mods/merrychristmas.pk3", true);
 
 		copy_asset(progdir + "/soundfonts", "qzdoom.sf2", false);
 		copy_asset(progdir + "/fm_banks", "GENMIDI.GS.wopl", false);
