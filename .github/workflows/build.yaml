@@ -45,6 +45,7 @@ jobs:
       - name: Checkout QuestZDoom
         uses: actions/checkout@v3
         with:
+          fetch-depth: 0
           submodules: true
           path: VrSamples/QuestZDoom
 
