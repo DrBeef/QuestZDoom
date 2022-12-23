@@ -1,0 +1,162 @@
+name: Continuous Integration
+
+on:
+
+  #pull_request:
+  push:
+    tags:
+      - '*'
+    paths-ignore:
+      - '**/README.md'
+      - '**/LICENSE'
+    # branches:
+    #   - master
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: ${{ matrix.name }} | ${{ matrix.build_type }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        name: [Visual Studio 64-bit]
+        os: [windows-latest]
+        extra_options: [-A x64]
+        build_type: [Debug, Release]
+
+    steps:
+      # - name: Checkout SDK Mobile
+      #   uses: actions/checkout@v3
+      #   with:
+      #     repository: emawind84/ovr_sdk_mobile
+      #     token: ${{ secrets.GH_PAT }}
+      #     path: ''
+
+      - name: Checkout SDK Mobile
+        uses: actions/checkout@v3
+        with:
+          repository: emawind84/ovr_sdk_mobile_dist
+          path: ''
+      - run: 7z x ovr_sdk_mobile_1.50.0.zip
+
+      - name: Checkout QuestZDoom
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          path: VrSamples/QuestZDoom
+
+      # - uses: actions/cache@v3
+      #   with:
+      #     path: |
+      #       ~/.gradle/caches
+      #       ~/.gradle/wrapper
+      #     key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-gradle-
+
+      - name: Configure CMAKE
+        #shell: bash
+        run: >
+          cmake -B build
+          -DZDOOM_OUTPUT_DIR=${{ github.workspace }}\VrSamples\QuestZDoom\assets\res 
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} 
+          -DPK3_QUIET_ZIPDIR=ON ${{ matrix.extra_options }} 
+          .
+        working-directory: VrSamples/QuestZDoom/Projects/Android/jni/gzdoom-g3.3mgw_mobile
+
+      - name: Prepare PK3 packages
+        shell: bash
+        run: >
+          cmake --build build 
+          --config ${{ matrix.build_type }} 
+          --target lzdoom_pk3 lights_pk3 lz_game_support_pk3 
+          --parallel 3
+        working-directory: VrSamples/QuestZDoom/Projects/Android/jni/gzdoom-g3.3mgw_mobile
+
+      - name: Revision update
+        run: cmake --build build --config ${{ matrix.build_type }} --target revision_check
+        working-directory: VrSamples/QuestZDoom/Projects/Android/jni/gzdoom-g3.3mgw_mobile
+
+      # - name: Setup NDK
+      #   uses: nttld/setup-ndk@v1
+      #   with:
+      #     ndk-version: r21e
+      #     #local-cache: ${{ strategy.job-index == 0 }}
+      
+      - name: Set up JDK 8 for x64
+        uses: actions/setup-java@v3
+        with:
+          java-version: '8'
+          distribution: 'adopt'
+          architecture: x64
+
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@v1
+      
+      - name: Setup gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          build-root-directory: VrSamples/QuestZDoom/Projects/Android
+          cache-read-only: true
+          cache-disabled: false
+
+      - name: Execute gradle build
+        id: gradle_build
+        shell: bash
+        run: |
+          chmod +x gradlew
+          ./gradlew :VrSamples:QuestzDoom:Projects:Android:assemble${{ matrix.build_type }} --scan
+        working-directory: VrSamples/QuestZDoom/Projects/Android
+
+      - uses: ilharp/sign-android-release@v1
+        name: Sign app APK
+        id: sign_app_apk
+        if: matrix.build_type == 'Release'
+        with:
+          releaseDir: VrSamples/QuestZDoom/Projects/Android/build/outputs/apk/release
+          signingKey: ${{ secrets.SIGNING_KEY }}
+          keyAlias: ${{ secrets.ALIAS }}
+          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+          keyPassword: ${{ secrets.KEY_PASSWORD }}
+          buildToolsVersion: 33.0.0
+
+      - run: mv --force '${{steps.sign_app_apk.outputs.signedFile}}' questzdoom-release.apk
+        shell: bash
+        if: ${{ steps.sign_app_apk.outcome == 'success' }}
+        working-directory: VrSamples/QuestZDoom/Projects/Android/build/outputs/apk/release
+
+      - name: Upload package
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.name }} ${{ matrix.build_type }}
+          path: VrSamples/QuestZDoom/Projects/Android/build/outputs/apk/${{ matrix.build_type }}/*-${{ matrix.build_type }}.apk
+          if-no-files-found: error
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: ${{ matrix.name }} ${{ matrix.build_type }}
+          path: release
+
+      - name: Display structure of release files
+        run: ls -R
+        working-directory: release
+
+      - name: Prepare release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          prerelease: true
+          draft: true
+          files: |
+            release/*.apk
+            LICENSE.txt
+
+      # - name: List Build Directory
+      #   if: always()
+      #   shell: bash
+      #   run: |
+      #     git status
+      #     ls -lR build
