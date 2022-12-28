@@ -83,6 +83,7 @@ void QuatToYawPitchRoll(XrQuaternionf q, vec3_t rotation, vec3_t out);
 
 //Called from engine code
 void QzDoom_setUseScreenLayer(bool use);
+void QzDoom_Restart();
 void jni_shutdown();
 
 

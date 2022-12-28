@@ -10,6 +10,7 @@
 #include <android/native_window_jni.h>	// for native window JNI
 #include <android/input.h>
 
+#include "cmdlib.h"
 #include "argtable3.h"
 #include "VrInput.h"
 
@@ -65,6 +66,8 @@ static bool useVirtualScreen = true;
 
 static bool hasIWADs = false;
 static bool hasLauncher = false;
+
+extern const char* M_GetActiveProfile();
 
 /*
 ================================================================================
@@ -413,6 +416,7 @@ Activity lifecycle
 */
 
 jmethodID android_shutdown;
+jmethodID android_reload;
 static JavaVM *jVM;
 static jobject jniCallbackObj=0;
 
@@ -432,6 +436,28 @@ void VR_Shutdown()
 {
 	jni_shutdown();
 }
+
+void jni_reload(const char* profile)
+{
+	ALOGV("Calling: jni_reload");
+	JNIEnv *env;
+	jobject tmp;
+	if ((jVM->GetEnv((void**) &env, JNI_VERSION_1_4))<0)
+	{
+		jVM->AttachCurrentThread(&env, NULL);
+	}
+	jstring jprofile = env->NewStringUTF(profile);
+	return env->CallVoidMethod(jniCallbackObj, android_reload, jprofile);
+}
+
+
+void QzDoom_Restart()
+{
+	const char* profile = M_GetActiveProfile();
+	//Ask Java to restart the app
+	jni_reload(profile);
+}
+
 
 jmethodID android_haptic_event;
 jmethodID android_haptic_stopevent;
@@ -584,6 +610,7 @@ JNIEXPORT void JNICALL Java_com_drbeef_questzdoom_GLES3JNILib_onStart( JNIEnv * 
 	jclass callbackClass = env->GetObjectClass( jniCallbackObj);
 
 	android_shutdown = env->GetMethodID(callbackClass,"shutdown","()V");
+	android_reload = env->GetMethodID(callbackClass,"reload","(Ljava/lang/String;)V");
 
 	android_haptic_event = env->GetMethodID(callbackClass, "haptic_event", "(Ljava/lang/String;IIFF)V");
 	android_haptic_stopevent = env->GetMethodID(callbackClass, "haptic_stopevent", "(Ljava/lang/String;)V");
@@ -719,6 +746,12 @@ JNIEXPORT void JNICALL Java_com_drbeef_questzdoom_GLES3JNILib_onSurfaceDestroyed
 	ALOGV( "        ANativeWindow_release( NativeWindow )" );
 	ANativeWindow_release( appThread->NativeWindow );
 	appThread->NativeWindow = NULL;
+}
+
+JNIEXPORT void JNICALL Java_com_drbeef_questzdoom_GLES3JNILib_prepareEnvironment(JNIEnv * env, jclass obj, jstring path) {
+	auto p = env->GetStringUTFChars(path, NULL);
+	progdir = p;
+	chdir(p);
 }
 
 }
