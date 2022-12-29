@@ -24,9 +24,9 @@ jobs:
       matrix:
         os: [ubuntu-20.04]
         build_type: [Release, Debug]
-        hmd: [meta]
+        hmd: [pico, meta]
         include:
-          - progdir: VrSamples/QuestZDoom/Projects/Android
+          - progdir: XrSamples/QuestZDoom/Projects/Android
           - ndk: 21.4.7075529
           - build_type: Release
             build_folder: release
@@ -36,6 +36,9 @@ jobs:
             name: Linux GCC 11
             deps_cmdline: "sudo apt update && sudo apt install g++-11 libsdl2-dev libgtk-3-dev"
             extra_options: "-DCMAKE_C_COMPILER=gcc-11 -DCMAKE_CXX_COMPILER=g++-11"
+          - hmd: pico
+            hmd_name: PICO
+            hmd_flag: -DPICO_XR
           - hmd: meta
             hmd_name: Meta Quest
             hmd_flag: -DMETA_QUEST
@@ -53,14 +56,14 @@ jobs:
         with:
           repository: emawind84/ovr_sdk_mobile_dist
           path: ''
-      - run: 7z x ovr_sdk_mobile_1.50.0.zip
+      - run: 7z x ovr_openxr_mobile_sdk_47.0.zip
 
       - name: Checkout QuestZDoom
         uses: actions/checkout@v3
         with:
           fetch-depth: 1
           submodules: true
-          path: VrSamples/QuestZDoom
+          path: XrSamples/QuestZDoom
       - run: git fetch --depth=100
         working-directory: ${{ matrix.progdir }}/jni/gzdoom-g3.3mgw_mobile
 
@@ -148,7 +151,9 @@ jobs:
         id: gradle_build
         shell: bash
         run: >
-          ./gradlew :VrSamples:QuestzDoom:Projects:Android:assemble${{ matrix.build_type }}
+          ./gradlew :XrSamples:QuestzDoom:Projects:Android:assemble${{ matrix.build_type }}
+          -Popenxr_hmd=${{ matrix.hmd_flag }}
+          --scan
         working-directory: ${{ matrix.progdir }}
 
       - name: Sign app APK

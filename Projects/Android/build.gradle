@@ -26,6 +26,8 @@ android {
             }
             ndkBuild {
                 abiFilters 'arm64-v8a'
+                if (project.hasProperty("openxr_hmd"))
+                    arguments 'OPENXR_HMD=' + project.getProperty("openxr_hmd")
             }
         }
 
