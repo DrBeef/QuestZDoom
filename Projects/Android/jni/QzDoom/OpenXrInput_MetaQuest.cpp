@@ -127,6 +127,8 @@ XrAction moveOnLeftJoystickAction;
 XrAction moveOnRightJoystickAction;
 XrAction thumbstickLeftClickAction;
 XrAction thumbstickRightClickAction;
+XrAction thumbrestLeftTouchAction;
+XrAction thumbrestRightTouchAction;
 XrAction vibrateLeftFeedback;
 XrAction vibrateRightFeedback;
 XrActionSet runningActionSet;
@@ -152,6 +154,8 @@ void TBXR_InitActions( void )
     moveOnRightJoystickAction = CreateAction(runningActionSet, XR_ACTION_TYPE_VECTOR2F_INPUT, "move_on_right_joy", "Move on right Joy", 0, NULL);
     thumbstickLeftClickAction = CreateAction(runningActionSet, XR_ACTION_TYPE_BOOLEAN_INPUT, "thumbstick_left", "Thumbstick left", 0, NULL);
     thumbstickRightClickAction = CreateAction(runningActionSet, XR_ACTION_TYPE_BOOLEAN_INPUT, "thumbstick_right", "Thumbstick right", 0, NULL);
+    thumbrestLeftTouchAction = CreateAction(runningActionSet, XR_ACTION_TYPE_BOOLEAN_INPUT, "thumbrest_left", "Thumbrest left", 0, NULL);
+    thumbrestRightTouchAction = CreateAction(runningActionSet, XR_ACTION_TYPE_BOOLEAN_INPUT, "thumbrest_right", "Thumbrest right", 0, NULL);
     vibrateLeftFeedback = CreateAction(runningActionSet, XR_ACTION_TYPE_VIBRATION_OUTPUT, "vibrate_left_feedback", "Vibrate Left Controller Feedback", 0, NULL);
     vibrateRightFeedback = CreateAction(runningActionSet, XR_ACTION_TYPE_VIBRATION_OUTPUT, "vibrate_right_feedback", "Vibrate Right Controller Feedback", 0, NULL);
 
@@ -241,6 +245,8 @@ void TBXR_InitActions( void )
                 bindings[currBinding++] = ActionSuggestedBinding(moveOnRightJoystickAction, "/user/hand/right/input/thumbstick");
                 bindings[currBinding++] = ActionSuggestedBinding(thumbstickLeftClickAction, "/user/hand/left/input/thumbstick/click");
                 bindings[currBinding++] = ActionSuggestedBinding(thumbstickRightClickAction, "/user/hand/right/input/thumbstick/click");
+                bindings[currBinding++] = ActionSuggestedBinding(thumbrestLeftTouchAction, "/user/hand/left/input/thumbrest/touch");
+                bindings[currBinding++] = ActionSuggestedBinding(thumbrestRightTouchAction, "/user/hand/right/input/thumbrest/touch");
                 bindings[currBinding++] = ActionSuggestedBinding(vibrateLeftFeedback, "/user/hand/left/output/haptic");
                 bindings[currBinding++] = ActionSuggestedBinding(vibrateRightFeedback, "/user/hand/right/output/haptic");
                 bindings[currBinding++] = ActionSuggestedBinding(handPoseLeftAction, "/user/hand/left/input/aim/pose");
@@ -407,6 +413,7 @@ void TBXR_UpdateControllers( )
 
 	//button mapping
 	if (GetActionStateBoolean(menuAction).currentState) leftTrackedRemoteState_new.Buttons |= xrButton_Enter;
+
 	if (GetActionStateBoolean(buttonXAction).currentState) leftTrackedRemoteState_new.Buttons |= xrButton_X;
 	if (GetActionStateBoolean(buttonYAction).currentState) leftTrackedRemoteState_new.Buttons |= xrButton_Y;
 	leftTrackedRemoteState_new.GripTrigger = GetActionStateFloat(gripLeftAction).currentState;
@@ -422,6 +429,10 @@ void TBXR_UpdateControllers( )
 	//index finger click
 	if (GetActionStateBoolean(indexLeftAction).currentState) leftTrackedRemoteState_new.Buttons |= xrButton_Trigger;
 	if (GetActionStateBoolean(indexRightAction).currentState) rightTrackedRemoteState_new.Buttons |= xrButton_Trigger;
+
+    //Thumbrest touch
+	if (GetActionStateBoolean(thumbrestLeftTouchAction).currentState) leftTrackedRemoteState_new.Touches |= xrButton_ThumbRest;
+	if (GetActionStateBoolean(thumbrestRightTouchAction).currentState) rightTrackedRemoteState_new.Touches |= xrButton_ThumbRest;
 
 	//thumbstick
 	XrActionStateVector2f moveJoystickState;

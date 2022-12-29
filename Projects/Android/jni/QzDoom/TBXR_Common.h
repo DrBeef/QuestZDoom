@@ -35,7 +35,7 @@ enum { ovrMaxLayerCount = 1 };
 enum { ovrMaxNumEyes = 2 };
 
 typedef enum xrButton_ {
-    xrButton_A = 0x00000001, // Set for trigger pulled on the Gear VR and Go Controllers
+    xrButton_A = 0x00000001,
     xrButton_B = 0x00000002,
     xrButton_RThumb = 0x00000004,
     xrButton_RShoulder = 0x00000008,
@@ -52,11 +52,16 @@ typedef enum xrButton_ {
     xrButton_GripTrigger = 0x04000000,
     xrButton_Trigger = 0x20000000,
     xrButton_Joystick = 0x80000000,
+
+    //Define additional controller touch points (not button presses)
+    xrButton_ThumbRest = 0x00000010,
+
     xrButton_EnumSize = 0x7fffffff
 } xrButton;
 
 typedef struct {
     uint32_t Buttons;
+    uint32_t Touches;
     float IndexTrigger;
     float GripTrigger;
     XrVector2f Joystick;

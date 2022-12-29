@@ -355,14 +355,12 @@ void HandleInput_Default( int control_scheme, ovrInputStateTrackedRemote *pDomin
             ((pDominantTrackedRemoteNew->Buttons & xrButton_Joystick) != 0) && !dominantGripPushedNew ? 1 : 0,
             1, KEY_ENTER);
 
-        //Button touching (but not pressing) needs adding to OpenXR mappings
-/*
         //No Default Binding
         Joy_GenerateButtonEvents(
-            ((pDominantTrackedRemoteOld->Touches & ovrTouch_ThumbRest) != 0) && !dominantGripPushedOld ? 1 : 0,
-            ((pDominantTrackedRemoteNew->Touches & ovrTouch_ThumbRest) != 0) && !dominantGripPushedNew ? 1 : 0,
+            ((pDominantTrackedRemoteOld->Touches & xrButton_ThumbRest) != 0) && !dominantGripPushedOld ? 1 : 0,
+            ((pDominantTrackedRemoteNew->Touches & xrButton_ThumbRest) != 0) && !dominantGripPushedNew ? 1 : 0,
             1, KEY_JOY5);
-*/
+
     }
     
     //Dominant Hand - Secondary keys (grip pushed)
@@ -391,14 +389,11 @@ void HandleInput_Default( int control_scheme, ovrInputStateTrackedRemote *pDomin
             ((pDominantTrackedRemoteNew->Buttons & xrButton_Joystick) != 0) && dominantGripPushedNew ? 1 : 0,
             1, KEY_TAB);
 
-        //Button touching (but not pressing) needs adding to OpenXR mappings
-/*
         //No Default Binding
         Joy_GenerateButtonEvents(
-            ((pDominantTrackedRemoteOld->Touches & ovrTouch_ThumbRest) != 0) && dominantGripPushedOld ? 1 : 0,
-            ((pDominantTrackedRemoteNew->Touches & ovrTouch_ThumbRest) != 0) && dominantGripPushedNew ? 1 : 0,
+            ((pDominantTrackedRemoteOld->Touches & xrButton_ThumbRest) != 0) && dominantGripPushedOld ? 1 : 0,
+            ((pDominantTrackedRemoteNew->Touches & xrButton_ThumbRest) != 0) && dominantGripPushedNew ? 1 : 0,
             1, KEY_JOY6);
-*/
 
         //Use grip as an extra button
         //Alt-Fire
@@ -435,14 +430,11 @@ void HandleInput_Default( int control_scheme, ovrInputStateTrackedRemote *pDomin
             ((pOffTrackedRemoteNew->Buttons & xrButton_Joystick) != 0) && !dominantGripPushedNew ? 1 : 0,
             1, KEY_SPACE);
 
-        //Button touching (but not pressing) needs adding to OpenXR mappings
-/*
         //No Default Binding
         Joy_GenerateButtonEvents(
-            ((pOffTrackedRemoteOld->Touches & ovrTouch_ThumbRest) != 0) && !dominantGripPushedOld ? 1 : 0,
-            ((pOffTrackedRemoteNew->Touches & ovrTouch_ThumbRest) != 0) && !dominantGripPushedNew ? 1 : 0,
+            ((pOffTrackedRemoteOld->Touches & xrButton_ThumbRest) != 0) && !dominantGripPushedOld ? 1 : 0,
+            ((pOffTrackedRemoteNew->Touches & xrButton_ThumbRest) != 0) && !dominantGripPushedNew ? 1 : 0,
             1, KEY_JOY7);
-*/
 
         Joy_GenerateButtonEvents(
             ((pOffTrackedRemoteOld->Buttons & xrButton_GripTrigger) != 0) && !dominantGripPushedOld ? 1 : 0,
@@ -476,14 +468,11 @@ void HandleInput_Default( int control_scheme, ovrInputStateTrackedRemote *pDomin
             ((pOffTrackedRemoteNew->Buttons & xrButton_Joystick) != 0) && dominantGripPushedNew ? 1 : 0,
             1, KEY_HOME);
 
-        //Button touching (but not pressing) needs adding to OpenXR mappings
-/*
         //No Default Binding
         Joy_GenerateButtonEvents(
-            ((pOffTrackedRemoteOld->Touches & ovrTouch_ThumbRest) != 0) && dominantGripPushedOld ? 1 : 0,
-            ((pOffTrackedRemoteNew->Touches & ovrTouch_ThumbRest) != 0) && dominantGripPushedNew ? 1 : 0,
+            ((pOffTrackedRemoteOld->Touches & xrButton_ThumbRest) != 0) && dominantGripPushedOld ? 1 : 0,
+            ((pOffTrackedRemoteNew->Touches & xrButton_ThumbRest) != 0) && dominantGripPushedNew ? 1 : 0,
             1, KEY_JOY8);
-*/
 
         Joy_GenerateButtonEvents(
             ((pOffTrackedRemoteOld->Buttons & xrButton_GripTrigger) != 0) && dominantGripPushedOld && !vr_two_handed_weapons ? 1 : 0,
