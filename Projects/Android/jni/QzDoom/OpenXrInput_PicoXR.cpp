@@ -549,7 +549,7 @@ void TBXR_UpdateControllers( )
     if (GetActionStateBoolean(XAction, SIDE_LEFT).currentState) leftTrackedRemoteState_new.Buttons |= xrButton_X;
     if (GetActionStateBoolean(YAction, SIDE_LEFT).currentState) leftTrackedRemoteState_new.Buttons |= xrButton_Y;
     if (GetActionStateBoolean(sideAction, SIDE_LEFT).currentState) leftTrackedRemoteState_new.Buttons |= xrButton_GripTrigger;
-    if (GetActionStateBoolean(touchpadAction, SIDE_LEFT).currentState) leftTrackedRemoteState_new.Buttons |= xrButton_LThumb;
+    if (GetActionStateBoolean(touchpadAction, SIDE_LEFT).currentState) leftTrackedRemoteState_new.Buttons |= xrButton_Joystick;
     if (GetActionStateFloat(triggerAction, SIDE_LEFT).currentState > 0.5f) leftTrackedRemoteState_new.Buttons |= xrButton_Trigger;
 
     if (GetActionStateBoolean(ThumbrestTouchAction, SIDE_LEFT).currentState) leftTrackedRemoteState_new.Touches |= xrButton_ThumbRest;
@@ -560,7 +560,7 @@ void TBXR_UpdateControllers( )
     if (GetActionStateBoolean(AAction, SIDE_RIGHT).currentState) rightTrackedRemoteState_new.Buttons |= xrButton_A;
     if (GetActionStateBoolean(BAction, SIDE_RIGHT).currentState) rightTrackedRemoteState_new.Buttons |= xrButton_B;
     if (GetActionStateBoolean(sideAction, SIDE_RIGHT).currentState) rightTrackedRemoteState_new.Buttons |= xrButton_GripTrigger;
-    if (GetActionStateBoolean(touchpadAction, SIDE_RIGHT).currentState) rightTrackedRemoteState_new.Buttons |= xrButton_RThumb;
+    if (GetActionStateBoolean(touchpadAction, SIDE_RIGHT).currentState) rightTrackedRemoteState_new.Buttons |= xrButton_Joystick;
     if (GetActionStateFloat(triggerAction, SIDE_RIGHT).currentState > 0.5f) rightTrackedRemoteState_new.Buttons |= xrButton_Trigger;
 
     if (GetActionStateBoolean(ThumbrestTouchAction, SIDE_RIGHT).currentState) rightTrackedRemoteState_new.Touches |= xrButton_ThumbRest;

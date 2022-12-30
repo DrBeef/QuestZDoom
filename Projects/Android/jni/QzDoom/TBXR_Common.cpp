@@ -1669,6 +1669,7 @@ void TBXR_Recenter() {
 		loc.type = XR_TYPE_SPACE_LOCATION;
 		OXR(xrLocateSpace(gAppState.HeadSpace, gAppState.CurrentSpace, gAppState.PredictedDisplayTime, &loc));
 		QuatToYawPitchRoll(loc.pose.orientation, rotation, hmdorientation);
+		playerYaw = hmdorientation[YAW];
 
 		spaceCreateInfo.poseInReferenceSpace.orientation.x = 0;
 		spaceCreateInfo.poseInReferenceSpace.orientation.y = 0;
@@ -1756,7 +1757,7 @@ static void TBXR_GetHMDOrientation() {
 //All the stuff we want to do each frame
 void TBXR_FrameSetup()
 {
-	if (gAppState.FrameSetup)
+	if (gAppState.FrameSetupRefCount > 0)
 	{
 		return;
 	}
@@ -1829,7 +1830,7 @@ void TBXR_FrameSetup()
 
 	TBXR_ProcessHaptics();
 
-	gAppState.FrameSetup = true;
+	gAppState.FrameSetupRefCount++;
 }
 
 int TBXR_GetRefresh()
@@ -1915,6 +1916,12 @@ float QzDoom_GetFOV()
 void TBXR_submitFrame()
 {
 	if (gAppState.SessionActive == GL_FALSE) {
+		return;
+	}
+
+	if (gAppState.FrameSetupRefCount == 0)
+	{
+		ALOGE("TBXR_submitFrame called with gAppState.FrameSetupRefCount == 0");
 		return;
 	}
 
@@ -2016,5 +2023,5 @@ void TBXR_submitFrame()
 
 	OXR(xrEndFrame(gAppState.Session, &endFrameInfo));
 
-	gAppState.FrameSetup = false;
+	gAppState.FrameSetupRefCount--;
 }

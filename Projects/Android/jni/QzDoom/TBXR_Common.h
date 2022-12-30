@@ -223,7 +223,7 @@ typedef struct
     ANativeWindow* NativeWindow;
     bool				Resumed;
     bool				Focused;
-    bool                FrameSetup;
+    int                FrameSetupRefCount;
 
     float               Width;
     float               Height;

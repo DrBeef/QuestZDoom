@@ -418,19 +418,19 @@ void TBXR_UpdateControllers( )
 	if (GetActionStateBoolean(buttonYAction).currentState) leftTrackedRemoteState_new.Buttons |= xrButton_Y;
 	leftTrackedRemoteState_new.GripTrigger = GetActionStateFloat(gripLeftAction).currentState;
 	if (leftTrackedRemoteState_new.GripTrigger > 0.5f) leftTrackedRemoteState_new.Buttons |= xrButton_GripTrigger;
-	if (GetActionStateBoolean(thumbstickLeftClickAction).currentState) leftTrackedRemoteState_new.Buttons |= xrButton_LThumb;
+	if (GetActionStateBoolean(thumbstickLeftClickAction).currentState) leftTrackedRemoteState_new.Buttons |= xrButton_Joystick;
 
 	if (GetActionStateBoolean(buttonAAction).currentState) rightTrackedRemoteState_new.Buttons |= xrButton_A;
 	if (GetActionStateBoolean(buttonBAction).currentState) rightTrackedRemoteState_new.Buttons |= xrButton_B;
 	rightTrackedRemoteState_new.GripTrigger = GetActionStateFloat(gripRightAction).currentState;
 	if (rightTrackedRemoteState_new.GripTrigger > 0.5f) rightTrackedRemoteState_new.Buttons |= xrButton_GripTrigger;
-	if (GetActionStateBoolean(thumbstickRightClickAction).currentState) rightTrackedRemoteState_new.Buttons |= xrButton_RThumb;
+	if (GetActionStateBoolean(thumbstickRightClickAction).currentState) rightTrackedRemoteState_new.Buttons |= xrButton_Joystick;
 
 	//index finger click
 	if (GetActionStateBoolean(indexLeftAction).currentState) leftTrackedRemoteState_new.Buttons |= xrButton_Trigger;
 	if (GetActionStateBoolean(indexRightAction).currentState) rightTrackedRemoteState_new.Buttons |= xrButton_Trigger;
 
-    //Thumbrest touch
+    //Thumbrest
 	if (GetActionStateBoolean(thumbrestLeftTouchAction).currentState) leftTrackedRemoteState_new.Touches |= xrButton_ThumbRest;
 	if (GetActionStateBoolean(thumbrestRightTouchAction).currentState) rightTrackedRemoteState_new.Touches |= xrButton_ThumbRest;
 
