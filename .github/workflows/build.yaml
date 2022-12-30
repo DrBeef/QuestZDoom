@@ -17,15 +17,27 @@ on:
 
 jobs:
   build:
-    name: ${{ matrix.name }} | ${{ matrix.build_type }}
+    name: ${{ matrix.name }} ${{ matrix.hmd_name }} | ${{ matrix.build_type }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        name: [Visual Studio 64-bit]
-        os: [windows-latest]
-        extra_options: [-A x64]
-        build_type: [Debug, Release]
+        os: [ubuntu-20.04]
+        build_type: [Release, Debug]
+        hmd: [meta]
+        include:
+          - progdir: VrSamples/QuestZDoom/Projects/Android
+          - build_type: Release
+            build_folder: release
+          - build_type: Debug
+            build_folder: debug
+          - os: ubuntu-20.04
+            name: Linux GCC 11
+            deps_cmdline: "sudo apt update && sudo apt install g++-11 libsdl2-dev libgtk-3-dev"
+            extra_options: "-DCMAKE_C_COMPILER=gcc-11 -DCMAKE_CXX_COMPILER=g++-11"
+          - hmd: meta
+            hmd_name: Meta Quest
+            hmd_flag: -DMETA_QUEST
 
     steps:
       # - name: Checkout SDK Mobile
@@ -45,7 +57,7 @@ jobs:
       - name: Checkout QuestZDoom
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0
+          fetch-depth: 200
           submodules: true
           path: VrSamples/QuestZDoom
 
@@ -58,15 +70,22 @@ jobs:
       #     restore-keys: |
       #       ${{ runner.os }}-gradle-
 
+      - name: Install Dependencies
+        shell: bash
+        run: |
+          if [[ ! -z "${{ matrix.deps_cmdline }}" ]]; then
+            eval ${{ matrix.deps_cmdline }}
+          fi
+
       - name: Configure CMAKE
-        #shell: bash
+        shell: bash
         run: >
           cmake -B build
-          -DZDOOM_OUTPUT_DIR=${{ github.workspace }}\VrSamples\QuestZDoom\assets\res 
+          -DZDOOM_OUTPUT_DIR=${{ github.workspace }}/VrSamples/QuestZDoom/assets/res 
           -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} 
           -DPK3_QUIET_ZIPDIR=ON ${{ matrix.extra_options }} 
           .
-        working-directory: VrSamples/QuestZDoom/Projects/Android/jni/gzdoom-g3.3mgw_mobile
+        working-directory: ${{ matrix.progdir }}/jni/gzdoom-g3.3mgw_mobile
 
       - name: Prepare PK3 packages
         shell: bash
@@ -75,11 +94,12 @@ jobs:
           --config ${{ matrix.build_type }} 
           --target lzdoom_pk3 lights_pk3 lz_game_support_pk3 
           --parallel 3
-        working-directory: VrSamples/QuestZDoom/Projects/Android/jni/gzdoom-g3.3mgw_mobile
+        working-directory: ${{ matrix.progdir }}/jni/gzdoom-g3.3mgw_mobile
 
       - name: Revision update
+        shell: bash
         run: cmake --build build --config ${{ matrix.build_type }} --target revision_check
-        working-directory: VrSamples/QuestZDoom/Projects/Android/jni/gzdoom-g3.3mgw_mobile
+        working-directory: ${{ matrix.progdir }}/jni/gzdoom-g3.3mgw_mobile
 
       # - name: Setup NDK
       #   uses: nttld/setup-ndk@v1
@@ -87,11 +107,11 @@ jobs:
       #     ndk-version: r21e
       #     #local-cache: ${{ strategy.job-index == 0 }}
       
-      - name: Set up JDK 8 for x64
+      - name: Set up JDK 11 for x64
         uses: actions/setup-java@v3
         with:
-          java-version: '8'
-          distribution: 'adopt'
+          java-version: '11'
+          distribution: 'temurin'
           architecture: x64
 
       - name: Validate Gradle wrapper
@@ -100,48 +120,60 @@ jobs:
       - name: Setup gradle
         uses: gradle/gradle-build-action@v2
         with:
-          build-root-directory: VrSamples/QuestZDoom/Projects/Android
+          build-root-directory: ${{ matrix.progdir }}
           cache-read-only: true
           cache-disabled: false
 
-      - name: Execute gradle build
+      - name: Set execution flag for gradlew
+        shell: bash
+        run: chmod +x gradlew
+        working-directory: ${{ matrix.progdir }}
+
+      - name: Build with gradle
         id: gradle_build
         shell: bash
-        run: |
-          chmod +x gradlew
-          ./gradlew :VrSamples:QuestzDoom:Projects:Android:assemble${{ matrix.build_type }} --scan
-        working-directory: VrSamples/QuestZDoom/Projects/Android
+        run: >
+          ./gradlew :VrSamples:QuestzDoom:Projects:Android:assemble${{ matrix.build_type }}
+        working-directory: ${{ matrix.progdir }}
 
-      - uses: ilharp/sign-android-release@v1
-        name: Sign app APK
+      - name: Sign app APK
+        uses: ilharp/sign-android-release@v1
         id: sign_app_apk
         if: matrix.build_type == 'Release'
         with:
-          releaseDir: VrSamples/QuestZDoom/Projects/Android/build/outputs/apk/release
+          releaseDir: ${{ matrix.progdir }}/build/outputs/apk/release
           signingKey: ${{ secrets.SIGNING_KEY }}
           keyAlias: ${{ secrets.ALIAS }}
           keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
           buildToolsVersion: 33.0.0
 
-      - run: mv --force '${{steps.sign_app_apk.outputs.signedFile}}' questzdoom-release.apk
+      - name: Prepare signed APK
         shell: bash
+        run: mv --force '${{steps.sign_app_apk.outputs.signedFile}}' questzdoom-${{ matrix.build_folder }}.apk
         if: ${{ steps.sign_app_apk.outcome == 'success' }}
-        working-directory: VrSamples/QuestZDoom/Projects/Android/build/outputs/apk/release
+        working-directory: ${{ matrix.progdir }}/build/outputs/apk/${{ matrix.build_folder }}
+
+      - name: Rename APK
+        shell: bash
+        run: mv --force questzdoom-${{ matrix.build_folder }}.apk questzdoom-${{ matrix.hmd }}-${{ matrix.build_folder }}.apk
+        working-directory: ${{ matrix.progdir }}/build/outputs/apk/${{ matrix.build_folder }}
 
       - name: Upload package
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.name }} ${{ matrix.build_type }}
-          path: VrSamples/QuestZDoom/Projects/Android/build/outputs/apk/${{ matrix.build_type }}/*-${{ matrix.build_type }}.apk
+          name: ${{ matrix.name }} ${{ matrix.hmd_name }} ${{ matrix.build_type }}
+          path: ${{ matrix.progdir }}/build/outputs/apk/${{ matrix.build_folder }}/*-${{ matrix.build_folder }}.apk
           if-no-files-found: error
 
-      - uses: actions/download-artifact@v3
+      - name: Prepare package for release
+        uses: actions/download-artifact@v3
         with:
-          name: ${{ matrix.name }} ${{ matrix.build_type }}
+          name: ${{ matrix.name }} ${{ matrix.hmd_name }} ${{ matrix.build_type }}
           path: release
 
       - name: Display structure of release files
+        shell: bash
         run: ls -R
         working-directory: release
 
@@ -154,10 +186,3 @@ jobs:
           files: |
             release/*.apk
             LICENSE.txt
-
-      # - name: List Build Directory
-      #   if: always()
-      #   shell: bash
-      #   run: |
-      #     git status
-      #     ls -lR build
