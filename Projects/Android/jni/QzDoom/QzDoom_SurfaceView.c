@@ -2160,5 +2160,6 @@ JNIEXPORT void JNICALL Java_com_drbeef_questzdoom_GLES3JNILib_onSurfaceDestroyed
 }
 
 JNIEXPORT void JNICALL Java_com_drbeef_questzdoom_GLES3JNILib_prepareEnvironment(JNIEnv * env, jobject obj, jstring path) {
+	ALOGV("    GLES3JNILib::prepareEnvironment()");
 	PrepareEnvironment((*env)->GetStringUTFChars(env, path, NULL));
 }
