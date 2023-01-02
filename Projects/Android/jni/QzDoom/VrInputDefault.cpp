@@ -7,11 +7,7 @@ Authors		:	Simon Brown
 
 *************************************************************************************/
 
-#include <VrApi.h>
-#include <VrApi_Helpers.h>
-#include <VrApi_SystemUtils.h>
-#include <VrApi_Input.h>
-#include <VrApi_Types.h>
+
 #include <android/keycodes.h>
 
 #include "VrInput.h"
@@ -20,17 +16,11 @@ Authors		:	Simon Brown
 
 extern ovrInputStateTrackedRemote leftTrackedRemoteState_old;
 extern ovrInputStateTrackedRemote leftTrackedRemoteState_new;
-extern ovrTracking leftRemoteTracking_new;
+extern ovrTrackedController leftRemoteTracking_new;
 
 extern ovrInputStateTrackedRemote rightTrackedRemoteState_old;
 extern ovrInputStateTrackedRemote rightTrackedRemoteState_new;
-extern ovrTracking rightRemoteTracking_new;
-
-extern ovrInputStateGamepad footTrackedRemoteState_old;
-extern ovrInputStateGamepad footTrackedRemoteState_new;
-
-
-extern ovrDeviceID controllerIDs[2];
+extern ovrTrackedController rightRemoteTracking_new;
 
 extern float remote_movementSideways;
 extern float remote_movementForward;
@@ -42,29 +32,30 @@ extern float snapTurn;
 extern float cinemamodeYaw;
 extern float cinemamodePitch;
 
+extern bool weaponStabilised;
+
 int getGameState();
 int getMenuState();
 void Joy_GenerateButtonEvents(int oldbuttons, int newbuttons, int numbuttons, int base);
 float getViewpointYaw();
 
-void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackingNew, ovrInputStateGamepad *pFootTrackingOld,
-                        ovrInputStateTrackedRemote *pDominantTrackedRemoteNew, ovrInputStateTrackedRemote *pDominantTrackedRemoteOld, ovrTracking* pDominantTracking,
-                          ovrInputStateTrackedRemote *pOffTrackedRemoteNew, ovrInputStateTrackedRemote *pOffTrackedRemoteOld, ovrTracking* pOffTracking,
+void HandleInput_Default( int control_scheme, ovrInputStateTrackedRemote *pDominantTrackedRemoteNew, ovrInputStateTrackedRemote *pDominantTrackedRemoteOld, ovrTrackedController* pDominantTracking,
+                          ovrInputStateTrackedRemote *pOffTrackedRemoteNew, ovrInputStateTrackedRemote *pOffTrackedRemoteOld, ovrTrackedController* pOffTracking,
                           int domButton1, int domButton2, int offButton1, int offButton2 )
 
 {
     //Menu button - invoke menu
-    handleTrackedControllerButton(&leftTrackedRemoteState_new, &leftTrackedRemoteState_old, ovrButton_Enter, KEY_ESCAPE);
-    handleTrackedControllerButton(&rightTrackedRemoteState_new, &rightTrackedRemoteState_old, ovrButton_Enter, KEY_ESCAPE); // For users who have switched the buttons
+    handleTrackedControllerButton(&leftTrackedRemoteState_new, &leftTrackedRemoteState_old, xrButton_Enter, KEY_ESCAPE);
+    handleTrackedControllerButton(&rightTrackedRemoteState_new, &rightTrackedRemoteState_old, xrButton_Enter, KEY_ESCAPE); // For users who have switched the buttons
 
     //Dominant Grip works like a shift key
-    bool dominantGripPushedOld = vr_secondarybuttonmappings ?
-            (pDominantTrackedRemoteOld->Buttons & ovrButton_GripTrigger) != 0 : false;
-    bool dominantGripPushedNew = vr_secondarybuttonmappings ?
-            (pDominantTrackedRemoteNew->Buttons & ovrButton_GripTrigger) != 0 : false;
+    bool dominantGripPushedOld = vr_secondary_button_mappings ?
+            (pDominantTrackedRemoteOld->Buttons & xrButton_GripTrigger) : false;
+    bool dominantGripPushedNew = vr_secondary_button_mappings ?
+            (pDominantTrackedRemoteNew->Buttons & xrButton_GripTrigger) : false;
 
     ovrInputStateTrackedRemote *pPrimaryTrackedRemoteNew, *pPrimaryTrackedRemoteOld,  *pSecondaryTrackedRemoteNew, *pSecondaryTrackedRemoteOld;
-    if (vr_switchsticks)
+    if (vr_switch_sticks)
     {
         pPrimaryTrackedRemoteNew = pOffTrackedRemoteNew;
         pPrimaryTrackedRemoteOld = pOffTrackedRemoteOld;
@@ -129,19 +120,19 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
     // Only do the following if we are definitely not in the menu
     if (getMenuState() == 0)
     {
-        float distance = sqrtf(powf(pOffTracking->HeadPose.Pose.Position.x -
-                                    pDominantTracking->HeadPose.Pose.Position.x, 2) +
-                               powf(pOffTracking->HeadPose.Pose.Position.y -
-                                    pDominantTracking->HeadPose.Pose.Position.y, 2) +
-                               powf(pOffTracking->HeadPose.Pose.Position.z -
-                                    pDominantTracking->HeadPose.Pose.Position.z, 2));
+        float distance = sqrtf(powf(pOffTracking->Pose.position.x -
+                                    pDominantTracking->Pose.position.x, 2) +
+                               powf(pOffTracking->Pose.position.y -
+                                    pDominantTracking->Pose.position.y, 2) +
+                               powf(pOffTracking->Pose.position.z -
+                                    pDominantTracking->Pose.position.z, 2));
 
         //Turn on weapon stabilisation?
-        if (vr_twohandedweapons &&
-                (pOffTrackedRemoteNew->Buttons & ovrButton_GripTrigger) !=
-            (pOffTrackedRemoteOld->Buttons & ovrButton_GripTrigger)) {
+        if (vr_two_handed_weapons &&
+                (pOffTrackedRemoteNew->Buttons & xrButton_GripTrigger) !=
+            (pOffTrackedRemoteOld->Buttons & xrButton_GripTrigger)) {
 
-            if (pOffTrackedRemoteNew->Buttons & ovrButton_GripTrigger) {
+            if (pOffTrackedRemoteNew->Buttons & xrButton_GripTrigger) {
                 if (distance < 0.50f) {
                     weaponStabilised = true;
                 }
@@ -153,9 +144,9 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
         //dominant hand stuff first
         {
             ///Weapon location relative to view
-            weaponoffset[0] = pDominantTracking->HeadPose.Pose.Position.x - hmdPosition[0] + vr_weapon_offset_x;
-            weaponoffset[1] = pDominantTracking->HeadPose.Pose.Position.y - hmdPosition[1] + vr_weapon_offset_y;
-            weaponoffset[2] = pDominantTracking->HeadPose.Pose.Position.z - hmdPosition[2] + vr_weapon_offset_z;
+            weaponoffset[0] = pDominantTracking->Pose.position.x - hmdPosition[0] + vr_weaponOffsetX;
+            weaponoffset[1] = pDominantTracking->Pose.position.y - hmdPosition[1] + vr_weaponOffsetY;
+            weaponoffset[2] = pDominantTracking->Pose.position.z - hmdPosition[2] + vr_weaponOffsetZ;
 
             vec2_t v;
             float yawRotation = getViewpointYaw() - hmdorientation[YAW];
@@ -164,23 +155,22 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
             weaponoffset[2] = v[0];
 
             //Set gun angles
-            const ovrQuatf quatRemote = pDominantTracking->HeadPose.Pose.Orientation;
             vec3_t rotation = {0};
-            rotation[PITCH] = vr_weapon_pitchadjust;
-            QuatToYawPitchRoll(quatRemote, rotation, weaponangles);
+            rotation[PITCH] = vr_weaponRotate;
+            QuatToYawPitchRoll(pDominantTracking->Pose.orientation, rotation, weaponangles);
 
 
             if (weaponStabilised) {
-                float z = pOffTracking->HeadPose.Pose.Position.z -
-                          pDominantTracking->HeadPose.Pose.Position.z;
-                float x = pOffTracking->HeadPose.Pose.Position.x -
-                          pDominantTracking->HeadPose.Pose.Position.x;
-                float y = pOffTracking->HeadPose.Pose.Position.y -
-                          pDominantTracking->HeadPose.Pose.Position.y;
+                float z = pOffTracking->Pose.position.z -
+                          pDominantTracking->Pose.position.z;
+                float x = pOffTracking->Pose.position.x -
+                          pDominantTracking->Pose.position.x;
+                float y = pOffTracking->Pose.position.y -
+                          pDominantTracking->Pose.position.y;
                 float zxDist = length(x, z);
 
                 if (zxDist != 0.0f && z != 0.0f) {
-                    VectorSet(weaponangles, -degrees(atanf(y / zxDist)), -degrees(atan2f(x, -z)),
+                    VectorSet(weaponangles, -RAD2DEG(atanf(y / zxDist)), -RAD2DEG(atan2f(x, -z)),
                               weaponangles[ROLL]);
                 }
             }
@@ -190,9 +180,9 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
 
         //off-hand stuff
         {
-            offhandoffset[0] = pOffTracking->HeadPose.Pose.Position.x - hmdPosition[0] + vr_weapon_offset_x;
-            offhandoffset[1] = pOffTracking->HeadPose.Pose.Position.y - hmdPosition[1] + vr_weapon_offset_y;
-            offhandoffset[2] = pOffTracking->HeadPose.Pose.Position.z - hmdPosition[2] + vr_weapon_offset_z;
+            offhandoffset[0] = pOffTracking->Pose.position.x - hmdPosition[0] + vr_weaponOffsetX;
+            offhandoffset[1] = pOffTracking->Pose.position.y - hmdPosition[1] + vr_weaponOffsetY;
+            offhandoffset[2] = pOffTracking->Pose.position.z - hmdPosition[2] + vr_weaponOffsetZ;
 
             vec2_t v;
             float yawRotation = getViewpointYaw() - hmdorientation[YAW];
@@ -201,10 +191,10 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
             offhandoffset[2] = v[0];
 
             vec3_t rotation = {0};
-            rotation[PITCH] = vr_weapon_pitchadjust;
-            QuatToYawPitchRoll(pOffTracking->HeadPose.Pose.Orientation, rotation, offhandangles);
+            rotation[PITCH] = vr_weaponRotate;
+            QuatToYawPitchRoll(pOffTracking->Pose.orientation, rotation, offhandangles);
 
-            if (vr_moveuseoffhand) {
+            if (vr_move_use_offhand) {
                 controllerYawHeading = offhandangles[YAW] - hmdorientation[YAW];
             } else {
                 controllerYawHeading = 0.0f;
@@ -214,9 +204,9 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
         //Positional movement
         {
             ALOGV("        Right-Controller-Position: %f, %f, %f",
-                  pDominantTracking->HeadPose.Pose.Position.x,
-                  pDominantTracking->HeadPose.Pose.Position.y,
-                  pDominantTracking->HeadPose.Pose.Position.z);
+                  pDominantTracking->Pose.position.x,
+                  pDominantTracking->Pose.position.y,
+                  pDominantTracking->Pose.position.z);
 
             vec2_t v;
             rotateAboutOrigin(positionDeltaThisFrame[0], positionDeltaThisFrame[2],
@@ -232,12 +222,12 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
         //Off-hand specific stuff
         {
             ALOGV("        Left-Controller-Position: %f, %f, %f",
-                  pOffTracking->HeadPose.Pose.Position.x,
-                  pOffTracking->HeadPose.Pose.Position.y,
-                  pOffTracking->HeadPose.Pose.Position.z);
+                  pOffTracking->Pose.position.x,
+                  pOffTracking->Pose.position.y,
+                  pOffTracking->Pose.position.z);
 
             //Teleport - only does anything if vr_teleport cvar is true
-            if (vr_use_teleport) {
+            if (vr_teleport) {
                 if ((pSecondaryTrackedRemoteOld->Joystick.y > 0.7f) && !ready_teleport) {
                     ready_teleport = true;
                 } else if ((pSecondaryTrackedRemoteOld->Joystick.y < 0.7f) && ready_teleport) {
@@ -250,8 +240,8 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
             //and we don't get movement jitter when the joystick doesn't quite center properly
             float dist = length(pSecondaryTrackedRemoteNew->Joystick.x, pSecondaryTrackedRemoteNew->Joystick.y);
             float nlf = nonLinearFilter(dist);
-            float x = nlf * pSecondaryTrackedRemoteNew->Joystick.x + pFootTrackingNew->LeftJoystick.x;
-            float y = nlf * pSecondaryTrackedRemoteNew->Joystick.y - pFootTrackingNew->LeftJoystick.y;
+            float x = nlf * pSecondaryTrackedRemoteNew->Joystick.x;
+            float y = nlf * pSecondaryTrackedRemoteNew->Joystick.y;
 
             //Apply a simple deadzone
             player_moving = (fabs(x) + fabs(y)) > 0.05f;
@@ -276,8 +266,8 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
                 if (pPrimaryTrackedRemoteNew->Joystick.x > 0.6f) {
                     if (increaseSnap) {
                         resetDoomYaw = true;
-                        snapTurn -= vr_snapturn_angle;
-                        if (vr_snapturn_angle > 10.0f) {
+                        snapTurn -= vr_snapTurn;
+                        if (vr_snapTurn > 10.0f) {
                             increaseSnap = false;
                         }
 
@@ -293,10 +283,10 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
                 if (pPrimaryTrackedRemoteNew->Joystick.x < -0.6f) {
                     if (decreaseSnap) {
                         resetDoomYaw = true;
-                        snapTurn += vr_snapturn_angle;
+                        snapTurn += vr_snapTurn;
 
                         //If snap turn configured for less than 10 degrees
-                        if (vr_snapturn_angle > 10.0f) {
+                        if (vr_snapTurn > 10.0f) {
                             decreaseSnap = false;
                         }
 
@@ -328,13 +318,13 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
 
         //If snap turn set to 0, then we can use left/right on the stick as mappable functions
         Joy_GenerateButtonEvents(
-            (pPrimaryTrackedRemoteOld->Joystick.x > 0.7f && !dominantGripPushedOld && !vr_snapturn_angle ? 1 : 0), 
-            (pPrimaryTrackedRemoteNew->Joystick.x > 0.7f && !dominantGripPushedNew && !vr_snapturn_angle ? 1 : 0), 
+            (pPrimaryTrackedRemoteOld->Joystick.x > 0.7f && !dominantGripPushedOld && !vr_snapTurn ? 1 : 0),
+            (pPrimaryTrackedRemoteNew->Joystick.x > 0.7f && !dominantGripPushedNew && !vr_snapTurn ? 1 : 0),
             1, KEY_MWHEELLEFT);
 
         Joy_GenerateButtonEvents(
-            (pPrimaryTrackedRemoteOld->Joystick.x < -0.7f && !dominantGripPushedOld && !vr_snapturn_angle ? 1 : 0), 
-            (pPrimaryTrackedRemoteNew->Joystick.x < -0.7f && !dominantGripPushedNew && !vr_snapturn_angle ? 1 : 0), 
+            (pPrimaryTrackedRemoteOld->Joystick.x < -0.7f && !dominantGripPushedOld && !vr_snapTurn ? 1 : 0),
+            (pPrimaryTrackedRemoteNew->Joystick.x < -0.7f && !dominantGripPushedNew && !vr_snapTurn ? 1 : 0),
             1, KEY_MWHEELRIGHT);
     }
 
@@ -343,8 +333,8 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
     {
         //Fire
         Joy_GenerateButtonEvents(
-            ((pDominantTrackedRemoteOld->Buttons & ovrButton_Trigger) != 0) && !dominantGripPushedOld ? 1 : 0,
-            ((pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger) != 0) && !dominantGripPushedNew ? 1 : 0,
+            ((pDominantTrackedRemoteOld->Buttons & xrButton_Trigger) != 0) && !dominantGripPushedOld ? 1 : 0,
+            ((pDominantTrackedRemoteNew->Buttons & xrButton_Trigger) != 0) && !dominantGripPushedNew ? 1 : 0,
             1, KEY_PAD_RTRIGGER);
 
         //"Use" (open door, toggle switch etc)
@@ -361,21 +351,21 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
 
         // Inv Use
         Joy_GenerateButtonEvents(
-            ((pDominantTrackedRemoteOld->Buttons & ovrButton_Joystick) != 0) && !dominantGripPushedOld ? 1 : 0,
-            ((pDominantTrackedRemoteNew->Buttons & ovrButton_Joystick) != 0) && !dominantGripPushedNew ? 1 : 0,
+            ((pDominantTrackedRemoteOld->Buttons & xrButton_Joystick) != 0) && !dominantGripPushedOld ? 1 : 0,
+            ((pDominantTrackedRemoteNew->Buttons & xrButton_Joystick) != 0) && !dominantGripPushedNew ? 1 : 0,
             1, KEY_ENTER);
 
         //No Default Binding
         Joy_GenerateButtonEvents(
-            ((pDominantTrackedRemoteOld->Touches & ovrTouch_ThumbRest) != 0) && !dominantGripPushedOld ? 1 : 0,
-            ((pDominantTrackedRemoteNew->Touches & ovrTouch_ThumbRest) != 0) && !dominantGripPushedNew ? 1 : 0,
+            ((pDominantTrackedRemoteOld->Touches & xrButton_ThumbRest) != 0) && !dominantGripPushedOld ? 1 : 0,
+            ((pDominantTrackedRemoteNew->Touches & xrButton_ThumbRest) != 0) && !dominantGripPushedNew ? 1 : 0,
             1, KEY_JOY5);
 
         //Use grip as an extra button
         //Alt-Fire
         Joy_GenerateButtonEvents(
-            ((pDominantTrackedRemoteOld->Buttons & ovrButton_GripTrigger) != 0) && !dominantGripPushedOld ? 1 : 0,
-            ((pDominantTrackedRemoteNew->Buttons & ovrButton_GripTrigger) != 0) && !dominantGripPushedNew ? 1 : 0,
+            ((pDominantTrackedRemoteOld->Buttons & xrButton_GripTrigger) != 0) && !dominantGripPushedOld ? 1 : 0,
+            ((pDominantTrackedRemoteNew->Buttons & xrButton_GripTrigger) != 0) && !dominantGripPushedNew ? 1 : 0,
             1, KEY_PAD_LTRIGGER);
     }
     
@@ -383,8 +373,8 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
     {
         //Alt-Fire
         Joy_GenerateButtonEvents(
-            ((pDominantTrackedRemoteOld->Buttons & ovrButton_Trigger) != 0) && dominantGripPushedOld ? 1 : 0,
-            ((pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger) != 0) && dominantGripPushedNew ? 1 : 0,
+            ((pDominantTrackedRemoteOld->Buttons & xrButton_Trigger) != 0) && dominantGripPushedOld ? 1 : 0,
+            ((pDominantTrackedRemoteNew->Buttons & xrButton_Trigger) != 0) && dominantGripPushedNew ? 1 : 0,
             1, KEY_PAD_LTRIGGER);
 
         //Crouch
@@ -401,14 +391,14 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
 
         //No Binding
         Joy_GenerateButtonEvents(
-            ((pDominantTrackedRemoteOld->Buttons & ovrButton_Joystick) != 0) && dominantGripPushedOld ? 1 : 0,
-            ((pDominantTrackedRemoteNew->Buttons & ovrButton_Joystick) != 0) && dominantGripPushedNew ? 1 : 0,
+            ((pDominantTrackedRemoteOld->Buttons & xrButton_Joystick) != 0) && dominantGripPushedOld ? 1 : 0,
+            ((pDominantTrackedRemoteNew->Buttons & xrButton_Joystick) != 0) && dominantGripPushedNew ? 1 : 0,
             1, KEY_TAB);
 
         //No Default Binding
         Joy_GenerateButtonEvents(
-            ((pDominantTrackedRemoteOld->Touches & ovrTouch_ThumbRest) != 0) && dominantGripPushedOld ? 1 : 0,
-            ((pDominantTrackedRemoteNew->Touches & ovrTouch_ThumbRest) != 0) && dominantGripPushedNew ? 1 : 0,
+            ((pDominantTrackedRemoteOld->Touches & xrButton_ThumbRest) != 0) && dominantGripPushedOld ? 1 : 0,
+            ((pDominantTrackedRemoteNew->Touches & xrButton_ThumbRest) != 0) && dominantGripPushedNew ? 1 : 0,
             1, KEY_JOY6);
 
     }
@@ -418,8 +408,8 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
     {
         //No Default Binding
         Joy_GenerateButtonEvents(
-            ((pOffTrackedRemoteOld->Buttons & ovrButton_Trigger) != 0) && !dominantGripPushedOld ? 1 : 0,
-            ((pOffTrackedRemoteNew->Buttons & ovrButton_Trigger) != 0) && !dominantGripPushedNew ? 1 : 0,
+            ((pOffTrackedRemoteOld->Buttons & xrButton_Trigger) != 0) && !dominantGripPushedOld ? 1 : 0,
+            ((pOffTrackedRemoteNew->Buttons & xrButton_Trigger) != 0) && !dominantGripPushedNew ? 1 : 0,
             1, KEY_LSHIFT);
 
         //No Default Binding
@@ -436,19 +426,19 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
 
         //"Use" (open door, toggle switch etc) - Can be rebound for other uses
         Joy_GenerateButtonEvents(
-            ((pOffTrackedRemoteOld->Buttons & ovrButton_Joystick) != 0) && !dominantGripPushedOld ? 1 : 0,
-            ((pOffTrackedRemoteNew->Buttons & ovrButton_Joystick) != 0) && !dominantGripPushedNew ? 1 : 0,
+            ((pOffTrackedRemoteOld->Buttons & xrButton_Joystick) != 0) && !dominantGripPushedOld ? 1 : 0,
+            ((pOffTrackedRemoteNew->Buttons & xrButton_Joystick) != 0) && !dominantGripPushedNew ? 1 : 0,
             1, KEY_SPACE);
 
         //No Default Binding
         Joy_GenerateButtonEvents(
-            ((pOffTrackedRemoteOld->Touches & ovrTouch_ThumbRest) != 0) && !dominantGripPushedOld ? 1 : 0,
-            ((pOffTrackedRemoteNew->Touches & ovrTouch_ThumbRest) != 0) && !dominantGripPushedNew ? 1 : 0,
+            ((pOffTrackedRemoteOld->Touches & xrButton_ThumbRest) != 0) && !dominantGripPushedOld ? 1 : 0,
+            ((pOffTrackedRemoteNew->Touches & xrButton_ThumbRest) != 0) && !dominantGripPushedNew ? 1 : 0,
             1, KEY_JOY7);
 
         Joy_GenerateButtonEvents(
-            ((pOffTrackedRemoteOld->Buttons & ovrButton_GripTrigger) != 0) && !dominantGripPushedOld ? 1 : 0,
-            ((pOffTrackedRemoteNew->Buttons & ovrButton_GripTrigger) != 0) && !dominantGripPushedNew ? 1 : 0,
+            ((pOffTrackedRemoteOld->Buttons & xrButton_GripTrigger) != 0) && !dominantGripPushedOld ? 1 : 0,
+            ((pOffTrackedRemoteNew->Buttons & xrButton_GripTrigger) != 0) && !dominantGripPushedNew ? 1 : 0,
             1, KEY_PAD_RTHUMB);
     }
 
@@ -456,8 +446,8 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
     {
         //No Default Binding
         Joy_GenerateButtonEvents(
-            ((pOffTrackedRemoteOld->Buttons & ovrButton_Trigger) != 0) && dominantGripPushedOld ? 1 : 0,
-            ((pOffTrackedRemoteNew->Buttons & ovrButton_Trigger) != 0) && dominantGripPushedNew ? 1 : 0,
+            ((pOffTrackedRemoteOld->Buttons & xrButton_Trigger) != 0) && dominantGripPushedOld ? 1 : 0,
+            ((pOffTrackedRemoteNew->Buttons & xrButton_Trigger) != 0) && dominantGripPushedNew ? 1 : 0,
             1, KEY_LALT);
 
         //Move Down
@@ -474,19 +464,19 @@ void HandleInput_Default( int control_scheme, ovrInputStateGamepad *pFootTrackin
 
         //Land
         Joy_GenerateButtonEvents(
-            ((pOffTrackedRemoteOld->Buttons & ovrButton_Joystick) != 0) && dominantGripPushedOld ? 1 : 0,
-            ((pOffTrackedRemoteNew->Buttons & ovrButton_Joystick) != 0) && dominantGripPushedNew ? 1 : 0,
+            ((pOffTrackedRemoteOld->Buttons & xrButton_Joystick) != 0) && dominantGripPushedOld ? 1 : 0,
+            ((pOffTrackedRemoteNew->Buttons & xrButton_Joystick) != 0) && dominantGripPushedNew ? 1 : 0,
             1, KEY_HOME);
 
         //No Default Binding
         Joy_GenerateButtonEvents(
-            ((pOffTrackedRemoteOld->Touches & ovrTouch_ThumbRest) != 0) && dominantGripPushedOld ? 1 : 0,
-            ((pOffTrackedRemoteNew->Touches & ovrTouch_ThumbRest) != 0) && dominantGripPushedNew ? 1 : 0,
+            ((pOffTrackedRemoteOld->Touches & xrButton_ThumbRest) != 0) && dominantGripPushedOld ? 1 : 0,
+            ((pOffTrackedRemoteNew->Touches & xrButton_ThumbRest) != 0) && dominantGripPushedNew ? 1 : 0,
             1, KEY_JOY8);
 
         Joy_GenerateButtonEvents(
-            ((pOffTrackedRemoteOld->Buttons & ovrButton_GripTrigger) != 0) && dominantGripPushedOld && !vr_twohandedweapons ? 1 : 0,
-            ((pOffTrackedRemoteNew->Buttons & ovrButton_GripTrigger) != 0) && dominantGripPushedNew && !vr_twohandedweapons ? 1 : 0,
+            ((pOffTrackedRemoteOld->Buttons & xrButton_GripTrigger) != 0) && dominantGripPushedOld && !vr_two_handed_weapons ? 1 : 0,
+            ((pOffTrackedRemoteNew->Buttons & xrButton_GripTrigger) != 0) && dominantGripPushedNew && !vr_two_handed_weapons ? 1 : 0,
             1, KEY_PAD_DPAD_UP);
     }
 
