@@ -58,9 +58,12 @@ jobs:
       - name: Checkout QuestZDoom
         uses: actions/checkout@v3
         with:
-          fetch-depth: 200
+          fetch-depth: 1
           submodules: true
           path: VrSamples/QuestZDoom
+      - run: git fetch --depth=100
+        working-directory: ${{ matrix.progdir }}/jni/gzdoom-g3.3mgw_mobile
+
 
       # - uses: actions/cache@v3
       #   with:
