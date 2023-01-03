@@ -1430,7 +1430,7 @@ void QzDoom_finishEyeBuffer(int eye )
 	ovrFramebuffer_SetNone();
 }
 
-bool QzDoom_processMessageQueue() {
+void QzDoom_processMessageQueue() {
 	for ( ; ; )
 	{
 		ovrMessage message;

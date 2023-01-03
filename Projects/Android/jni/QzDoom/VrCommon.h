@@ -89,7 +89,7 @@ void handleTrackedControllerButton(ovrInputStateTrackedRemote * trackedRemoteSta
 bool QzDoom_useScreenLayer();
 void QzDoom_GetScreenRes(uint32_t *width, uint32_t *height);
 void QzDoom_Vibrate(float duration, int channel, float intensity );
-bool QzDoom_processMessageQueue();
+void QzDoom_processMessageQueue();
 void QzDoom_FrameSetup();
 void QzDoom_setUseScreenLayer(bool use);
 void QzDoom_processHaptics();
