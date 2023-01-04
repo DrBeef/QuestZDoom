@@ -84,12 +84,12 @@ void QzDoom_setUseScreenLayer(bool use)
 
 int QzDoom_SetRefreshRate(int refreshRate)
 {
+	XrResult result;
 #ifdef META_QUEST
-	OXR(gAppState.pfnRequestDisplayRefreshRate(gAppState.Session, (float)refreshRate));
-	return refreshRate;
+	OXR(result = gAppState.pfnRequestDisplayRefreshRate(gAppState.Session, (float)refreshRate));
 #endif
 
-	return 0;
+	return XR_SUCCEEDED(result) ? 0 : -1;
 }
 
 void QzDoom_GetScreenRes(uint32_t *width, uint32_t *height)
