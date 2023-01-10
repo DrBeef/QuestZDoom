@@ -85,7 +85,6 @@ jobs:
         shell: bash
         run: >
           cmake -B build
-          -DZDOOM_OUTPUT_DIR=${{ github.workspace }}/VrSamples/QuestZDoom/assets/res 
           -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} 
           -DPK3_QUIET_ZIPDIR=ON ${{ matrix.extra_options }} 
           .
@@ -93,11 +92,12 @@ jobs:
 
       - name: Prepare PK3 packages
         shell: bash
-        run: >
-          cmake --build build 
-          --config ${{ matrix.build_type }} 
-          --target lzdoom_pk3 lights_pk3 lz_game_support_pk3 
+        run: |
+          cmake --build build \
+          --config ${{ matrix.build_type }} \
+          --target lzdoom_pk3 lights_pk3 lz_game_support_pk3 \
           --parallel 3
+          cp build/*.pk3 ../../../../assets/res
         working-directory: ${{ matrix.progdir }}/jni/gzdoom-g3.3mgw_mobile
 
       - name: Revision update
