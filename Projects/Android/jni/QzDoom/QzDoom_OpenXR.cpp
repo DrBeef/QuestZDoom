@@ -242,8 +242,6 @@ void VR_Init()
 	chdir("/sdcard/QuestZDoom");
 }
 
-int VR_main( int argc, char* argv[] );
-
 void * AppThreadFunction(void * parm ) {
 	gAppThread = (ovrAppThread *) parm;
 
@@ -285,7 +283,7 @@ void * AppThreadFunction(void * parm ) {
 	}
 
 	if (hasIWADs)// && hasLauncher)
-		{
+	{
 		//Should now be all set up and ready - start the Doom main loop
 		VR_DoomMain(argc, argv);
 	}
