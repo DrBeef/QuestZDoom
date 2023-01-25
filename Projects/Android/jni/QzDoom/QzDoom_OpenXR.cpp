@@ -61,7 +61,7 @@ bool trigger_teleport;
 bool cinemamode;
 
 //This is now controlled by the engine
-static bool useVirtualScreen = true;
+static bool useVirtualScreen = false;
 
 static bool hasIWADs = false;
 static bool hasLauncher = false;
