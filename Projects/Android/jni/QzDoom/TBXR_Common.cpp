@@ -1667,7 +1667,7 @@ void TBXR_Recenter() {
 		vec3_t rotation = {0, 0, 0};
 		XrSpaceLocation loc = {};
 		loc.type = XR_TYPE_SPACE_LOCATION;
-		OXR(xrLocateSpace(gAppState.HeadSpace, gAppState.CurrentSpace, gAppState.PredictedDisplayTime, &loc));
+		OXR(xrLocateSpace(gAppState.HeadSpace, gAppState.CurrentSpace, gAppState.FrameState.predictedDisplayTime, &loc));
 		QuatToYawPitchRoll(loc.pose.orientation, rotation, hmdorientation);
 		playerYaw = hmdorientation[YAW];
 
@@ -1729,7 +1729,7 @@ void TBXR_WaitForSessionActive()
 
 static void TBXR_GetHMDOrientation() {
 
-	if (gAppState.PredictedDisplayTime == 0)
+	if (gAppState.FrameState.predictedDisplayTime == 0)
 	{
 		return;
 	}
@@ -1740,7 +1740,7 @@ static void TBXR_GetHMDOrientation() {
 	// The better the prediction, the less black will be pulled in at the edges.
 	XrSpaceLocation loc = {};
 	loc.type = XR_TYPE_SPACE_LOCATION;
-	OXR(xrLocateSpace(gAppState.HeadSpace, gAppState.CurrentSpace, gAppState.PredictedDisplayTime, &loc));
+	OXR(xrLocateSpace(gAppState.HeadSpace, gAppState.CurrentSpace, gAppState.FrameState.predictedDisplayTime, &loc));
 	gAppState.xfStageFromHead = loc.pose;
 
 	const XrQuaternionf quatHmd = gAppState.xfStageFromHead.orientation;
@@ -1755,11 +1755,11 @@ static void TBXR_GetHMDOrientation() {
 
 
 //All the stuff we want to do each frame
-void TBXR_FrameSetup()
+bool TBXR_FrameSetup()
 {
 	if (gAppState.FrameSetupRefCount > 0)
 	{
-		return;
+		return false;
 	}
 
     while (!destroyed)
@@ -1798,19 +1798,13 @@ void TBXR_FrameSetup()
 
 	// NOTE: OpenXR does not use the concept of frame indices. Instead,
 	// XrWaitFrame returns the predicted display time.
-	XrFrameWaitInfo waitFrameInfo = {};
-	waitFrameInfo.type = XR_TYPE_FRAME_WAIT_INFO;
-	waitFrameInfo.next = NULL;
+	//XrFrameWaitInfo waitFrameInfo = {};
+	//waitFrameInfo.type = XR_TYPE_FRAME_WAIT_INFO;
+	//waitFrameInfo.next = NULL;
 
-	XrFrameState frameState = {};
-	frameState.type = XR_TYPE_FRAME_STATE;
-	frameState.next = NULL;
-
-	OXR(xrWaitFrame(gAppState.Session, &waitFrameInfo, &frameState));
-	gAppState.PredictedDisplayTime = frameState.predictedDisplayTime;
-	if (!frameState.shouldRender) {
-		return;
-	}
+	memset(&gAppState.FrameState, 0, sizeof(XrFrameState));
+	gAppState.FrameState.type = XR_TYPE_FRAME_STATE;
+	OXR(xrWaitFrame(gAppState.Session, NULL, &gAppState.FrameState));
 
 	// Get the HMD pose, predicted for the middle of the time period during which
 	// the new eye images will be displayed. The number of frames predicted ahead
@@ -1831,6 +1825,8 @@ void TBXR_FrameSetup()
 	TBXR_ProcessHaptics();
 
 	gAppState.FrameSetupRefCount++;
+
+	return gAppState.FrameState.shouldRender;
 }
 
 int TBXR_GetRefresh()
@@ -1890,7 +1886,7 @@ void TBXR_updateProjections()
 	XrViewLocateInfo projectionInfo = {};
 	projectionInfo.type = XR_TYPE_VIEW_LOCATE_INFO;
 	projectionInfo.viewConfigurationType = gAppState.ViewportConfig.viewConfigurationType;
-	projectionInfo.displayTime = gAppState.PredictedDisplayTime;
+	projectionInfo.displayTime = gAppState.FrameState.predictedDisplayTime;
 	projectionInfo.space = gAppState.HeadSpace;
 
 	XrViewState viewState = {XR_TYPE_VIEW_STATE, NULL};
@@ -2002,7 +1998,7 @@ void TBXR_submitFrame()
 		};
 		quad_layer.pose.orientation = XrQuaternionf_CreateFromVectorAngle(axis, DEG2RAD(playerYaw));
 		quad_layer.pose.position = pos;
-		XrExtent2Df size = {5.0f, 4.5f};
+		XrExtent2Df size = {4.0f, 4.5f};
 		quad_layer.size = size;
 
 		gAppState.Layers[gAppState.LayerCount++].Quad = quad_layer;
@@ -2016,7 +2012,7 @@ void TBXR_submitFrame()
 
 	XrFrameEndInfo endFrameInfo = {};
 	endFrameInfo.type = XR_TYPE_FRAME_END_INFO;
-	endFrameInfo.displayTime = gAppState.PredictedDisplayTime;
+	endFrameInfo.displayTime = gAppState.FrameState.predictedDisplayTime;
 	endFrameInfo.environmentBlendMode = XR_ENVIRONMENT_BLEND_MODE_OPAQUE;
 	endFrameInfo.layerCount = gAppState.LayerCount;
 	endFrameInfo.layers = layers;

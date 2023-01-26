@@ -62,7 +62,7 @@ bool trigger_teleport;
 bool cinemamode;
 
 //This is now controlled by the engine
-static bool useVirtualScreen = true;
+static bool useVirtualScreen = false;
 
 static bool hasIWADs = false;
 static bool hasLauncher = false;
@@ -245,8 +245,6 @@ void VR_Init()
 	chdir("/sdcard/QuestZDoom");
 }
 
-int VR_main( int argc, char* argv[] );
-
 void * AppThreadFunction(void * parm ) {
 	gAppThread = (ovrAppThread *) parm;
 
@@ -288,7 +286,7 @@ void * AppThreadFunction(void * parm ) {
 	}
 
 	if (hasIWADs)// && hasLauncher)
-		{
+	{
 		//Should now be all set up and ready - start the Doom main loop
 		VR_DoomMain(argc, argv);
 	}

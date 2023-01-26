@@ -240,8 +240,9 @@ void HandleInput_Default( int control_scheme, ovrInputStateTrackedRemote *pDomin
             //and we don't get movement jitter when the joystick doesn't quite center properly
             float dist = length(pSecondaryTrackedRemoteNew->Joystick.x, pSecondaryTrackedRemoteNew->Joystick.y);
             float nlf = nonLinearFilter(dist);
-            float x = nlf * pSecondaryTrackedRemoteNew->Joystick.x;
-            float y = nlf * pSecondaryTrackedRemoteNew->Joystick.y;
+            dist = (dist > 1.0f) ? dist : 1.0f;
+            float x = nlf * (pSecondaryTrackedRemoteNew->Joystick.x / dist);
+            float y = nlf * (pSecondaryTrackedRemoteNew->Joystick.y / dist);
 
             //Apply a simple deadzone
             player_moving = (fabs(x) + fabs(y)) > 0.05f;

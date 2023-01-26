@@ -250,7 +250,7 @@ typedef struct
     PFN_xrGetDisplayRefreshRateFB pfnGetDisplayRefreshRate;
     PFN_xrRequestDisplayRefreshRateFB pfnRequestDisplayRefreshRate;
 
-    XrTime              PredictedDisplayTime;
+    XrFrameState        FrameState;
     int					SwapInterval;
     int					MainThreadTid;
     int					RenderThreadTid;
@@ -327,7 +327,7 @@ void TBXR_GetScreenRes(int *width, int *height);
 void TBXR_InitActions( void );
 void TBXR_Vibrate(int duration, int channel, float intensity );
 void TBXR_ProcessHaptics();
-void TBXR_FrameSetup();
+bool TBXR_FrameSetup();
 void TBXR_updateProjections();
 void TBXR_UpdateControllers( );
 void TBXR_prepareEyeBuffer(int eye );
