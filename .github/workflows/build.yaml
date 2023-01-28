@@ -38,10 +38,10 @@ jobs:
             extra_options: "-DCMAKE_C_COMPILER=gcc-11 -DCMAKE_CXX_COMPILER=g++-11"
           - hmd: pico
             hmd_name: PICO
-            hmd_flag: -DPICO_XR
+            hmd_flag: PICO_XR
           - hmd: meta
             hmd_name: Meta Quest
-            hmd_flag: -DMETA_QUEST
+            hmd_flag: META_QUEST
 
     steps:
       # - name: Checkout SDK Mobile
@@ -54,9 +54,19 @@ jobs:
       - name: Checkout SDK Mobile
         uses: actions/checkout@v3
         with:
+          fetch-depth: 1
           repository: emawind84/ovr_sdk_mobile_dist
           path: ''
       - run: 7z x ovr_openxr_mobile_sdk_47.0.zip
+
+      - name: Checkout PICO SDK Native Libraries
+        if: matrix.hmd == 'pico'
+        run: 7z x Pico_OpenXR_SDK_v210.zip -opicosdk
+
+      - name: Prepare PICO SDK Libraries
+        if: matrix.hmd == 'pico'
+        shell: bash
+        run: mv picosdk/libs/* OpenXR/Libs
 
       - name: Checkout QuestZDoom
         uses: actions/checkout@v3
