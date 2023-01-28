@@ -18,7 +18,7 @@ endif
 
 # Pico only provide the one loader
 ifeq ($(OPENXR_HMD),PICO_XR)
- LOCAL_SRC_FILES := ../../../../../OpenXR/libs/android.$(TARGET_ARCH_ABI)/lib$(LOCAL_MODULE).so
+ LOCAL_SRC_FILES := ../../../../../OpenXR/Libs/android.$(TARGET_ARCH_ABI)/lib$(LOCAL_MODULE).so
 endif
 
 
