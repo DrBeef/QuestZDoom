@@ -74,7 +74,7 @@ jobs:
           fetch-depth: 1
           submodules: true
           path: XrSamples/QuestZDoom
-      - run: git fetch --depth=100
+      - run: git fetch --deepen=100
         working-directory: ${{ matrix.progdir }}/jni/gzdoom-g3.3mgw_mobile
 
 
