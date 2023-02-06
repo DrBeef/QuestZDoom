@@ -1,4 +1,4 @@
-rootProject.projectDir = new File(settingsDir, '../../../..')
+rootProject.projectDir = new File(settingsDir, '../..')
 rootProject.name = "QuestZDoom"
 
-include ':', 'XrSamples:QuestZDoom:Projects:Android'
+include ':', 'Projects:Android'
