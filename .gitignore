@@ -34,8 +34,8 @@ Projects/Android/.externalNativeBuild/*
 *.ser
 Projects/Android/.idea/*
 .gradle/*
+**/local.properties
 Projects/Android/.gradle/*
 Projects/Android/Android.iml
-Projects/Android/local.properties
 Projects/Android/libs/arm64-v8a/libopenxr_loader_meta.so
 Projects/Android/libs/arm64-v8a/libopenxr_loader_pico.so
