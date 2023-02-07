@@ -2,7 +2,7 @@ name: Continuous Integration
 
 on:
 
-  #pull_request:
+  pull_request:
   push:
     tags:
       - '*'
@@ -17,31 +17,27 @@ on:
 
 jobs:
   build:
-    name: ${{ matrix.name }} ${{ matrix.hmd_name }} | ${{ matrix.build_type }}
+    name: ${{ matrix.name }} | ${{ matrix.build_type }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04]
+        os: [ubuntu-20.04, windows-latest]
         build_type: [Release, Debug]
-        hmd: [pico, meta]
         include:
-          - progdir: XrSamples/QuestZDoom/Projects/Android
+          - progdir: Projects/Android
           - ndk: 21.4.7075529
           - build_type: Release
             build_folder: release
           - build_type: Debug
             build_folder: debug
+          - os: windows-latest
+            name: Visual Studio 64-bit
+            extra_options: -A x64
           - os: ubuntu-20.04
             name: Linux GCC 11
             deps_cmdline: "sudo apt update && sudo apt install g++-11 libsdl2-dev libgtk-3-dev"
             extra_options: "-DCMAKE_C_COMPILER=gcc-11 -DCMAKE_CXX_COMPILER=g++-11"
-          - hmd: pico
-            hmd_name: PICO
-            hmd_flag: PICO_XR
-          - hmd: meta
-            hmd_name: Meta Quest
-            hmd_flag: META_QUEST
 
     steps:
       # - name: Checkout SDK Mobile
@@ -51,32 +47,41 @@ jobs:
       #     token: ${{ secrets.GH_PAT }}
       #     path: ''
 
-      - name: Checkout SDK Mobile
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 1
-          repository: emawind84/ovr_sdk_mobile_dist
-          path: ''
-      - run: 7z x ovr_openxr_mobile_sdk_47.0.zip
-
-      - name: Checkout PICO SDK Native Libraries
-        if: matrix.hmd == 'pico'
-        run: 7z x Pico_OpenXR_SDK_v210.zip -opicosdk
-
-      - name: Prepare PICO SDK Libraries
-        if: matrix.hmd == 'pico'
-        shell: bash
-        run: mv picosdk/libs/* OpenXR/Libs
-
       - name: Checkout QuestZDoom
         uses: actions/checkout@v3
         with:
           fetch-depth: 1
           submodules: true
-          path: XrSamples/QuestZDoom
+          path: ''
       - run: git fetch --deepen=100
         working-directory: ${{ matrix.progdir }}/jni/gzdoom-g3.3mgw_mobile
 
+      - name: Checkout SDK Mobile
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+          repository: emawind84/ovr_sdk_mobile_dist
+          path: 'sdk'
+
+      - name: Checkout META SDK Native Libraries
+        run: 7z x ovr_openxr_mobile_sdk_47.0.zip -ometasdk
+        working-directory: sdk
+
+      - name: Prepare META SDK Native Libraries
+        shell: bash
+        run: >
+          mv sdk/metasdk/OpenXR/Libs/Android/arm64-v8a/Release/libopenxr_loader.so 
+          Projects/Android/libs/arm64-v8a/libopenxr_loader_meta.so
+
+      - name: Checkout PICO SDK Native Libraries
+        run: 7z x Pico_OpenXR_SDK_v210.zip -opicosdk
+        working-directory: sdk
+
+      - name: Prepare PICO SDK Libraries
+        shell: bash
+        run: >
+          mv sdk/picosdk/libs/android.arm64-v8a/libopenxr_loader.so 
+          Projects/Android/libs/arm64-v8a/libopenxr_loader_pico.so
 
       # - uses: actions/cache@v3
       #   with:
@@ -160,16 +165,13 @@ jobs:
       - name: Build with gradle
         id: gradle_build
         shell: bash
-        run: >
-          ./gradlew :XrSamples:QuestzDoom:Projects:Android:assemble${{ matrix.build_type }}
-          -Popenxr_hmd=${{ matrix.hmd_flag }}
-          --scan
+        run: ./gradlew :Projects:Android:assemble${{ matrix.build_type }}
         working-directory: ${{ matrix.progdir }}
 
       - name: Sign app APK
+        if: matrix.build_type == 'Release'
         uses: ilharp/sign-android-release@v1
         id: sign_app_apk
-        if: matrix.build_type == 'Release'
         with:
           releaseDir: ${{ matrix.progdir }}/build/outputs/apk/release
           signingKey: ${{ secrets.SIGNING_KEY }}
@@ -184,25 +186,22 @@ jobs:
         if: ${{ steps.sign_app_apk.outcome == 'success' }}
         working-directory: ${{ matrix.progdir }}/build/outputs/apk/${{ matrix.build_folder }}
 
-      - name: Rename APK
-        shell: bash
-        run: mv --force questzdoom-${{ matrix.build_folder }}.apk questzdoom-${{ matrix.hmd }}-${{ matrix.build_folder }}.apk
-        working-directory: ${{ matrix.progdir }}/build/outputs/apk/${{ matrix.build_folder }}
-
       - name: Upload package
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.name }} ${{ matrix.hmd_name }} ${{ matrix.build_type }}
+          name: ${{ matrix.name }} ${{ matrix.build_type }}
           path: ${{ matrix.progdir }}/build/outputs/apk/${{ matrix.build_folder }}/*-${{ matrix.build_folder }}.apk
           if-no-files-found: error
 
       - name: Prepare package for release
+        if: runner.os == 'Linux'
         uses: actions/download-artifact@v3
         with:
-          name: ${{ matrix.name }} ${{ matrix.hmd_name }} ${{ matrix.build_type }}
+          name: ${{ matrix.name }} ${{ matrix.build_type }}
           path: release
 
       - name: Display structure of release files
+        if: runner.os == 'Linux'
         shell: bash
         run: ls -R
         working-directory: release
