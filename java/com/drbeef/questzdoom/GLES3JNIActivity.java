@@ -2,6 +2,8 @@
 package com.drbeef.questzdoom;
 
 
+import static android.system.Os.setenv;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -31,12 +33,29 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Locale;
 
 @SuppressLint("SdCardPath") public class GLES3JNIActivity extends Activity implements SurfaceHolder.Callback
 {
+	private static String manufacturer = "";
+
 	// Load the gles3jni library right away to make sure JNI_OnLoad() gets called as the very first thing.
 	static
 	{
+		manufacturer = Build.MANUFACTURER.toLowerCase(Locale.ROOT);
+		if (manufacturer.contains("oculus")) // rename oculus to meta as this will probably happen in the future anyway
+		{
+			manufacturer = "meta";
+		}
+
+		try
+		{
+			//Load manufacturer specific loader
+			System.loadLibrary("openxr_loader_" + manufacturer);
+			setenv("OPENXR_HMD", manufacturer, true);
+		} catch (Exception e)
+		{}
+
 		System.loadLibrary( "qzdoom" );
 	}
 

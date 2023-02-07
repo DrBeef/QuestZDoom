@@ -84,10 +84,11 @@ void QzDoom_setUseScreenLayer(bool use)
 
 int QzDoom_SetRefreshRate(int refreshRate)
 {
-	XrResult result;
-#ifdef META_QUEST
-	OXR(result = gAppState.pfnRequestDisplayRefreshRate(gAppState.Session, (float)refreshRate));
-#endif
+	XrResult result = XR_SUCCESS;
+	if (strstr(gAppState.OpenXRHMD, "meta") != NULL)
+	{
+		OXR(result = gAppState.pfnRequestDisplayRefreshRate(gAppState.Session, (float) refreshRate));
+	}
 
 	return XR_SUCCEEDED(result) ? 0 : -1;
 }
@@ -285,7 +286,7 @@ void * AppThreadFunction(void * parm ) {
 		QzDoom_SetRefreshRate(REFRESH);
 	}
 
-	if (hasIWADs)// && hasLauncher)
+	if (hasIWADs && hasLauncher)
 	{
 		//Should now be all set up and ready - start the Doom main loop
 		VR_DoomMain(argc, argv);
@@ -307,24 +308,27 @@ void VR_FrameSetup()
 
 bool VR_GetVRProjection(int eye, float zNear, float zFar, float* projection)
 {
-#ifdef PICO_XR
-		XrMatrix4x4f_CreateProjectionFov(
-				&(gAppState.ProjectionMatrices[eye]), GRAPHICS_OPENGL_ES,
-				gAppState.Projections[eye].fov, zNear, zFar);
-#endif
+    if (strstr(gAppState.OpenXRHMD, "pico") != NULL)
+    {
+        XrMatrix4x4f_CreateProjectionFov(
+                &(gAppState.ProjectionMatrices[eye]), GRAPHICS_OPENGL_ES,
+                gAppState.Projections[eye].fov, zNear, zFar);
+    }
 
-#ifdef META_QUEST
-		XrFovf fov = {};
-		for (int eye = 0; eye < ovrMaxNumEyes; eye++) {
-			fov.angleLeft += gAppState.Projections[eye].fov.angleLeft / 2.0f;
-			fov.angleRight += gAppState.Projections[eye].fov.angleRight / 2.0f;
-			fov.angleUp += gAppState.Projections[eye].fov.angleUp / 2.0f;
-			fov.angleDown += gAppState.Projections[eye].fov.angleDown / 2.0f;
-		}
-		XrMatrix4x4f_CreateProjectionFov(
-				&(gAppState.ProjectionMatrices[eye]), GRAPHICS_OPENGL_ES,
-				fov, zNear, zFar);
-#endif
+    if (strstr(gAppState.OpenXRHMD, "meta") != NULL)
+    {
+        XrFovf fov = {};
+        for (int eye = 0; eye < ovrMaxNumEyes; eye++)
+        {
+            fov.angleLeft += gAppState.Projections[eye].fov.angleLeft / 2.0f;
+            fov.angleRight += gAppState.Projections[eye].fov.angleRight / 2.0f;
+            fov.angleUp += gAppState.Projections[eye].fov.angleUp / 2.0f;
+            fov.angleDown += gAppState.Projections[eye].fov.angleDown / 2.0f;
+        }
+        XrMatrix4x4f_CreateProjectionFov(
+                &(gAppState.ProjectionMatrices[eye]), GRAPHICS_OPENGL_ES,
+                fov, zNear, zFar);
+    }
 
 	memcpy(projection, gAppState.ProjectionMatrices[eye].m, 16 * sizeof(float));
 	return true;

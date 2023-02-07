@@ -15,9 +15,6 @@ $RECYCLE.BIN/
 *.o
 *.d
 
-#binaries
-*.so
-
 #libs
 *.a
 
@@ -36,6 +33,9 @@ Projects/Android/.externalNativeBuild/*
 *.bin
 *.ser
 Projects/Android/.idea/*
+.gradle/*
 Projects/Android/.gradle/*
 Projects/Android/Android.iml
 Projects/Android/local.properties
+Projects/Android/libs/arm64-v8a/libopenxr_loader_meta.so
+Projects/Android/libs/arm64-v8a/libopenxr_loader_pico.so
