@@ -50,10 +50,11 @@ android {
     packagingOptions {
         exclude 'lib/arm64-v8a/libopenxr_loader.so'
     }
-	
+
+    ndkVersion = "21.4.7075529"
+
     compileSdkVersion = 24
-    buildToolsVersion = '29.0.1'
-	
+
 /*    buildTypes {
         release {
             debuggable true
