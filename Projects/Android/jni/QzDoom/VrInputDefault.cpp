@@ -262,41 +262,41 @@ void HandleInput_Default( int control_scheme, ovrInputStateTrackedRemote *pDomin
 
             if (!cinemamode && !dominantGripPushedNew)
             {
-                // Turning logic
                 static int increaseSnap = true;
-                if (pPrimaryTrackedRemoteNew->Joystick.x > 0.6f) {
-                    if (increaseSnap) {
-                        resetDoomYaw = true;
-                        snapTurn -= vr_snapTurn;
-                        if (vr_snapTurn > 10.0f) {
-                            increaseSnap = false;
-                        }
+                static int decreaseSnap = true;
 
-                        if (snapTurn < -180.0f) {
-                            snapTurn += 360.f;
-                        }
+                float joy = pPrimaryTrackedRemoteNew->Joystick.x;
+                if (vr_snapTurn <= 10.0f && abs(joy) > 0.05f)
+                {
+                    increaseSnap = false;
+                    decreaseSnap = false;
+                    snapTurn -= vr_snapTurn * nonLinearFilter(joy);
+                }
+
+                // Turning logic
+                if (joy > 0.6f && increaseSnap) {
+                    snapTurn -= vr_snapTurn;
+                    if (vr_snapTurn > 10.0f) {
+                        increaseSnap = false;
                     }
-                } else if (pPrimaryTrackedRemoteNew->Joystick.x < 0.4f) {
+                } else if (joy < 0.4f) {
                     increaseSnap = true;
                 }
 
-                static int decreaseSnap = true;
-                if (pPrimaryTrackedRemoteNew->Joystick.x < -0.6f) {
-                    if (decreaseSnap) {
-                        resetDoomYaw = true;
-                        snapTurn += vr_snapTurn;
-
-                        //If snap turn configured for less than 10 degrees
-                        if (vr_snapTurn > 10.0f) {
-                            decreaseSnap = false;
-                        }
-
-                        if (snapTurn > 180.0f) {
-                            snapTurn -= 360.f;
-                        }
+                if (joy < -0.6f && decreaseSnap) {
+                    snapTurn += vr_snapTurn;
+                    if (vr_snapTurn > 10.0f) {
+                        decreaseSnap = false;
                     }
-                } else if (pPrimaryTrackedRemoteNew->Joystick.x > -0.4f) {
+                } else if (joy > -0.4f) {
                     decreaseSnap = true;
+                }
+
+                if (snapTurn < -180.0f) {
+                    snapTurn += 360.f;
+                }
+                else if (snapTurn > 180.0f) {
+                    snapTurn -= 360.f;
                 }
             }
         }
