@@ -144,15 +144,15 @@ void HandleInput_Default( int control_scheme, ovrInputStateTrackedRemote *pDomin
         //dominant hand stuff first
         {
             ///Weapon location relative to view
-            weaponoffset[0] = pDominantTracking->Pose.position.x - hmdPosition[0];
+            weaponoffset[0] = pDominantTracking->Pose.position.x - hmdPosition[0] - vr_weaponOffsetX;
             weaponoffset[1] = pDominantTracking->Pose.position.y - hmdPosition[1] + vr_weaponOffsetY;
-            weaponoffset[2] = pDominantTracking->Pose.position.z - hmdPosition[2];
+            weaponoffset[2] = pDominantTracking->Pose.position.z - hmdPosition[2] + vr_weaponOffsetZ;
 
             vec2_t v;
             float yawRotation = getViewpointYaw() - hmdorientation[YAW];
             rotateAboutOrigin(weaponoffset[0], weaponoffset[2], -yawRotation, v);
-            weaponoffset[0] = v[1] - vr_weaponOffsetX;
-            weaponoffset[2] = v[0] + vr_weaponOffsetZ;
+            weaponoffset[0] = v[1];
+            weaponoffset[2] = v[0];
 
             //Set gun angles
             vec3_t rotation = {0};
@@ -180,15 +180,15 @@ void HandleInput_Default( int control_scheme, ovrInputStateTrackedRemote *pDomin
 
         //off-hand stuff
         {
-            offhandoffset[0] = pOffTracking->Pose.position.x - hmdPosition[0];
+            offhandoffset[0] = pOffTracking->Pose.position.x - hmdPosition[0] + vr_weaponOffsetX;
             offhandoffset[1] = pOffTracking->Pose.position.y - hmdPosition[1] + vr_weaponOffsetY;
-            offhandoffset[2] = pOffTracking->Pose.position.z - hmdPosition[2];
+            offhandoffset[2] = pOffTracking->Pose.position.z - hmdPosition[2] + vr_weaponOffsetZ;
 
             vec2_t v;
             float yawRotation = getViewpointYaw() - hmdorientation[YAW];
             rotateAboutOrigin(offhandoffset[0], offhandoffset[2], -yawRotation, v);
-            offhandoffset[0] = v[1] - vr_weaponOffsetX;
-            offhandoffset[2] = v[0] + vr_weaponOffsetZ;
+            offhandoffset[0] = v[1];
+            offhandoffset[2] = v[0];
 
             vec3_t rotation = {0};
             rotation[PITCH] = vr_weaponRotate;
