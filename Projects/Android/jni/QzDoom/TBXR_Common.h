@@ -312,7 +312,7 @@ void VR_HapticEndFrame();
 void VR_HapticStopEvent(const char* event);
 void VR_HapticEnable();
 void VR_HapticDisable();
-extern "C" void VR_Shutdown();
+void VR_Shutdown();
 
 
 //Reusable Team Beef OpenXR stuff (in TBXR_Common.cpp)

@@ -71,7 +71,6 @@ extern bool ready_teleport;
 extern bool trigger_teleport;
 
 extern bool shutdown;
-void shutdownVR();
 
 bool isMultiplayer();
 float length(float x, float y);
@@ -84,7 +83,6 @@ void QuatToYawPitchRoll(XrQuaternionf q, vec3_t rotation, vec3_t out);
 //Called from engine code
 void QzDoom_setUseScreenLayer(bool use);
 void QzDoom_Restart();
-void jni_shutdown();
 
 
 #endif //vrcommon_h

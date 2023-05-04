@@ -295,7 +295,7 @@ void * AppThreadFunction(void * parm ) {
 	TBXR_LeaveVR();
 
 	//Ask Java to shut down
-    jni_shutdown();
+    VR_Shutdown();
 
 	return NULL;
 }

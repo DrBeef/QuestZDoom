@@ -10,7 +10,6 @@
 #include <android/input.h>
 
 #include "argtable3.h"
-#include "VrInput.h"
 
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
