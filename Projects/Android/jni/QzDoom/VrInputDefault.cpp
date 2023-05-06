@@ -275,6 +275,7 @@ void HandleInput_Default( int control_scheme, ovrInputStateTrackedRemote *pDomin
 
                 // Turning logic
                 if (joy > 0.6f && increaseSnap) {
+                    resetDoomYaw = true;
                     snapTurn -= vr_snapTurn;
                     if (vr_snapTurn > 10.0f) {
                         increaseSnap = false;
@@ -284,6 +285,7 @@ void HandleInput_Default( int control_scheme, ovrInputStateTrackedRemote *pDomin
                 }
 
                 if (joy < -0.6f && decreaseSnap) {
+                    resetDoomYaw = true;
                     snapTurn += vr_snapTurn;
                     if (vr_snapTurn > 10.0f) {
                         decreaseSnap = false;
