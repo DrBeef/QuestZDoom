@@ -192,6 +192,7 @@ jobs:
           name: ${{ matrix.name }} ${{ matrix.build_type }}
           path: ${{ matrix.progdir }}/build/outputs/apk/${{ matrix.build_folder }}/*-${{ matrix.build_folder }}.apk
           if-no-files-found: error
+          retention-days: 30
 
       - name: Prepare package for release
         if: runner.os == 'Linux'
