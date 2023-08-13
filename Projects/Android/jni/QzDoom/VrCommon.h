@@ -16,9 +16,6 @@ EXTERN_CVAR(Bool, vr_switch_sticks);
 EXTERN_CVAR(Bool, vr_secondary_button_mappings);
 EXTERN_CVAR(Bool, vr_two_handed_weapons);
 EXTERN_CVAR(Bool, vr_crouch_use_button);
-EXTERN_CVAR(Float, vr_weaponOffsetX);
-EXTERN_CVAR(Float, vr_weaponOffsetY);
-EXTERN_CVAR(Float, vr_weaponOffsetZ);
 
 
 #include <android/log.h>
