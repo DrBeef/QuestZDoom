@@ -270,7 +270,7 @@ import java.util.Locale;
 		//to allow the launcher app to do its thing, otherwise it would crash anyway
 		//Check that launcher is installed too
         boolean hasIWADs = ((new File(progdir, "wads").listFiles().length) > 0);
-		boolean hasLauncher = //(new File(progdir, "no_launcher").exists()) || //Allow users to run without launcher if they _really_ want to
+		boolean hasLauncher = new File(progdir, "no_launcher").exists() || //Allow users to run without launcher if they _really_ want to
 				isPackageInstalled("com.Baggyg.QuestZDoom_Launcher", this.getPackageManager());
 		mNativeHandle = GLES3JNILib.onCreate( this, commandLineParams, hasIWADs, hasLauncher );
 	}
