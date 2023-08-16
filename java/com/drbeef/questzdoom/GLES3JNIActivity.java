@@ -88,8 +88,8 @@ import java.util.Locale;
 
 	public void reload(String profile) {
 		if (profile != null && !profile.isEmpty()) {
-			copy_file(progdir + "/commandline-" + profile + ".txt", progdir + "/commandline.txt");
 			copy_file(progdir + "/commandline_" + profile + ".txt", progdir + "/commandline.txt");
+			copy_file(progdir + "/profiles/commandline_" + profile + ".txt", progdir + "/commandline.txt");
 		}
 		restartApplication(this);
 	}
