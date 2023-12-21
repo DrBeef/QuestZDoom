@@ -136,9 +136,7 @@ jobs:
         run: |
           $sdkRoot = "C:\Android\android-sdk"
           $sdkManager = "$sdkRoot\cmdline-tools\latest\bin\sdkmanager.bat"
-          Install-AndroidSDKPackages -AndroidSDKManagerPath $sdkManager `
-          -AndroidSDKRootPath $sdkRoot `
-          -AndroidPackages "ndk;${{ matrix.ndk }}"
+          & $sdkManager --sdk_root=$sdkRoot "ndk;${{ matrix.ndk }}"
       
       - name: Set up JDK 11 for x64
         uses: actions/setup-java@v3
