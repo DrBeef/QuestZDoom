@@ -10,6 +10,7 @@
 #include <android/native_window_jni.h>	// for native window JNI
 #include <android/input.h>
 
+#include "m_argv.h"
 #include "cmdlib.h"
 #include "argtable3.h"
 #include "VrInput.h"
@@ -68,6 +69,9 @@ static bool hasIWADs = false;
 static bool hasLauncher = false;
 
 extern const char* M_GetActiveProfile();
+
+// The command line arguments.
+FArgs *Args;
 
 /*
 ================================================================================

@@ -39,3 +39,4 @@ Projects/Android/.gradle/*
 Projects/Android/Android.iml
 Projects/Android/libs/arm64-v8a/libopenxr_loader_meta.so
 Projects/Android/libs/arm64-v8a/libopenxr_loader_pico.so
+assets/res/Debug/
