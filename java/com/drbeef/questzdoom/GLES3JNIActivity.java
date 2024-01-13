@@ -221,7 +221,7 @@ import java.util.Locale;
 		new File(progdir, "soundfonts").mkdirs();
 
 		copy_asset(progdir, "res/lzdoom.pk3", true);
-		copy_asset(progdir, "res/lz_game_support.pk3", true);
+		copy_asset(progdir, "res/game_support.pk3", true);
 		copy_asset(progdir, "res/lights.pk3", true);
 		copy_asset(progdir, "res/brightmaps.pk3", true);
 
