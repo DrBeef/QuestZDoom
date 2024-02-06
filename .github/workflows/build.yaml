@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04, windows-latest]
+        os: [ubuntu-22.04, windows-2022]
         build_type: [Release, Debug]
         include:
           - progdir: Projects/Android
@@ -31,13 +31,13 @@ jobs:
             build_folder: release
           - build_type: Debug
             build_folder: debug
-          - os: windows-latest
-            name: Visual Studio 64-bit
+          - os: windows-2022
+            name: Visual Studio 2022
             extra_options: -A x64
-          - os: ubuntu-20.04
-            name: Linux GCC 11
-            deps_cmdline: "sudo apt update && sudo apt install g++-11 libsdl2-dev libgtk-3-dev"
-            extra_options: "-DCMAKE_C_COMPILER=gcc-11 -DCMAKE_CXX_COMPILER=g++-11"
+          - os: ubuntu-22.04
+            name: Linux GCC 12
+            deps_cmdline: "sudo apt update && sudo apt install libsdl2-dev libvpx-dev libgtk-3-dev libwebp-dev"
+            extra_options: "-DCMAKE_C_COMPILER=gcc-12 -DCMAKE_CXX_COMPILER=g++-12"
 
     steps:
       # - name: Checkout SDK Mobile
@@ -92,18 +92,38 @@ jobs:
       #     restore-keys: |
       #       ${{ runner.os }}-gradle-
 
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v11
+        if: runner.os == 'Windows'
+        with:
+          vcpkgDirectory: '${{ github.workspace }}/build/vcpkg'
+          vcpkgGitCommitId: '2c401863dd54a640aeb26ed736c55489c079323b'
+
+      - name: Setup environment
+        if: runner.os == 'Windows'
+        shell: bash
+        run: echo CMAKE_TOOLCHAIN_FILE="${{ env.VCPKG_ROOT}}/scripts/buildsystems/vcpkg.cmake" >> $GITHUB_ENV
+    
       - name: Install Dependencies
         shell: bash
         run: |
-          if [[ ! -z "${{ matrix.deps_cmdline }}" ]]; then
+          if [[ -n "${{ matrix.deps_cmdline }}" ]]; then
             eval ${{ matrix.deps_cmdline }}
           fi
+
+      - name: Install ZMusic
+        shell: bash
+        run: |
+          cmake -B zmusic_build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_INSTALL_PREFIX=`pwd`/zmusic_install ZMusic
+          cmake --build zmusic_build --target install --parallel 3
+        working-directory: ${{ matrix.progdir }}/jni/SupportLibs
 
       - name: Configure CMAKE
         shell: bash
         run: >
           cmake -B build
           -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} 
+          -DCMAKE_PREFIX_PATH=`pwd`/../SupportLibs/zmusic_install
           -DPK3_QUIET_ZIPDIR=ON ${{ matrix.extra_options }} 
           .
         working-directory: ${{ matrix.progdir }}/jni/gzdoom-g3.3mgw_mobile
@@ -124,14 +144,14 @@ jobs:
         working-directory: ${{ matrix.progdir }}/jni/gzdoom-g3.3mgw_mobile
 
       - name: Setup NDK for Ubuntu
-        if: matrix.os == 'ubuntu-20.04'
+        if: runner.os == 'Linux'
         shell: bash
         run: echo "y" | ${{ env.SDKMANAGER }} "ndk;${{ matrix.ndk }}"
         env:
           SDKMANAGER: ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager
 
       - name: Setup NDK for Windows
-        if: matrix.os == 'windows-latest'
+        if: runner.os == 'Windows'
         shell: pwsh
         run: |
           $sdkRoot = "C:\Android\android-sdk"
