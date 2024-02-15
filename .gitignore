@@ -15,9 +15,6 @@ $RECYCLE.BIN/
 *.o
 *.d
 
-#libs
-*.a
-
 #model files
 *.mdl
 
