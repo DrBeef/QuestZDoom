@@ -45,7 +45,6 @@ bool resetDoomYaw;
 bool resetPreviousPitch;
 float doomYaw;
 float previousPitch;
-float vrFOV;
 vec3_t worldPosition;
 vec3_t hmdPosition;
 vec3_t hmdorientation;

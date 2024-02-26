@@ -48,8 +48,6 @@ extern float doomYaw;
 extern bool resetPreviousPitch;
 extern float previousPitch;
 
-extern float vrFOV;
-
 extern vec3_t worldPosition;
 
 extern vec3_t hmdPosition;

@@ -62,37 +62,4 @@ void rotateAboutOrigin(float v1, float v2, float rotation, vec2_t out)
     out[1] = v[1];
 }
 
-float length(float x, float y)
-{
-    return sqrtf(powf(x, 2.0f) + powf(y, 2.0f));
-}
-
-#define NLF_DEADZONE 0.1
-#define NLF_POWER 2.2
-
-float nonLinearFilter(float in)
-{
-    float val = 0.0f;
-    if (in > NLF_DEADZONE)
-    {
-        val = in > 1.0f ? 1.0f : in;
-        val -= NLF_DEADZONE;
-        val /= (1.0f - NLF_DEADZONE);
-        val = powf(val, NLF_POWER);
-    }
-    else if (in < -NLF_DEADZONE)
-    {
-        val = in < -1.0f ? -1.0f : in;
-        val += NLF_DEADZONE;
-        val /= (1.0f - NLF_DEADZONE);
-        val = -powf(fabsf(val), NLF_POWER);
-    }
-
-    return val;
-}
-
-bool between(float min, float val, float max)
-{
-    return (min < val) && (val < max);
-}
 
