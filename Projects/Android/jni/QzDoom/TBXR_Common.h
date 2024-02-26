@@ -74,9 +74,9 @@ typedef struct {
 } ovrTrackedController;
 
 typedef enum control_scheme {
-    RIGHT_HANDED_DEFAULT = 0,
-    LEFT_HANDED_DEFAULT = 10,
-    LEFT_HANDED_ALT = 11
+    RIGHT_HANDED_DEFAULT = 0,  // x,y,a,b - trigger,grip,joystick btn,thumb left/right - joystick axis left/right
+    LEFT_HANDED_DEFAULT = 10,  // a,b,x,y - trigger,grip,joystick btn,thumb right/left - joystick axis right/left
+    LEFT_HANDED_ALT = 11       // x,y,a,b - trigger,grip,joystick btn,thumb right/left - joystick axis left/right
 } control_scheme_t;
 
 typedef struct {
