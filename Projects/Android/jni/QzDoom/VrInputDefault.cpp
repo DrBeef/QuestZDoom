@@ -107,7 +107,7 @@ void HandleInput_Default( int control_scheme, ovrInputStateTrackedRemote *pDomin
 
     //In cinema mode, right-stick controls mouse
     const float mouseSpeed = 3.0f;
-    if (cinemamode)
+    if (cinemamode && !dominantGripPushedNew)
     {
         if (fabs(pPrimaryTrackedRemoteNew->Joystick.x) > 0.1f) {
             cinemamodeYaw -= mouseSpeed * pPrimaryTrackedRemoteNew->Joystick.x;
