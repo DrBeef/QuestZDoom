@@ -133,7 +133,7 @@ jobs:
         run: |
           cmake --build build \
           --config ${{ matrix.build_type }} \
-          --target lzdoom_pk3 lights_pk3 game_support_pk3 \
+          --target qzdoom_pk3 lights_pk3 game_support_pk3 \
           --parallel 3
           cp build/*.pk3 ../../../../assets/res
         working-directory: ${{ matrix.progdir }}/jni/gzdoom-g3.3mgw_mobile
