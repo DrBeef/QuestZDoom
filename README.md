@@ -3,11 +3,9 @@
 
 [![Build Status](https://github.com/emawind84/QuestZDoom/actions/workflows/build.yaml/badge.svg)](https://github.com/emawind84/QuestZDoom/actions/workflows/build.yaml)
 
-Welcome to the VR port of the popular LZDoom/GZDoom engine for the Oculus Quest.
+Welcome to the VR port of the popular GZDoom engine for the Oculus Quest and PCVR.
 
-This is built solely for the Oculus Quest VR HMD and will *not* run on any other device.
-
-The easiest way to install this on your Quest is using SideQuest, a Desktop app designed to simplify sideloading apps and games ( even beat saber songs on quest ) on Standalone Android Headsets like Oculus Quest and Oculus Go. It supports drag and drop for installing APK files!
+For Meta Quest Users the easiest way to install this on your headset is using SideQuest, a Desktop app designed to simplify sideloading apps and games ( even beat saber songs on quest ) on Standalone Android Headsets like Oculus Quest and Oculus Go. It supports drag and drop for installing APK files!
 
 Download SideQuest here:
 https://github.com/the-expanse/SideQuest/releases
@@ -28,10 +26,11 @@ You can play many wads/mods without having to own the full version of Doom. The 
 This port features..
 --------------------
 
+* Dual wield weapon
 * Two handed weapon grip
 * Awesome Haptic Feedback
 * Smooth Locomotion, Teleport locomotion, Smooth/Snap turn
-* All the cool mod support of LZDoom
+* All the cool mod support of GZDoom
 
 
 Copying the Full Game WAD files to your Oculus Quest
@@ -123,7 +122,7 @@ Things to note / FAQs
 Mods
 ----
 
-This is a port of the LZDoom (3.83a) engine, so any mod that works with that should work with this.
+This is a port of GZDoom engine, so any mod that works with that should work with this.
 
 
 Recommendations
