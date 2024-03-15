@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 		package="com.drbeef.questzdoom"
-		android:versionCode="31"
-		android:versionName="1.4.0" android:installLocation="auto" >
+		android:versionCode="35"
+		android:versionName="1.6.1" android:installLocation="auto" >
 
 	<!-- Tell the system this app requires OpenGL ES 3.1. -->
 	<uses-feature android:glEsVersion="0x00030001" android:required="true"/>
@@ -17,9 +17,17 @@
 	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
 	<application android:allowBackup="false" android:icon="@drawable/ic_qquest" android:label="@string/qzdoom">
+
+		
 		<meta-data android:name="com.samsung.android.vr.application.mode" android:value="vr_only"/>
+
+		<!-- META QUEST -->
 		<meta-data android:name="com.oculus.supportedDevices" android:value="quest|quest2"/>
 		<meta-data android:name="com.oculus.ossplash" android:value="true"/>
+
+		<!-- PICO XR -->
+		<meta-data android:name="pvr.app.type" android:value="vr" />
+
 		<!-- The activity is the built-in NativeActivity framework class. -->
 		<!-- launchMode is set to singleTask because there should never be multiple copies of the app running. -->
 		<!-- Theme.Black.NoTitleBar.Fullscreen gives solid black instead of a (bad stereoscopic) gradient on app transition. -->
@@ -39,6 +47,7 @@
 			<!-- This filter lets the apk show up as a launchable icon. -->
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
+				<category android:name="android.intent.category.DEFAULT" />
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>

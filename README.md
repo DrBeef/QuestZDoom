@@ -1,6 +1,8 @@
 ![QuestZDoom Banner](https://www.questzdoom.com/img/banner2.jpg)
 ===
 
+[![Build Status](https://github.com/emawind84/QuestZDoom/actions/workflows/build.yaml/badge.svg)](https://github.com/emawind84/QuestZDoom/actions/workflows/build.yaml)
+
 Welcome to the VR port of the popular LZDoom/GZDoom engine for the Oculus Quest.
 
 This is built solely for the Oculus Quest VR HMD and will *not* run on any other device.

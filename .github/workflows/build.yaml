@@ -1,0 +1,216 @@
+name: Continuous Integration
+
+on:
+
+  pull_request:
+  push:
+    tags:
+      - '*'
+    paths-ignore:
+      - '**/README.md'
+      - '**/LICENSE'
+    # branches:
+    #   - master
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: ${{ matrix.name }} | ${{ matrix.build_type }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-20.04, windows-latest]
+        build_type: [Release, Debug]
+        include:
+          - progdir: Projects/Android
+          - ndk: 21.4.7075529
+          - build_type: Release
+            build_folder: release
+          - build_type: Debug
+            build_folder: debug
+          - os: windows-latest
+            name: Visual Studio 64-bit
+            extra_options: -A x64
+          - os: ubuntu-20.04
+            name: Linux GCC 11
+            deps_cmdline: "sudo apt update && sudo apt install g++-11 libsdl2-dev libgtk-3-dev"
+            extra_options: "-DCMAKE_C_COMPILER=gcc-11 -DCMAKE_CXX_COMPILER=g++-11"
+
+    steps:
+      # - name: Checkout SDK Mobile
+      #   uses: actions/checkout@v3
+      #   with:
+      #     repository: emawind84/ovr_sdk_mobile
+      #     token: ${{ secrets.GH_PAT }}
+      #     path: ''
+
+      - name: Checkout QuestZDoom
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+          submodules: true
+          path: ''
+      - run: git fetch --deepen=100
+        working-directory: ${{ matrix.progdir }}/jni/gzdoom-g3.3mgw_mobile
+
+      - name: Checkout SDK Mobile
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+          repository: emawind84/ovr_sdk_mobile_dist
+          path: 'sdk'
+
+      - name: Checkout META SDK Native Libraries
+        run: 7z x ovr_openxr_mobile_sdk_47.0.zip -ometasdk
+        working-directory: sdk
+
+      - name: Prepare META SDK Native Libraries
+        shell: bash
+        run: >
+          mv sdk/metasdk/OpenXR/Libs/Android/arm64-v8a/Release/libopenxr_loader.so 
+          Projects/Android/libs/arm64-v8a/libopenxr_loader_meta.so
+
+      - name: Checkout PICO SDK Native Libraries
+        run: 7z x Pico_OpenXR_SDK_v210.zip -opicosdk
+        working-directory: sdk
+
+      - name: Prepare PICO SDK Libraries
+        shell: bash
+        run: >
+          mv sdk/picosdk/libs/android.arm64-v8a/libopenxr_loader.so 
+          Projects/Android/libs/arm64-v8a/libopenxr_loader_pico.so
+
+      # - uses: actions/cache@v3
+      #   with:
+      #     path: |
+      #       ~/.gradle/caches
+      #       ~/.gradle/wrapper
+      #     key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-gradle-
+
+      - name: Install Dependencies
+        shell: bash
+        run: |
+          if [[ ! -z "${{ matrix.deps_cmdline }}" ]]; then
+            eval ${{ matrix.deps_cmdline }}
+          fi
+
+      - name: Configure CMAKE
+        shell: bash
+        run: >
+          cmake -B build
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} 
+          -DPK3_QUIET_ZIPDIR=ON ${{ matrix.extra_options }} 
+          .
+        working-directory: ${{ matrix.progdir }}/jni/gzdoom-g3.3mgw_mobile
+
+      - name: Prepare PK3 packages
+        shell: bash
+        run: |
+          cmake --build build \
+          --config ${{ matrix.build_type }} \
+          --target lzdoom_pk3 lights_pk3 lz_game_support_pk3 \
+          --parallel 3
+          cp build/*.pk3 ../../../../assets/res
+        working-directory: ${{ matrix.progdir }}/jni/gzdoom-g3.3mgw_mobile
+
+      - name: Revision update
+        shell: bash
+        run: cmake --build build --config ${{ matrix.build_type }} --target revision_check
+        working-directory: ${{ matrix.progdir }}/jni/gzdoom-g3.3mgw_mobile
+
+      - name: Setup NDK for Ubuntu
+        if: matrix.os == 'ubuntu-20.04'
+        shell: bash
+        run: echo "y" | ${{ env.SDKMANAGER }} "ndk;${{ matrix.ndk }}"
+        env:
+          SDKMANAGER: ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager
+
+      - name: Setup NDK for Windows
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          $sdkRoot = "C:\Android\android-sdk"
+          $sdkManager = "$sdkRoot\cmdline-tools\latest\bin\sdkmanager.bat"
+          & $sdkManager --sdk_root=$sdkRoot "ndk;${{ matrix.ndk }}"
+      
+      - name: Set up JDK 11 for x64
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          architecture: x64
+
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@v1
+      
+      - name: Setup gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          build-root-directory: ${{ matrix.progdir }}
+          cache-read-only: true
+          cache-disabled: false
+
+      - name: Set execution flag for gradlew
+        shell: bash
+        run: chmod +x gradlew
+        working-directory: ${{ matrix.progdir }}
+
+      - name: Build with gradle
+        id: gradle_build
+        shell: bash
+        run: ./gradlew :Projects:Android:assemble${{ matrix.build_type }}
+        working-directory: ${{ matrix.progdir }}
+
+      - name: Sign app APK
+        if: matrix.build_type == 'Release'
+        uses: ilharp/sign-android-release@v1
+        id: sign_app_apk
+        with:
+          releaseDir: ${{ matrix.progdir }}/build/outputs/apk/release
+          signingKey: ${{ secrets.SIGNING_KEY }}
+          keyAlias: ${{ secrets.ALIAS }}
+          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+          keyPassword: ${{ secrets.KEY_PASSWORD }}
+          buildToolsVersion: 33.0.0
+
+      - name: Prepare signed APK
+        shell: bash
+        run: mv --force '${{steps.sign_app_apk.outputs.signedFile}}' questzdoom-${{ matrix.build_folder }}.apk
+        if: ${{ steps.sign_app_apk.outcome == 'success' }}
+        working-directory: ${{ matrix.progdir }}/build/outputs/apk/${{ matrix.build_folder }}
+
+      - name: Upload package
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.name }} ${{ matrix.build_type }}
+          path: ${{ matrix.progdir }}/build/outputs/apk/${{ matrix.build_folder }}/*-${{ matrix.build_folder }}.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Prepare package for release
+        if: runner.os == 'Linux'
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ matrix.name }} ${{ matrix.build_type }}
+          path: release
+
+      - name: Display structure of release files
+        if: runner.os == 'Linux'
+        shell: bash
+        run: ls -R
+        working-directory: release
+
+      - name: Prepare release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          prerelease: true
+          draft: true
+          files: |
+            release/*.apk
+            LICENSE.txt
